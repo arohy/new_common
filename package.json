@@ -14,5 +14,12 @@
     "url": "git@gitlab.insales.ru:templates/new_common_js.git"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-concat": "^2.6.0",
+    "gulp-plumber": "^1.1.0",
+    "gulp-shell": "^0.5.2",
+    "stream-combiner": "^0.2.2"
+  }
 }
