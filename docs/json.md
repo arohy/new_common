@@ -32,7 +32,16 @@ ISnew.json.getProduct(123456)
 
 где id_list - список id товаров, за раз можно получить информацию не более чем о 100 товарах.
 
-В ответе приходит json со списком товаров (уточнить ответ!!!)
+В ответе приходит json с отсортированныйм по возрастанию id товаров списком товаров вида
+````javascript
+{
+  products: [
+    {/* product info */},
+    {/* product info */},
+    {/* product info */}
+  ]
+}
+````
 
 **Важно**
 
@@ -51,15 +60,33 @@ ISnew.json.getProductsList([123456, 123457, 123458])
   });
 ````
 
+**Важно**
+
+Учтите, что `.done()` сробатывает всегда, даже если запрос будет пустым.
+
 ## Отпаравка сообщений
 
 `sendMessage(options)`
 
-options - не понятно. надо полуркать по костылям.
+options - объект с полями:
+
+* `feedback[content]` - тело сообщения. **Обязательно**
+* `feedback[from]` - e-mail, с которого "отправлено" сообщение. **Обязательно**
+* `feedback[phone]` - телефон, указывается в теле письма. По-умолчанию - пустое
+* `feedback[name]` - имя, указывается в теле письма. По-умолчанию - пустое.
+* `feedback[subject]` - тема письма.
+
+**нужно полуркать, какие еще есть поля!!!**
 
 Пример.
 ````javascript
-ISnew.json.sendMessage(options)
+ISnew.json.sendMessage({
+  'feedback[from]': 'json@test.ru',
+  'feedback[name]': 'test is my name',
+  'feedback[subject]': 'test is my subject',
+  'feedback[content]': 'YAAAAR!!!!',
+  'feedback[phone]': '+00000000000000'
+})
   .done(function(response) {
     console.log(response);
   })
@@ -84,7 +111,20 @@ ISnew.json.sendMessage(options)
 
 Возвращает состав корзины.
 
-Важно учесть, что если в корзине не больше 4х товаров, она хранится в куках.
+
+Пример.
+````javascript
+ISnew.json.getCartItems()
+  .done(function(response) {
+    console.log(response);
+  })
+  .fail(function(response) {
+    console.log('что-то пошло не так!! ', response);
+  });
+````
+**Важно**
+* учтите, что если в корзине не больше 4х товаров, она хранится в куках (на уровне обертки это не важно)
+* ответ этого запроса **отличен** от ответа других запросов.
 
 ## Добавление товара
 
@@ -92,7 +132,7 @@ ISnew.json.sendMessage(options)
 
 где `id_list` - объект, состоящий из пар id варианта модификации и добавляемого кол-ва.
 
-Ответ - **нужно точнить**
+Ответ - **нужно уточнить**
 
 Пример.
 ````javascript
@@ -115,7 +155,7 @@ ISnew.json.addCartItems({ 123456: 1; 123457: 3; 123450: 100 })
 
 Пример.
 ````javascript
-ISnew.json.addCartItems( 123456 )
+ISnew.json.removeCartItem( 123456 )
   .done(function(response) {
     console.log(response);
   })
