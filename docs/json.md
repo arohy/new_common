@@ -68,11 +68,25 @@ ISnew.json.getProductsList([123456, 123457, 123458])
 
 `sendMessage(options)`
 
-options - не понятно. надо полуркать по костылям.
+options - объект с полями:
+
+* `feedback[content]` - тело сообщения. **Обязательно**
+* `feedback[from]` - e-mail, с которого "отправлено" сообщение. **Обязательно**
+* `feedback[phone]` - телефон, указывается в теле письма. По-умолчанию - пустое
+* `feedback[name]` - имя, указывается в теле письма. По-умолчанию - пустое.
+* `feedback[subject]` - тема письма.
+
+**нужно полуркать, какие еще есть поля!!!**
 
 Пример.
 ````javascript
-ISnew.json.sendMessage(options)
+ISnew.json.sendMessage({
+  'feedback[from]': 'json@test.ru',
+  'feedback[name]': 'test is my name',
+  'feedback[subject]': 'test is my subject',
+  'feedback[content]': 'YAAAAR!!!!',
+  'feedback[phone]': '+00000000000000'
+})
   .done(function(response) {
     console.log(response);
   })
