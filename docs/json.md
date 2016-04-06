@@ -155,7 +155,7 @@ ISnew.json.addCartItems({ 123456: 1; 123457: 3; 123450: 100 })
 
 Пример.
 ````javascript
-ISnew.json.addCartItems( 123456 )
+ISnew.json.removeCartItem( 123456 )
   .done(function(response) {
     console.log(response);
   })
