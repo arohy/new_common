@@ -33,16 +33,6 @@ ISnew.json.addCartItems = function(items) {
 
   return $.post(path , fields);
 }
-
-testAdd = function(items) {
-  ISnew.json.addCartItems(items)
-    .done(function(response) {
-      console.log(response);
-    })
-    .fail(function(response) {
-      console.log(response);
-    })
-}
 /*
  * Получение состава корзины
  */
@@ -72,16 +62,6 @@ ISnew.json.getCartItems = function() {
 
   return result.promise();
 };
-
-testGet = function() {
-  ISnew.json.getCartItems()
-    .done(function(response) {
-      console.log(response);
-    })
-    .fail(function(response) {
-      console.log(response);
-    });
-}
 /*
  * Получение информации о товаре
  */
@@ -202,16 +182,6 @@ ISnew.json.removeCartItem = function(variant_id) {
 
   return $.post(path, fields);
 }
-
-testRemove = function(id) {
-  ISnew.json.removeCartItem(id)
-    .done(function(response) {
-      console.log(response);
-    })
-    .fail(function(response) {
-      console.log(response);
-    });
-}
 /*
  * Отправление сообщения
  */
@@ -231,13 +201,3 @@ ISnew.json.sendMessage = function(message) {
 
   return result.promise();
 };
-
-testSend = function(message) {
-  ISnew.json.sendMessage(message)
-    .done(function(response) {
-      console.log('done', response);
-    })
-    .fail(function(response) {
-      console.log('fail', response);
-    })
-}

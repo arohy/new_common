@@ -6,22 +6,38 @@ var combine = require('stream-combiner');
 var shell = require('gulp-shell');
 
 // ==============================
-gulp.task('default', ['insup-load','js-watch'], function() {
+gulp.task('default', ['insup-load','common-watch', 'test-watch'], function() {
   // пустая таска, главное - просто работает )
 });
 
-gulp.task('js-watch', function() {
+gulp.task('common-watch', function() {
   return gulp.watch(['source/**/*.js'],
     { cwd: './' },
-    ['build-test']
+    ['build-common']
+  );
+});
+
+gulp.task('test-watch', function() {
+  return gulp.watch(['test/js_tests/**/*.js'],
+    { cwd: './' },
+    ['build-tests']
   );
 })
 
-gulp.task('build-test', function() {
+gulp.task('build-common', function() {
   return gulp.src(['source/**/*.js'])
     .pipe(combine(
       plumber(),
       concat('new_common.js'),
+      gulp.dest('./test/media')
+    ))
+});
+
+gulp.task('build-tests', function() {
+  return gulp.src(['test/js_tests/**/*.js'])
+    .pipe(combine(
+      plumber(),
+      concat('tests.js'),
       gulp.dest('./test/media')
     ))
 });

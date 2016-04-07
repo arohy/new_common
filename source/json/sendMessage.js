@@ -17,13 +17,3 @@ ISnew.json.sendMessage = function(message) {
 
   return result.promise();
 };
-
-testSend = function(message) {
-  ISnew.json.sendMessage(message)
-    .done(function(response) {
-      console.log('done', response);
-    })
-    .fail(function(response) {
-      console.log('fail', response);
-    })
-}

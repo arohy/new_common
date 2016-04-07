@@ -10,13 +10,3 @@ ISnew.json.removeCartItem = function(variant_id) {
 
   return $.post(path, fields);
 }
-
-testRemove = function(id) {
-  ISnew.json.removeCartItem(id)
-    .done(function(response) {
-      console.log(response);
-    })
-    .fail(function(response) {
-      console.log(response);
-    });
-}

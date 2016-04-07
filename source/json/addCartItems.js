@@ -12,13 +12,3 @@ ISnew.json.addCartItems = function(items) {
 
   return $.post(path , fields);
 }
-
-testAdd = function(items) {
-  ISnew.json.addCartItems(items)
-    .done(function(response) {
-      console.log(response);
-    })
-    .fail(function(response) {
-      console.log(response);
-    })
-}
