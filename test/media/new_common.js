@@ -144,11 +144,11 @@ ISnew.json.removeCartItem = function (variant_id) {
  * Отправление сообщения
  */
 
-ISnew.json.sendMessage = function(message) {
+ISnew.json.sendMessage = function (message) {
   var result = $.Deferred()
 
   $.post('/client_account/feedback.json', message)
-    .done(function(response) {
+    .done(function (response) {
       if (message && response.status == 'ok') {
         result.resolve(response);
       } else {
