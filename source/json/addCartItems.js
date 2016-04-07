@@ -2,23 +2,18 @@
  * Добавление товара в корзину
  */
 
-ISnew.json.addCartItems = function(items) {
-  var fields = {};
-  var path = '/cart_items.json';
+/**
+ * Принимаем объект
+ *
+ * Внезапно, если это объект невалидного вида мы все равно получим ответ!!!
+ */
 
-  $.each( items, function( variant_id, quantity ){
-    fields[ 'variant_ids['+ variant_id +']' ] = quantity;
+ISnew.json.addCartItems = function (items) {
+  var fields = {};
+
+  _.forIn(items, function (quantity, variant_id) {
+    fields['variant_ids['+ variant_id +']'] = quantity;
   });
 
-  return $.post(path , fields);
-}
-
-testAdd = function(items) {
-  ISnew.json.addCartItems(items)
-    .done(function(response) {
-      console.log(response);
-    })
-    .fail(function(response) {
-      console.log(response);
-    })
+  return $.post('/cart_items.json', fields);
 }

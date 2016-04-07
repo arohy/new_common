@@ -2,6 +2,8 @@
  * Инициализация переменных
  */
 
+'use strict';
+
 if (!ISnew) {
   var ISnew = {};
 }

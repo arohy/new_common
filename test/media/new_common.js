@@ -2,6 +2,8 @@
  * Инициализация переменных
  */
 
+'use strict';
+
 if (!ISnew) {
   var ISnew = {};
 }
@@ -23,25 +25,20 @@ if (!ISnew.tools) {
  * Добавление товара в корзину
  */
 
-ISnew.json.addCartItems = function(items) {
-  var fields = {};
-  var path = '/cart_items.json';
+/**
+ * Принимаем объект
+ *
+ * Внезапно, если это объект невалидного вида мы все равно получим ответ!!!
+ */
 
-  $.each( items, function( variant_id, quantity ){
-    fields[ 'variant_ids['+ variant_id +']' ] = quantity;
+ISnew.json.addCartItems = function (items) {
+  var fields = {};
+
+  _.forIn(items, function (quantity, variant_id) {
+    fields['variant_ids['+ variant_id +']'] = quantity;
   });
 
-  return $.post(path , fields);
-}
-
-testAdd = function(items) {
-  ISnew.json.addCartItems(items)
-    .done(function(response) {
-      console.log(response);
-    })
-    .fail(function(response) {
-      console.log(response);
-    })
+  return $.post('/cart_items.json', fields);
 }
 /*
  * Получение состава корзины
@@ -72,155 +69,86 @@ ISnew.json.getCartItems = function() {
 
   return result.promise();
 };
-
-testGet = function() {
-  ISnew.json.getCartItems()
-    .done(function(response) {
-      console.log(response);
-    })
-    .fail(function(response) {
-      console.log(response);
-    });
-}
 /*
  * Получение информации о товаре
  */
 
-if (!ISnew.json) {
-  ISnew.json = {}
-};
-
 ISnew.json.getProduct = function (id) {
-  var path = '/product_by_id/'+ id +'.json';
-
-  return $.getJSON(path);
+  return $.getJSON('/product_by_id/'+ _.toInteger(id) +'.json');
 }
 /*
  * Получение информации о списке товаров
  */
 
-if (!ISnew.json) {
-  ISnew.json = {}
-};
+ISnew.json.getProductsList = function (id_array) {
+  // указваем, сколько id нужно отправить за раз
+  var query_limit = 25;
 
-ISnew.json.getProductsList = function(id_array) {
-  var end = 0;
-  var paths = [];
-  var ids = [];
-  var productsList;
-
-  /*
-   * хелпер для склейки результатов
-   * target - целевой массив
-   * from - массив из ответа
+  /**
+   * Генерим адреса для запросов
+   *
+   * Приводим к типу массив (мало ли что там прилетело)
+   * Разбиваем на пачки, делаем из них правильные адреса для запросов
    */
-  var concatHelper = function(target, from) {
-    // делаем проверку, к нам пришло описание одного товара или пачки
-    // console.log(from);
-    if (from.product) {
-      target.push(from.product);
-    } else {
-      $.each(from.products, function(index, value) {
-        target.push(value);
-      });
-    }
-
-    return target;
-  };
-
-  // если у водной массив вообще не задан - превращаем его в тыкву.
-  // В результате нам все равно нужен Deferred объект ответа
-  if (id_array === null) {
-    id_array = [];
-  }
-
-  // Распиливаем входной массив на пачки по 25 id'ника
-  paths = id_array.reduce(function(p, c, i) {
-    if (i % 25 === 0) {
-      p.push([]);
-    }
-
-    p[p.length - 1].push(c);
-    return p;
-  }, []);
-
-  // и генерим массив путей для json
-  $.each(paths, function(index, id_list) {
-    paths[index] = '/products_by_id/'+ id_list.join() +'.json';
-  });
+  var paths = _.chain(id_array)
+    .toArray()
+    .compact()
+    .chunk(query_limit)
+    .map(function (ids_list) {
+      return '/products_by_id/'+ ids_list.join() +'.json';
+    })
+    .value();
 
   // собираем задачи
-  promises = $.map(paths, function(path) {
-    var temp = $.ajax(path).then(function(response) {
+  var promises = $.map(paths, function(path) {
+    return $.ajax(path).then(function(response) {
         return response;
       });
-
-    return temp;
   });
 
-  // в качель. микро чит. максимум в запрос - 100 товаров
-  // ну кто еще хочет забрать инфу о более чем 100 товарах,
-  // если в шаблон коллекции за раз отдается максимум 100??
-  // склеиваем ответы
-  productsList = $.when.apply(this, promises)
-    .then(function(response_1, response_2, response_3, response_4) {
-      var result = {
-        products: []
-      };
-
-      //console.log( response_1, response_2, response_3, response_4 );
-      if (response_1) {
-        result.products = concatHelper(result.products, response_1);
-      }
-
-      if (response_2) {
-        result.products = concatHelper(result.products, response_2);
-      }
-
-      if (response_3) {
-        result.products = concatHelper(result.products, response_3);
-      }
-
-      if (response_4) {
-        result.products = concatHelper(result.products, response_4);
-      }
-
-      return result;
+  /**
+   * Склеиваем ответы.
+   *
+   * Проходимся по всем получившимся промисам, дергаем их
+   */
+  return $.when.apply(this, promises)
+    .then(function () {
+      /**
+       * Получаем ответы ото ВСЕХ промисов.
+       * Приводим к типу массив, на случай если ответы все кривые и там - пустота
+       * Вытаскиваем массив с продуктами, склеиваем все массивы и выдаем наружу
+       */
+      return _.chain(arguments)
+        .toArray()
+        .map(function (response) {
+          return response.products;
+        })
+        .flatten()
+        .union()
+        .value()
     });
-
-  return productsList;
 }
 /*
  * Удаление товара из корзины
  */
 
-ISnew.json.removeCartItem = function(variant_id) {
-  var path = '/cart_items/'+ variant_id +'.json';
+ISnew.json.removeCartItem = function (variant_id) {
+  var path = '/cart_items/'+ _.toInteger(variant_id) +'.json';
   var fields = {
     '_method': 'delete'
   };
 
   return $.post(path, fields);
 }
-
-testRemove = function(id) {
-  ISnew.json.removeCartItem(id)
-    .done(function(response) {
-      console.log(response);
-    })
-    .fail(function(response) {
-      console.log(response);
-    });
-}
 /*
  * Отправление сообщения
  */
 
-ISnew.json.sendMessage = function(message) {
+ISnew.json.sendMessage = function (message) {
   var result = $.Deferred()
 
   $.post('/client_account/feedback.json', message)
-    .done(function(response) {
+    .done(function (response) {
       if (message && response.status == 'ok') {
         result.resolve(response);
       } else {
@@ -231,13 +159,18 @@ ISnew.json.sendMessage = function(message) {
 
   return result.promise();
 };
+/**
+ * Обновление корзины
+ */
 
-testSend = function(message) {
-  ISnew.json.sendMessage(message)
-    .done(function(response) {
-      console.log('done', response);
-    })
-    .fail(function(response) {
-      console.log('fail', response);
-    })
+ISnew.json.updateCartItems = function (items) {
+  var fields = {
+    '_method': 'put'
+  };
+
+  _.forIn(items, function(quantity, variant_id) {
+    fields['cart[quantity]['+ variant_id +']'] = quantity;
+  });
+
+  return $.post('/cart_items.json', fields);
 }

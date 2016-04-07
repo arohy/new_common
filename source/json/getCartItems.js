@@ -27,13 +27,3 @@ ISnew.json.getCartItems = function() {
 
   return result.promise();
 };
-
-testGet = function() {
-  ISnew.json.getCartItems()
-    .done(function(response) {
-      console.log(response);
-    })
-    .fail(function(response) {
-      console.log(response);
-    });
-}
