@@ -40,6 +40,17 @@ ISnew.json.addCartItems = function (items) {
 
   return $.post('/cart_items.json', fields);
 }
+/**
+ * Добавление товара в сравнение
+ */
+
+ISnew.json.addCompareItem = function (id) {
+  var fields = {
+    'product[id]': _.toInteger(id)
+  };
+
+  return $.post('/compares.json', fields);
+}
 /*
  * Получение состава корзины
  */
