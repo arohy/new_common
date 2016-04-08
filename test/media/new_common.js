@@ -80,6 +80,9 @@ ISnew.json.getCartItems = function () {
 
   return result.promise();
 };
+ISnew.json.getClientInfo = function (){
+  return $.getJSON('/client_account/contacts.json');
+}
 /**
  * Добавление товара в сравнение
  */
