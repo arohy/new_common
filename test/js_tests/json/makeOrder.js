@@ -1,9 +1,9 @@
-/**
- * Тест для removeCartItem()
+/*
+ * Тест для makeCheckout()
  */
 
-testRemoveItem = function (id) {
-  ISnew.json.removeCartItem(id)
+testMakeCheckout = function (client, order) {
+  ISnew.json.makeCheckout(client, order)
     .done(function (response) {
       console.log('done', response);
     })

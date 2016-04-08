@@ -2,7 +2,7 @@
  * Получение состава корзины
  */
 
-ISnew.json.getCartItems = function() {
+ISnew.json.getCartItems = function () {
   var result = $.Deferred();
   var cookieCart = $.cookie('cart');
 
@@ -17,10 +17,10 @@ ISnew.json.getCartItems = function() {
     // reject??
   } else {
     $.getJSON('/cart_items.json')
-      .done(function(order) {
+      .done(function (order) {
         result.resolve(order);
       })
-      .fail(function(response) {
+      .fail(function (response) {
         result.reject(response);
       });
   }

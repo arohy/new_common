@@ -1,13 +1,13 @@
-/**
- * Тест для removeCartItem()
+/*
+ * Тест для addCompareItem()
  */
 
-testRemoveItem = function (id) {
-  ISnew.json.removeCartItem(id)
+testAddCompareItem = function (item) {
+  ISnew.json.addCompareItem(item)
     .done(function (response) {
       console.log('done', response);
     })
     .fail(function (response) {
       console.log('fail', response);
-    });
+    })
 }

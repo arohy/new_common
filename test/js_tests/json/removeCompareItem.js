@@ -1,9 +1,9 @@
-/**
- * Тест для removeCartItem()
+/*
+ * Тест для removeCompareItem
  */
 
-testRemoveItem = function (id) {
-  ISnew.json.removeCartItem(id)
+testRemoveCompareItem = function (id) {
+  ISnew.json.removeCompareItem(id)
     .done(function (response) {
       console.log('done', response);
     })

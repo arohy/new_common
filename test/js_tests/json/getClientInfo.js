@@ -1,9 +1,9 @@
-/**
- * Тест для removeCartItem()
+/*
+ * Тест для getClientInfo
  */
 
-testRemoveItem = function (id) {
-  ISnew.json.removeCartItem(id)
+testGetClientInfo = function () {
+  ISnew.json.getClientInfo()
     .done(function (response) {
       console.log('done', response);
     })

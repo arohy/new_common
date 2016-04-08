@@ -1,10 +1,8 @@
-## Удаление товара
+# Удаление товара
 
 `removeCartItem( variant_id )`
 
 `variant_id` - id удаляемой позиции
-
-Ответ - **нужно уточнить**
 
 Пример.
 ````javascript
@@ -16,3 +14,5 @@ ISnew.json.removeCartItem (123456)
     console.log('что-то пошло не так!! ', response);
   });
 ````
+
+Ответ - **нужно уточнить**

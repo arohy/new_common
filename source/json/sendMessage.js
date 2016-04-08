@@ -2,8 +2,13 @@
  * Отправление сообщения
  */
 
-ISnew.json.sendMessage = function (message) {
-  var result = $.Deferred()
+ISnew.json.sendMessage = function (input) {
+  var result = $.Deferred();
+  var message = {};
+
+  _.forIn(input, function (value, key) {
+    message['feedback['+ key +']'] = value;
+  });
 
   $.post('/client_account/feedback.json', message)
     .done(function (response) {

@@ -10,10 +10,21 @@
 </head>
 
 <body class="adaptive">
+  <h2>products</h2>
   34942992<br/>
   34942519<br/>
   34948127<br/>
   34942883<br/>
+
+  <h2>delivery_id</h2>
+  {% for delivery in account.delivery_variants %}
+  {{ delivery.id }}
+  {% endfor %}
+
+  <h2>payment_id</h2>
+  {% for payment in account.payment_gateways %}
+  {{ payment.id }}
+  {% endfor %}
   <script type="text/javascript" src="{{ 'tests.js' | asset_url }}"></script>
 </body>
 </html>
