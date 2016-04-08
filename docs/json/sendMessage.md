@@ -4,11 +4,11 @@
 
 options - объект с полями:
 
-* `feedback[content]` - тело сообщения. **Обязательно**
-* `feedback[from]` - e-mail, с которого "отправлено" сообщение. **Обязательно**
-* `feedback[phone]` - телефон, указывается в теле письма. По-умолчанию - пустое
-* `feedback[name]` - имя, указывается в теле письма. По-умолчанию - пустое.
-* `feedback[subject]` - тема письма.
+* `content` - тело сообщения. **Обязательно**
+* `from` - e-mail, с которого "отправлено" сообщение. **Обязательно??**
+* `phone` - телефон, указывается в теле письма. По-умолчанию - пустое
+* `name` - имя, указывается в теле письма. По-умолчанию - пустое.
+* `subject` - тема письма.
 
 **нужно полуркать, какие еще есть поля!!!**
 
@@ -21,14 +21,14 @@ options - объект с полями:
 Пример.
 ````javascript
 ISnew.json.sendMessage({
-  'feedback[from]': 'json@test.ru',
-  'feedback[name]': 'test is my name',
-  'feedback[subject]': 'test is my subject',
-  'feedback[content]': 'YAAAAR!!!!',
-  'feedback[phone]': '+00000000000000'
+  'from': 'json@test.ru',
+  'name': 'test is my name',
+  'subject': 'test is my subject',
+  'content': 'YAAAAR!!!!',
+  'phone': '+00000000000000'
 })
   .done(function(response) {
-    console.log(response);
+    console.log('done', response);
   })
   .fail(function(response) {
     console.log('что-то пошло не так!! ', response);
