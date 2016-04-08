@@ -55,7 +55,7 @@ ISnew.json.addCompareItem = function (id) {
  * Получение состава корзины
  */
 
-ISnew.json.getCartItems = function() {
+ISnew.json.getCartItems = function () {
   var result = $.Deferred();
   var cookieCart = $.cookie('cart');
 
@@ -70,16 +70,24 @@ ISnew.json.getCartItems = function() {
     // reject??
   } else {
     $.getJSON('/cart_items.json')
-      .done(function(order) {
+      .done(function (order) {
         result.resolve(order);
       })
-      .fail(function(response) {
+      .fail(function (response) {
         result.reject(response);
       });
   }
 
   return result.promise();
 };
+/**
+ * Добавление товара в сравнение
+ */
+
+ISnew.json.getCompareItems = function (id) {
+
+  return $.getJSON('/compares.json');
+}
 /*
  * Получение информации о товаре
  */
@@ -111,8 +119,8 @@ ISnew.json.getProductsList = function (id_array) {
     .value();
 
   // собираем задачи
-  var promises = $.map(paths, function(path) {
-    return $.ajax(path).then(function(response) {
+  var promises = $.map(paths, function (path) {
+    return $.ajax(path).then(function (response) {
         return response;
       });
   });

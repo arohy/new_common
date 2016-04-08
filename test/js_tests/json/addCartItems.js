@@ -2,12 +2,12 @@
  * Тест для addCartItems()
  */
 
-testAddCartItems = function(items) {
+testAddCartItems = function (items) {
   ISnew.json.addCartItems(items)
-    .done(function(response) {
-      console.log(response);
+    .done(function (response) {
+      console.log('done', response);
     })
-    .fail(function(response) {
-      console.log(response);
+    .fail(function (response) {
+      console.log('fail', response);
     })
 }

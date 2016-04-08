@@ -22,8 +22,8 @@ ISnew.json.getProductsList = function (id_array) {
     .value();
 
   // собираем задачи
-  var promises = $.map(paths, function(path) {
-    return $.ajax(path).then(function(response) {
+  var promises = $.map(paths, function (path) {
+    return $.ajax(path).then(function (response) {
         return response;
       });
   });
