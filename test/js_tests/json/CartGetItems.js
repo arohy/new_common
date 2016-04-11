@@ -1,9 +1,9 @@
 /*
- * Тест для getCartItems
+ * Тест для CartGetItems
  */
 
-testGetCartItems = function () {
-  ISnew.json.getCartItems()
+testCartGetItems = function () {
+  ISnew.json.CartGetItems()
     .done(function (response) {
       console.log('done', response);
     })
