@@ -32,6 +32,58 @@ if (!Events) {
   var Events;
 }
 /**
+ * Cart
+ */
+
+ISnew.Cart = function (options) {
+  var self = this;
+  var json = ISnew.json;
+  var cart = {};
+
+  // Обновить корзину и дернуть события
+  self.reload = function () {
+    json.getCartItems()
+      .done(function (response) {
+        console.log('cart:reload:done', response);
+        cart = response;
+      })
+      .fail(function (response) {
+        console.log('cart:reload:fail', response);
+      });
+  };
+
+  // Добавить товар в корзину и дернуть события
+  self.add = function (items) {
+    json.addCartItems(items)
+      .done(function (response) {
+        console.log('cart:add:done', response);
+      })
+      .fail(function (response) {
+        console.log('cart:add:fail', response);
+      })
+  };
+
+  // Удалить товар из корзины и дернуть события
+  self.remove = function (item) {
+
+  };
+
+  // Изменить состав корзины и дернуть события
+  self.update = function () {
+
+  };
+
+  // получить информацию о заказе
+  self.getOrder = function () {
+
+  }
+
+  // обновить информацию о заказе
+  self.setOrder = function (order) {
+
+  }
+}
+/**
  * Event bus
  *
  * Шина событий. Построена на $.Callbacks;
@@ -63,53 +115,6 @@ Events = function (id) {
   return Event;
 }
 /*
- * Получение состава корзины
- */
-
-ISnew.json.getCartItems = function () {
-  var result = $.Deferred();
-  var cookieCart = $.cookie('cart');
-
-  /*
-   * В куке состав корзины хранится, если там не более 4х РАЗНЫХ модификаций
-   * Кука может быть пустой - дергаем инфу с сервера
-   * Если кука содержит строку 'json' - дергаю инфу с сервера
-   */
-  if (cookieCart && cookieCart != 'json') {
-    order = $.parseJSON(cookieCart) || null;
-    result.resolve(order);
-    // reject??
-  } else {
-    $.getJSON('/cart_items.json')
-      .done(function (order) {
-        result.resolve(order);
-      })
-      .fail(function (response) {
-        result.reject(response);
-      });
-  }
-
-  return result.promise();
-};
-/*
- * Получение информации о коллекции
- */
-
-ISnew.json.CollectionGetInfo = function () {
-  var path = '/collection/'+ _.toString(arguments[0]) +'.json';
-  var fields = {};
-
-  _.chain(arguments)
-    .drop()
-    .compact()
-    .each(function (value) {
-      _.assign(fields, value)
-    })
-    .value();
-
-  return $.getJSON(path, fields);
-}
-/*
  * Добавление товара в корзину
  */
 
@@ -139,8 +144,55 @@ ISnew.json.addCompareItem = function (id) {
 
   return $.post('/compares.json', fields);
 }
+/*
+ * Получение состава корзины
+ */
+
+ISnew.json.getCartItems = function () {
+  var result = $.Deferred();
+  var cookieCart = $.cookie('cart');
+
+  /*
+   * В куке состав корзины хранится, если там не более 4х РАЗНЫХ модификаций
+   * Кука может быть пустой - дергаем инфу с сервера
+   * Если кука содержит строку 'json' - дергаю инфу с сервера
+   */
+  if (cookieCart && cookieCart != 'json') {
+    order = $.parseJSON(cookieCart) || null;
+    result.resolve(order);
+    // reject??
+  } else {
+    $.getJSON('/cart_items.json')
+      .done(function (order) {
+        result.resolve(order);
+      })
+      .fail(function (response) {
+        result.reject(response);
+      });
+  }
+
+  return result.promise();
+};
 ISnew.json.getClientInfo = function (){
   return $.getJSON('/client_account/contacts.json');
+}
+/*
+ * Получение информации о коллекции
+ */
+
+ISnew.json.getCollection = function () {
+  var path = '/collection/'+ _.toString(arguments[0]) +'.json';
+  var fields = {};
+
+  _.chain(arguments)
+    .drop()
+    .compact()
+    .each(function (value) {
+      _.assign(fields, value)
+    })
+    .value();
+
+  return $.getJSON(path, fields);
 }
 /**
  * Добавление товара в сравнение

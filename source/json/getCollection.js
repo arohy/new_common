@@ -2,7 +2,7 @@
  * Получение информации о коллекции
  */
 
-ISnew.json.CollectionGetInfo = function () {
+ISnew.json.getCollection = function () {
   var path = '/collection/'+ _.toString(arguments[0]) +'.json';
   var fields = {};
 

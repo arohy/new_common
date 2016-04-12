@@ -8,7 +8,7 @@
 
 Пример.
 ````javascript
-ISnew.json.CartGetItems()
+ISnew.json.getCartItems()
   .done(function(response) {
     console.log(response);
   })
