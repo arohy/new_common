@@ -8,6 +8,7 @@ if (!ISnew) {
   var ISnew = {};
 }
 
+// Глобальная информация о сайте.
 if (!Site) {
   var Site = {};
 }
@@ -20,4 +21,13 @@ if (!ISnew.json) {
 // Место для всяких утилиток
 if (!ISnew.tools) {
   ISnew.tools = {};
+}
+
+// Список событий и прикрученных колбеков
+if (!EventsList) {
+  var EventsList = {};
+}
+
+if (!Events) {
+  var Events;
 }
