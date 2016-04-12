@@ -1,6 +1,6 @@
 # Получение состава корзины
 
-`getCartItems()`
+`CartGetItems()`
 
 Нет входных параметров.
 
@@ -8,7 +8,7 @@
 
 Пример.
 ````javascript
-ISnew.json.getCartItems()
+ISnew.json.CartGetItems()
   .done(function(response) {
     console.log(response);
   })
@@ -16,6 +16,7 @@ ISnew.json.getCartItems()
     console.log('что-то пошло не так!! ', response);
   });
 ````
+
 **Важно**
 * учтите, что если в корзине не больше 4х товаров, она хранится в куках (на уровне обертки это не важно)
 * ответ этого запроса **отличен** от ответа других запросов.
