@@ -150,4 +150,4 @@ Events('delete_items:insales:cart').subscribe(function (data) {
 * `delete_items:insales:cart` - срабаотывает после успешного удаления позиций из корзины
 * `set_items:insales:cart` - срабатывает после успешного задания состава корзины
 * `update_items.insales:cart` - всегда срабатывает после любого успешного действия с корзиной
-* `after:insales:cart` - всегда срабатывает после любого действия с корзиной
+* `always:insales:cart` - всегда срабатывает после любого действия с корзиной
