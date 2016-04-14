@@ -1,6 +1,6 @@
 # Удаление товара из сравнения
 
-`removeCompareItem( id )`
+`removeCompareItem(id)`
 
 Удаляет товар с указанным id из списка
 

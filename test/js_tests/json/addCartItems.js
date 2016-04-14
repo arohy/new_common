@@ -2,8 +2,8 @@
  * Тест для addCartItems()
  */
 
-testAddCartItems = function (items) {
-  ISnew.json.addCartItems(items)
+testAddCartItems = function (items, comments) {
+  ISnew.json.addCartItems(items, comments)
     .done(function (response) {
       console.log('done', response);
     })

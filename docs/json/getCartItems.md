@@ -7,12 +7,13 @@
 Возвращает состав корзины.
 
 Пример.
+
 ````javascript
 ISnew.json.getCartItems()
-  .done(function(response) {
+  .done(function (response) {
     console.log(response);
   })
-  .fail(function(response) {
+  .fail(function (response) {
     console.log('что-то пошло не так!! ', response);
   });
 ````
