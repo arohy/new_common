@@ -8,4 +8,4 @@ ISnew.json.addCompareItem = function (id) {
   };
 
   return $.post('/compares.json', fields);
-}
+};

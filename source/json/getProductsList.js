@@ -49,4 +49,4 @@ ISnew.json.getProductsList = function (id_array) {
         .union()
         .value()
     });
-}
+};

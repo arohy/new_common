@@ -8,7 +8,7 @@ ISnew.json.updateCartItems = function (items, comments) {
   };
 
   _.forIn(items, function(quantity, variant_id) {
-    fields['cart[quantity]['+ variant_id +']'] = quantity;
+    fields['cart[quantity]['+ variant_id +']'] = _.toInteger(quantity);
   });
 
   _.forIn(comments, function(comment, variant_id) {
@@ -16,4 +16,4 @@ ISnew.json.updateCartItems = function (items, comments) {
   });
 
   return $.post('/cart_items.json', fields);
-}
+};

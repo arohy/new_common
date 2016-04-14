@@ -30,4 +30,4 @@ ISnew.json.makeCheckout = function (client, order) {
     })
 
   return dfd.promise();
-}
+};

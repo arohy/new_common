@@ -12,7 +12,7 @@ ISnew.json.addCartItems = function (items, comments) {
   var fields = {};
 
   _.forIn(items, function (quantity, variant_id) {
-    fields['variant_ids['+ variant_id +']'] = quantity;
+    fields['variant_ids['+ variant_id +']'] = _.toInteger(quantity);
   });
 
   _.forIn(comments, function (comment, variant_id) {

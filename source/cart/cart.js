@@ -21,7 +21,7 @@ ISnew.Cart = function () {
     task.method = 'add_items';
 
     _.forIn(task.items, function(quantity, variant_id) {
-      var current_quantity = current_items[variant_id] + quantity;
+      var current_quantity = _.toInteger(current_items[variant_id]) + _.toInteger(quantity);
 
       current_items[variant_id] = current_quantity;
     });
@@ -39,7 +39,7 @@ ISnew.Cart = function () {
     task.method = 'remove_items';
 
     _.forIn(task.items, function(quantity, variant_id) {
-      var current_quantity = current_items[variant_id] - quantity;
+      var current_quantity = _.toInteger(current_items[variant_id]) - _.toInteger(quantity);
 
       current_items[variant_id] = current_quantity > 0 ? current_quantity : 0;
     });
@@ -57,7 +57,7 @@ ISnew.Cart = function () {
     task.method = 'set_items';
 
     _.forIn(task.items, function(quantity, variant_id) {
-      current_items[variant_id] = quantity;
+      current_items[variant_id] = _.toInteger(quantity);
     });
 
     self._update(current_items, task);

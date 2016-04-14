@@ -15,4 +15,4 @@ ISnew.json.getCollection = function () {
     .value();
 
   return $.getJSON(path, fields);
-}
+};

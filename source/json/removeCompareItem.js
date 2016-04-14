@@ -9,4 +9,4 @@ ISnew.json.removeCompareItem = function (id) {
   var path   = '/compares/'+ _.toInteger(id) +'.json';
 
   return $.post(path, fields);
-}
+};
