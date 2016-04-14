@@ -15,8 +15,9 @@ ISnew.CartHelper = function () {
     order = {};
 
     order.order_lines = current_order.order_lines || current_order.items;
-    order.positions_count = order.order_lines.length;
+    order.order_line_comments = current_order.order_line_comments || current_order.order.order_line_comments;
 
+    order.positions_count = order.order_lines.length;
     order.items_count = current_order.items_count;
     order.items_price = [];
 
