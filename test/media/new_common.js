@@ -54,7 +54,7 @@ ISnew.Cart = function () {
     task.method = 'add_items';
 
     _.forIn(task.items, function(quantity, variant_id) {
-      var current_quantity = current_items[variant_id] + quantity;
+      var current_quantity = _.toInteger(current_items[variant_id]) + _.toInteger(quantity);
 
       current_items[variant_id] = current_quantity;
     });
@@ -72,7 +72,7 @@ ISnew.Cart = function () {
     task.method = 'remove_items';
 
     _.forIn(task.items, function(quantity, variant_id) {
-      var current_quantity = current_items[variant_id] - quantity;
+      var current_quantity = _.toInteger(current_items[variant_id]) - _.toInteger(quantity);
 
       current_items[variant_id] = current_quantity > 0 ? current_quantity : 0;
     });
@@ -90,7 +90,7 @@ ISnew.Cart = function () {
     task.method = 'set_items';
 
     _.forIn(task.items, function(quantity, variant_id) {
-      current_items[variant_id] = quantity;
+      current_items[variant_id] = _.toInteger(quantity);
     });
 
     self._update(current_items, task);
@@ -341,7 +341,7 @@ ISnew.json.addCartItems = function (items, comments) {
   var fields = {};
 
   _.forIn(items, function (quantity, variant_id) {
-    fields['variant_ids['+ variant_id +']'] = quantity;
+    fields['variant_ids['+ variant_id +']'] = _.toInteger(quantity);
   });
 
   _.forIn(comments, function (comment, variant_id) {
@@ -360,7 +360,7 @@ ISnew.json.addCompareItem = function (id) {
   };
 
   return $.post('/compares.json', fields);
-}
+};
 /*
  * Получение состава корзины
  */
@@ -392,7 +392,7 @@ ISnew.json.getCartItems = function () {
 };
 ISnew.json.getClientInfo = function (){
   return $.getJSON('/client_account/contacts.json');
-}
+};
 /*
  * Получение информации о коллекции
  */
@@ -410,7 +410,7 @@ ISnew.json.getCollection = function () {
     .value();
 
   return $.getJSON(path, fields);
-}
+};
 /**
  * Добавление товара в сравнение
  */
@@ -418,14 +418,14 @@ ISnew.json.getCollection = function () {
 ISnew.json.getCompareItems = function (id) {
 
   return $.getJSON('/compares.json');
-}
+};
 /*
  * Получение информации о товаре
  */
 
 ISnew.json.getProduct = function (id) {
   return $.getJSON('/product_by_id/'+ _.toInteger(id) +'.json');
-}
+};
 /*
  * Получение информации о списке товаров
  */
@@ -477,7 +477,7 @@ ISnew.json.getProductsList = function (id_array) {
         .union()
         .value()
     });
-}
+};
 /**
  * Оформление заказа
  */
@@ -510,7 +510,7 @@ ISnew.json.makeCheckout = function (client, order) {
     })
 
   return dfd.promise();
-}
+};
 /*
  * Удаление товара из корзины
  */
@@ -522,7 +522,7 @@ ISnew.json.removeCartItem = function (variant_id) {
   };
 
   return $.post(path, fields);
-}
+};
 /*
  * Удаление товара из сравнения
  */
@@ -534,7 +534,7 @@ ISnew.json.removeCompareItem = function (id) {
   var path   = '/compares/'+ _.toInteger(id) +'.json';
 
   return $.post(path, fields);
-}
+};
 /*
  * Отправление сообщения
  */
@@ -569,7 +569,7 @@ ISnew.json.updateCartItems = function (items, comments) {
   };
 
   _.forIn(items, function(quantity, variant_id) {
-    fields['cart[quantity]['+ variant_id +']'] = quantity;
+    fields['cart[quantity]['+ variant_id +']'] = _.toInteger(quantity);
   });
 
   _.forIn(comments, function(comment, variant_id) {
@@ -577,4 +577,4 @@ ISnew.json.updateCartItems = function (items, comments) {
   });
 
   return $.post('/cart_items.json', fields);
-}
+};

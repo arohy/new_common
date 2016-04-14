@@ -9,4 +9,4 @@ ISnew.json.removeCartItem = function (variant_id) {
   };
 
   return $.post(path, fields);
-}
+};
