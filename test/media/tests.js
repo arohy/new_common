@@ -32,8 +32,8 @@ Events('always:insales:cart').subscribe(function (data) {
  * Тест для addCartItems()
  */
 
-testAddCartItems = function (items) {
-  ISnew.json.addCartItems(items)
+testAddCartItems = function (items, comments) {
+  ISnew.json.addCartItems(items, comments)
     .done(function (response) {
       console.log('done', response);
     })
@@ -190,8 +190,8 @@ testSendMessage = function (message) {
  * Тест для updateCartItems();
  */
 
-testUpdateCartItems = function (items) {
-  ISnew.json.updateCartItems(items)
+testUpdateCartItems = function (items, comments) {
+  ISnew.json.updateCartItems(items, comments)
     .done(function (response) {
       console.log('done', response);
     })

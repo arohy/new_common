@@ -1,6 +1,6 @@
 # Получение информации о коллекции
 
-`getCollection(handle, [filter,] [pager])`
+`getCollection(handle[, filter] [, pager])`
 
 * `handle` - пермалинк коллекции, обязателен.
 * `filter` - объект с выбранными параметрами для фильтрации.

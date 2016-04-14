@@ -1,6 +1,6 @@
 # Удаление товара
 
-`removeCartItem( variant_id )`
+`removeCartItem(variant_id)`
 
 `variant_id` - id удаляемой позиции
 

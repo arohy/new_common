@@ -5,16 +5,27 @@
 * удалить несколько позиций
 * добавить несколько позиций
 * изменить кол-во товаров позиции
+* установить комментарии к позициям
 
-`updateCartItems(items)`
+`updateCartItems(items, comments)`
 
-items - объект вида
+* items - объект вида
 
 ````javascript
 {
   variant_id: актуальное кол-во,
   variant_id: актуальное кол-во,
   variant_id: актуальное кол-во
+}
+````
+
+* comments - объект вида
+
+````javascript
+{
+  variant_id: комментарий,
+  variant_id: комментарий,
+  variant_id: комментарий
 }
 ````
 

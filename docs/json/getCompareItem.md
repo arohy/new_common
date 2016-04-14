@@ -5,6 +5,7 @@
 Нет входных данных.
 
 Пример.
+
 ````javascript
 ISnew.json.getCompareItems()
   .done(function (response) {

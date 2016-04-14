@@ -22,12 +22,13 @@
 Применять в случае, если нужно динамически получить информации о товарах коллекции и подобных.
 
 Пример.
+
 ````javascript
 ISnew.json.getProductsList([123456, 123457, 123458])
-  .done(function(response) {
+  .done(function (response) {
     console.log(response);
   })
-  .fail(function(response) {
+  .fail(function (response) {
     console.log('что-то пошло не так!! ', response);
   });
 ````
