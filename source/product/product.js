@@ -2,12 +2,28 @@
  * Product
  */
 
-ISnew.Product = function (id) {
+ISnew.Product = function () {
   var self = this;
-  var variants;
-  var tree;
-  var options;
-  var selected;
-  var quantity;
-  var priceType;
+  self.product = {};
+};
+
+ISnew.Product.prototype.init = function (product) {
+  var self = this;
+
+  self.product = product;
+
+  self.tree = new ISnew.VariantsTree(product);
+  self.log();
+};
+
+ISnew.Product.prototype.log = function () {
+  var self = this;
+
+  console.log(self);
+};
+
+ISnew.Product.prototype.getTree = function () {
+  var self = this;
+
+  console.log(self.tree);
 };

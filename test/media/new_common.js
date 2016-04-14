@@ -578,3 +578,49 @@ ISnew.json.updateCartItems = function (items, comments) {
 
   return $.post('/cart_items.json', fields);
 }
+/**
+ * Product
+ */
+
+ISnew.Product = function () {
+  var self = this;
+  self.product = {};
+};
+
+ISnew.Product.prototype.init = function (product) {
+  var self = this;
+
+  self.product = product;
+
+  self.tree = new ISnew.VariantsTree(product);
+  self.log();
+};
+
+ISnew.Product.prototype.log = function () {
+  var self = this;
+
+  console.log(self);
+};
+
+ISnew.Product.prototype.getTree = function () {
+  var self = this;
+
+  console.log(self.tree);
+};
+/**
+ * Variants tree
+ */
+
+ISnew.VariantsTree = function (product) {
+  var self = this;
+
+  self.init(product);
+};
+
+ISnew.VariantsTree.prototype.init = function (product) {
+  var self = this;
+
+  self.variantsTree = product.variants;
+
+  console.log(self);
+};
