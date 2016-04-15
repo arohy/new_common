@@ -2,19 +2,21 @@
  * Variants tree
  */
 
-ISnew.ProductVariants = function (product, _product) {
+ISnew.ProductVariants = function (product, _owner) {
   var self = this;
-  self._product;
+  self._owner = _owner;
 
   self.variants = product.variants;
-  self.tree = self.buildTree(product.variants);
-  self.options = self.initOptions(product.option_names);
+  self.tree = self._buildTree(product.variants);
+  self.options = self._initOptions(product.option_names);
+
+  self._update();
 };
 
 /**
  * Строим дерево вариантов
  */
-ISnew.ProductVariants.prototype.buildTree = function (variants) {
+ISnew.ProductVariants.prototype._buildTree = function (variants) {
   var self = this;
   var tree = {};
 
@@ -85,6 +87,19 @@ ISnew.ProductVariants.prototype._nodeAvailable = function (leaf) {
 };
 
 /**
+ * Обновляем состояние вариантов
+ */
+ISnew.ProductVariants.prototype._update = function () {
+  var self = this;
+  var status = self.getVariant();
+
+  status.action = 'update_variant';
+
+  self._owner._updateStatus(status);
+  return;
+};
+
+/**
  * Получить значения с уровня
  */
 ISnew.ProductVariants.prototype.getLevel = function (level) {
@@ -143,6 +158,7 @@ ISnew.ProductVariants.prototype.setVariant = function (variant_id) {
 
   self._setOptionByVariant(variant_id);
 
+  self._update();
   return;
 };
 
@@ -151,7 +167,7 @@ ISnew.ProductVariants.prototype.setVariant = function (variant_id) {
 /**
  * Подготовка опций
  */
-ISnew.ProductVariants.prototype.initOptions = function (options) {
+ISnew.ProductVariants.prototype._initOptions = function (options) {
   var self = this;
   var leaf = self.tree;
 

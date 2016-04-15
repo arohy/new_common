@@ -1,9 +1,9 @@
 var product;
 
-testProduct = function (id) {
-  ISnew.json.getProduct(id)
-    .done(function (response) {
-      product = new ISnew.Product(response.product);
-      console.log('done');
-    });
-};
+Events('update_price:insales:product').subscribe(function (data) {
+  console.log('update_price:insales:product', data);
+});
+
+Events('update_variant:insales:product').subscribe(function (data) {
+  console.log('update_variant:insales:product', data);
+});

@@ -581,13 +581,107 @@ ISnew.json.updateCartItems = function (items, comments) {
 /**
  * Типы цен
  */
-ISnew.ProductPriceType = function (price_kinds, _product) {
+ISnew.ProductPriceType = function (product, _owner) {
   var self = this;
+  self._owner = _owner;
+  self.quantity = 1;
+  self.variant_id = product.variants[0].id;
 
-  self.price_kinds = price_kinds;
-  self._product = _product;
+  self.price_kinds = self._initPrices(product);
 
   return self;
+};
+
+/**
+ * Инициализация
+ */
+ISnew.ProductPriceType.prototype._initPrices = function (product) {
+  var self = this;
+  var price_kinds = product.price_kinds;
+  var price_types = {};
+
+  _.forEach(product.variants, function (variant) {
+    price_types[variant.id] = [];
+
+    price_types[variant.id].push({
+      min_quantity: 0,
+      price: parseFloat(variant.price)
+    });
+
+    _.forEach(variant.prices, function (price, index) {
+      price_types[variant.id].push({
+        min_quantity: price_kinds[index].value,
+        price: parseFloat(variant.prices[index])
+      });
+    })
+  });
+
+  return price_types;
+};
+
+/**
+ * Обновление после любых действий
+ */
+ISnew.ProductPriceType.prototype._update = function () {
+  var self = this;
+  var status = {
+    action: 'update_price'
+  }
+
+  self._owner._updateStatus(status);
+  return;
+};
+
+/**
+ * Получение актуальной цены за штуку
+ */
+ISnew.ProductPriceType.prototype.getPrice = function () {
+  var self = this;
+  var price = 0;
+
+  _.forEach(self.price_kinds[self.variant_id], function (price_type) {
+    if (self.quantity < price_type.min_quantity) {
+      return false;
+    }
+
+    price = price_type.price;
+  });
+
+  return price;
+};
+
+/**
+ * Задать актуальное кол-во товара
+ */
+ISnew.ProductPriceType.prototype.setQuantity = function (quantity) {
+  var self = this;
+  quantity = parseFloat(quantity);
+
+  if (self.quantity == quantity) {
+    return false;
+  }
+
+  self.quantity = quantity;
+  self._update();
+
+  return;
+};
+
+/**
+ * Выбираем модификацию товара
+ */
+ISnew.ProductPriceType.prototype.setVariant = function (variant_id) {
+  var self = this;
+  variant_id = parseInt(variant_id);
+
+  if (self.variant_id == variant_id) {
+    return false;
+  }
+
+  self.variant_id = variant_id;
+  self._update();
+
+  return;
 };
 /**
  * Product
@@ -597,11 +691,32 @@ ISnew.Product = function (product) {
   var self = this;
   self.product = product;
 
+  self.price_kinds = new ISnew.ProductPriceType(product, self);
   self.variants = new ISnew.ProductVariants(product, self);
-  self.price_kinds = new ISnew.ProductPriceType(product.price_kinds, self);
   self.log();
 };
 
+/**
+ * Обновления состояний товара
+ */
+ISnew.Product.prototype._updateStatus = function (status) {
+  var self = this;
+
+  status.product_id = self.product.id;
+
+  switch (status.action) {
+    case 'update_variant':
+      self.price_kinds.setVariant(status.id);
+      break;
+  };
+
+  Events(status.action +':insales:product').publish(status);
+  return;
+};
+
+/**
+ * чисто логи почитать
+ */
 ISnew.Product.prototype.log = function () {
   var self = this;
 
@@ -612,19 +727,21 @@ ISnew.Product.prototype.log = function () {
  * Variants tree
  */
 
-ISnew.ProductVariants = function (product, _product) {
+ISnew.ProductVariants = function (product, _owner) {
   var self = this;
-  self._product;
+  self._owner = _owner;
 
   self.variants = product.variants;
-  self.tree = self.buildTree(product.variants);
-  self.options = self.initOptions(product.option_names);
+  self.tree = self._buildTree(product.variants);
+  self.options = self._initOptions(product.option_names);
+
+  self._update();
 };
 
 /**
  * Строим дерево вариантов
  */
-ISnew.ProductVariants.prototype.buildTree = function (variants) {
+ISnew.ProductVariants.prototype._buildTree = function (variants) {
   var self = this;
   var tree = {};
 
@@ -695,6 +812,19 @@ ISnew.ProductVariants.prototype._nodeAvailable = function (leaf) {
 };
 
 /**
+ * Обновляем состояние вариантов
+ */
+ISnew.ProductVariants.prototype._update = function () {
+  var self = this;
+  var status = self.getVariant();
+
+  status.action = 'update_variant';
+
+  self._owner._updateStatus(status);
+  return;
+};
+
+/**
  * Получить значения с уровня
  */
 ISnew.ProductVariants.prototype.getLevel = function (level) {
@@ -753,6 +883,7 @@ ISnew.ProductVariants.prototype.setVariant = function (variant_id) {
 
   self._setOptionByVariant(variant_id);
 
+  self._update();
   return;
 };
 
@@ -761,7 +892,7 @@ ISnew.ProductVariants.prototype.setVariant = function (variant_id) {
 /**
  * Подготовка опций
  */
-ISnew.ProductVariants.prototype.initOptions = function (options) {
+ISnew.ProductVariants.prototype._initOptions = function (options) {
   var self = this;
   var leaf = self.tree;
 
