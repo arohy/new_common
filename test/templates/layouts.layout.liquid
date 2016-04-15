@@ -30,12 +30,17 @@
     {% for payment in account.payment_gateways %}
     {{ payment.id }}
     {% endfor %}
-  </div>
+  </div>2
 
   <div class="" style="float: left; width: 50%">
     cart
     <pre class="prettyprint js-cart"></pre>
   </div>
   <script type="text/javascript" src="{{ 'tests.js' | asset_url }}"></script>
+  <script type="text/javascript">
+    $(function(){
+      product = new ISnew.Product({{ collections.sarome.products.last | json }});
+    })
+  </script>
 </body>
 </html>

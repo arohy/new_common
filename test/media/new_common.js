@@ -579,6 +579,17 @@ ISnew.json.updateCartItems = function (items, comments) {
   return $.post('/cart_items.json', fields);
 }
 /**
+ * Типы цен
+ */
+ISnew.ProductPriceType = function (price_kinds, _product) {
+  var self = this;
+
+  self.price_kinds = price_kinds;
+  self._product = _product;
+
+  return self;
+};
+/**
  * Product
  */
 
@@ -586,7 +597,8 @@ ISnew.Product = function (product) {
   var self = this;
   self.product = product;
 
-  self.variants = new ISnew.ProductVariants(product);
+  self.variants = new ISnew.ProductVariants(product, self);
+  self.price_kinds = new ISnew.ProductPriceType(product.price_kinds, self);
   self.log();
 };
 
@@ -595,18 +607,18 @@ ISnew.Product.prototype.log = function () {
 
   console.log(self);
 };
+
 /**
  * Variants tree
  */
 
-ISnew.ProductVariants = function (product) {
+ISnew.ProductVariants = function (product, _product) {
   var self = this;
+  self._product;
 
-  self.tree = {};
-  self.options = [];
-
-  self.buildTree(product.variants);
-  self.initOptions(product.option_names);
+  self.variants = product.variants;
+  self.tree = self.buildTree(product.variants);
+  self.options = self.initOptions(product.option_names);
 };
 
 /**
@@ -614,11 +626,12 @@ ISnew.ProductVariants = function (product) {
  */
 ISnew.ProductVariants.prototype.buildTree = function (variants) {
   var self = this;
+  var tree = {};
 
   // Проходимся по вариантам
   _.forEach(variants, function (variant) {
     var variant_id = variant.id;
-    var leaf = self.tree;
+    var leaf = tree;
 
     // Разбираем опции
     _.forEach(variant.option_values, function(option, index) {
@@ -651,24 +664,26 @@ ISnew.ProductVariants.prototype.buildTree = function (variants) {
     });
   });
 
-  _.forEach(self.tree, function (leaf) {
-    self.treeAvailable(leaf);
+  _.forEach(tree, function (leaf) {
+    self._nodeAvailable(leaf);
   });
 
-  return;
+  return tree;
 };
 
 /**
  * Установка доступности вариантов
+ *
+ * Если все потомки узла недоступны - узел недоступен
  */
-ISnew.ProductVariants.prototype.treeAvailable = function (leaf) {
+ISnew.ProductVariants.prototype._nodeAvailable = function (leaf) {
   var self = this;
 
   if (leaf.variant_id === undefined) {
     var isAvailable = false;
 
     _.forEach(leaf.tree, function (child){
-      if (self.treeAvailable(child)) {
+      if (self._nodeAvailable(child)) {
         isAvailable = true;
       };
     });
@@ -682,24 +697,24 @@ ISnew.ProductVariants.prototype.treeAvailable = function (leaf) {
 /**
  * Получить значения с уровня
  */
-ISnew.ProductVariants.prototype.getTreeLevel = function (level) {
+ISnew.ProductVariants.prototype.getLevel = function (level) {
   var self = this;
   var leaf = self.tree;
 
-  _.forEach(self.options, function(option_level, option) {
+  _.forEach(self.options, function(option, option_level) {
     if (level == option_level) {
       return false;
     }
     leaf = leaf[option.selected].tree;
   });
 
-  return;
+  return leaf;
 };
 
 /**
  * Получить первый элемент на уровне
  */
-ISnew.ProductVariants.prototype.getTreeFirst = function (leaf) {
+ISnew.ProductVariants.prototype.getFirst = function (leaf) {
   var self = this;
 
   var first = _.chain(leaf)
@@ -711,36 +726,66 @@ ISnew.ProductVariants.prototype.getTreeFirst = function (leaf) {
 };
 
 /**
+ * Получаем выбранный вариант
+ */
+ISnew.ProductVariants.prototype.getVariant = function () {
+  var self = this;
+  var selected = '';
+  var id;
+
+  _.forEach(self.options, function(option, index) {
+    selected += '.tree['+ (option.selected) +']';
+  });
+
+  id = _.get(self, selected);
+  id = _.findKey(self.variants, function(variant) {
+    return variant.id == id.variant_id;
+  });
+
+  return self.variants[id];
+};
+
+/**
+ * Устанавливаем вариант
+ */
+ISnew.ProductVariants.prototype.setVariant = function (variant_id) {
+  var self = this;
+
+  self._setOptionByVariant(variant_id);
+
+  return;
+};
+
+// ====================================================================================
+
+/**
  * Подготовка опций
  */
 ISnew.ProductVariants.prototype.initOptions = function (options) {
   var self = this;
   var leaf = self.tree;
 
-  self.options = options;
+  _.forEach(options, function(option, index) {
+    var first = self.getFirst(leaf);
 
-  _.forEach(self.options, function(option, index) {
-    var first = self.getTreeFirst(leaf);
-
-    self.options[index].selected = first.position;
+    options[index].selected = first.position;
     leaf = first.tree;
   });
 
-  return;
+  return options;
 };
 
 /**
- * Выбрать опцию
+ * Устанавливаем опцию
  */
 ISnew.ProductVariants.prototype.setOption = function (option) {
   var self = this;
 
-  option = {
-    index: _.toInteger(option.index),
-    value: _.toInteger(option.value)
-  };
+  var index = _.findKey(self.options, function (_option) {
+    return _option.id == option.option_name_id;
+  });
 
-  self.options[option.index].selected = option.value;
+  self.options[index].selected = option.position;
 
   return;
 };
@@ -755,8 +800,18 @@ ISnew.ProductVariants.prototype.getOption = function (index) {
 };
 
 /**
- * Установить опции по вырианту
+ * Установить опции по варианту
  */
-ISnew.ProductVariants.prototype.setOptionByVariant = function () {
+ISnew.ProductVariants.prototype._setOptionByVariant = function (variant_id) {
   var self = this;
+
+  var index = _.findKey(self.variants, function (variant) {
+    return variant.id == variant_id;
+  });
+
+  _.forEach(self.variants[index].option_values, function(option) {
+    self.setOption(option);
+  });
+
+  return;
 };

@@ -28,15 +28,6 @@ Events('before:insales:cart').subscribe(function (data) {
 Events('always:insales:cart').subscribe(function (data) {
   console.log('always:insales:cart', data);
 });
-var product;
-
-testProduct = function (id) {
-  ISnew.json.getProduct(id)
-    .done(function (response) {
-      product = new ISnew.Product(response.product);
-      console.log('done');
-    });
-};
 /*
  * Тест для addCartItems()
  */
@@ -208,3 +199,12 @@ testUpdateCartItems = function (items, comments) {
       console.log('fail', response);
     })
 }
+var product;
+
+testProduct = function (id) {
+  ISnew.json.getProduct(id)
+    .done(function (response) {
+      product = new ISnew.Product(response.product);
+      console.log('done');
+    });
+};
