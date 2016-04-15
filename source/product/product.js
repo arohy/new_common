@@ -6,9 +6,9 @@ ISnew.Product = function (product) {
   var self = this;
   self.product = product;
 
+  self.quantity = 0;
   self.price_kinds = new ISnew.ProductPriceType(product, self);
   self.variants = new ISnew.ProductVariants(product, self);
-  self.log();
 };
 
 /**
@@ -19,21 +19,24 @@ ISnew.Product.prototype._updateStatus = function (status) {
 
   status.product_id = self.product.id;
 
-  switch (status.action) {
-    case 'update_variant':
-      self.price_kinds.setVariant(status.id);
-      break;
+  // Если у нас переключался вариант - обновляем тип цен
+  if (status.action == 'update_variant') {
+    self.price_kinds.setVariant(status.id);
   };
 
+  // Трегирим нужное событие и сбрасываем состояние
   Events(status.action +':insales:product').publish(status);
   return;
 };
 
 /**
- * чисто логи почитать
+ * Установка кол-ва товара
  */
-ISnew.Product.prototype.log = function () {
+ISnew.Product.prototype.setQuantity = function (quantity) {
   var self = this;
 
-  console.log(self);
+  self.quantity = parseFloat(quantity);
+
+  self.price_kinds.setQuantity(self.quantity);
+  return;
 };

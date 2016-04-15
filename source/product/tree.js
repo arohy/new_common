@@ -1,13 +1,12 @@
 /**
  * Variants tree
  */
-
 ISnew.ProductVariants = function (product, _owner) {
   var self = this;
   self._owner = _owner;
 
   self.variants = product.variants;
-  self.tree = self._buildTree(product.variants);
+  self.tree = self._initTree(product.variants);
   self.options = self._initOptions(product.option_names);
 
   self._update();
@@ -16,7 +15,7 @@ ISnew.ProductVariants = function (product, _owner) {
 /**
  * Строим дерево вариантов
  */
-ISnew.ProductVariants.prototype._buildTree = function (variants) {
+ISnew.ProductVariants.prototype._initTree = function (variants) {
   var self = this;
   var tree = {};
 
@@ -135,16 +134,11 @@ ISnew.ProductVariants.prototype.getFirst = function (leaf) {
  */
 ISnew.ProductVariants.prototype.getVariant = function () {
   var self = this;
-  var selected = '';
+  var branch = _.get(self, self._getSelectedVector());
   var id;
 
-  _.forEach(self.options, function(option, index) {
-    selected += '.tree['+ (option.selected) +']';
-  });
-
-  id = _.get(self, selected);
   id = _.findKey(self.variants, function(variant) {
-    return variant.id == id.variant_id;
+    return variant.id == branch.variant_id;
   });
 
   return self.variants[id];
@@ -182,7 +176,8 @@ ISnew.ProductVariants.prototype._initOptions = function (options) {
 };
 
 /**
- * Устанавливаем опцию
+ * Устанавливаем опцию внешним обработчиком.
+ * АХТУНГ!!! Влечет обновление актуального варианта!
  */
 ISnew.ProductVariants.prototype.setOption = function (option) {
   var self = this;
@@ -191,8 +186,31 @@ ISnew.ProductVariants.prototype.setOption = function (option) {
     return _option.id == option.option_name_id;
   });
 
+  // Если не опцию не меняли - на выход
+  if (self.options[index].selected == option.position) {
+    return;
+  }
+
   self.options[index].selected = option.position;
 
+  /**
+   * Проходим по выбранным опциям и фиксим неприавльно выбранные.
+   * Неправильные - если при текущем варианте мы уходм в лес.
+   */
+  _.forEach(self.options, function (_option, index) {
+    var isLeaf = _.get(self, self._getSelectedVector(index + 1));
+
+    // Если мы не можем найти такую ветку - вытаскиваем строение уровня
+    // и помечаем первое свойство как выбранное
+    if (isLeaf === undefined) {
+      var leaf = self.getLevel(index);
+      var first = self.getFirst(leaf);
+
+      _option.selected = first.position;
+    }
+  });
+
+  self._update();
   return;
 };
 
@@ -215,9 +233,27 @@ ISnew.ProductVariants.prototype._setOptionByVariant = function (variant_id) {
     return variant.id == variant_id;
   });
 
-  _.forEach(self.variants[index].option_values, function(option) {
-    self.setOption(option);
+  _.forEach(self.variants[index].option_values, function(option, option_index) {
+    self.options[option_index].selected = option.position;
   });
 
   return;
+};
+
+/**
+ * генерим путь по выбранным опциям
+ */
+ISnew.ProductVariants.prototype._getSelectedVector = function (_length) {
+  var self = this;
+  var vector = '';
+  _length = (_length || self.options.length) - 1;
+
+  _.forEach(self.options, function(option, index) {
+    vector += '.tree['+ (option.selected) +']';
+    if (_length == index) {
+      return false;
+    }
+  });
+
+  return vector;
 };
