@@ -1,7 +1,6 @@
 /**
  * Product
  */
-
 ISnew.Product = function (product) {
   var self = this;
   self.product = product;

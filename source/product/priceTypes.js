@@ -4,7 +4,6 @@
 ISnew.ProductPriceType = function (product, _owner) {
   var self = this;
   self._owner = _owner;
-  self.quantity = 1;
   self.variant_id = product.variants[0].id;
 
   self.price_kinds = self._initPrices(product);
@@ -45,8 +44,10 @@ ISnew.ProductPriceType.prototype._initPrices = function (product) {
 ISnew.ProductPriceType.prototype._update = function () {
   var self = this;
   var status = {
-    action: 'update_price'
-  }
+    action: 'update_price',
+    price: self.getPrice(),
+    quantity: self._owner.quantity
+  };
 
   self._owner._updateStatus(status);
   return;
@@ -60,7 +61,7 @@ ISnew.ProductPriceType.prototype.getPrice = function () {
   var price = 0;
 
   _.forEach(self.price_kinds[self.variant_id], function (price_type) {
-    if (self.quantity < price_type.min_quantity) {
+    if (self._owner.quantity < price_type.min_quantity) {
       return false;
     }
 
@@ -73,17 +74,10 @@ ISnew.ProductPriceType.prototype.getPrice = function () {
 /**
  * Задать актуальное кол-во товара
  */
-ISnew.ProductPriceType.prototype.setQuantity = function (quantity) {
+ISnew.ProductPriceType.prototype.setQuantity = function () {
   var self = this;
-  quantity = parseFloat(quantity);
 
-  if (self.quantity == quantity) {
-    return false;
-  }
-
-  self.quantity = quantity;
   self._update();
-
   return;
 };
 
@@ -99,7 +93,7 @@ ISnew.ProductPriceType.prototype.setVariant = function (variant_id) {
   }
 
   self.variant_id = variant_id;
-  self._update();
 
+  self._update();
   return;
 };
