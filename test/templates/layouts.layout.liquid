@@ -21,6 +21,15 @@
       <br />
     {% endfor %}
 
+    ==================<br />
+    {% for product in collections.tovar-dnya.products limit: 10 %}
+      {{ product.id }} ->
+      {% for variant in product.variants %}
+        {{ variant.id }} ||
+      {% endfor %}
+      <br />
+    {% endfor %}
+
     <h2>delivery_id</h2>
     {% for delivery in account.delivery_variants %}
     {{ delivery.id }}
@@ -39,7 +48,7 @@
   <script type="text/javascript" src="{{ 'tests.js' | asset_url }}"></script>
   <script type="text/javascript">
     $(function(){
-      product = new ISnew.Product({{ collections.sarome.products.last | json }});
+      product = new ISnew.Product({{ collections.tovar-dnya.products.last | json }});
     })
   </script>
 </body>
