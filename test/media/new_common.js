@@ -578,3 +578,402 @@ ISnew.json.updateCartItems = function (items, comments) {
 
   return $.post('/cart_items.json', fields);
 };
+/**
+ * Типы цен
+ */
+ISnew.ProductPriceType = function (product, _owner) {
+  var self = this;
+  self._owner = _owner;
+  self.variant_id = product.variants[0].id;
+
+  self.price_kinds = self._initPrices(product);
+
+  return self;
+};
+
+/**
+ * Инициализация
+ */
+ISnew.ProductPriceType.prototype._initPrices = function (product) {
+  var self = this;
+  var price_kinds = product.price_kinds;
+  var price_types = {};
+
+  _.forEach(product.variants, function (variant) {
+    price_types[variant.id] = [];
+
+    price_types[variant.id].push({
+      min_quantity: 0,
+      price: parseFloat(variant.price)
+    });
+
+    _.forEach(variant.prices, function (price, index) {
+      price_types[variant.id].push({
+        min_quantity: price_kinds[index].value,
+        price: parseFloat(variant.prices[index])
+      });
+    })
+  });
+
+  return price_types;
+};
+
+/**
+ * Обновление после любых действий
+ */
+ISnew.ProductPriceType.prototype._update = function () {
+  var self = this;
+  var status = {
+    action: 'update_price',
+    price: self.getPrice(),
+    quantity: self._owner.quantity
+  };
+
+  self._owner._updateStatus(status);
+  return;
+};
+
+/**
+ * Получение актуальной цены за штуку
+ */
+ISnew.ProductPriceType.prototype.getPrice = function () {
+  var self = this;
+  var price = 0;
+
+  _.forEach(self.price_kinds[self.variant_id], function (price_type) {
+    if (self._owner.quantity < price_type.min_quantity) {
+      return false;
+    }
+
+    price = price_type.price;
+  });
+
+  return price;
+};
+
+/**
+ * Задать актуальное кол-во товара
+ */
+ISnew.ProductPriceType.prototype.setQuantity = function () {
+  var self = this;
+
+  self._update();
+  return;
+};
+
+/**
+ * Выбираем модификацию товара
+ */
+ISnew.ProductPriceType.prototype.setVariant = function (variant_id) {
+  var self = this;
+  variant_id = parseInt(variant_id);
+
+  if (self.variant_id == variant_id) {
+    return false;
+  }
+
+  self.variant_id = variant_id;
+
+  self._update();
+  return;
+};
+/**
+ * Product
+ */
+ISnew.Product = function (product) {
+  var self = this;
+  self.product = product;
+
+  self.quantity = 0;
+  self.price_kinds = new ISnew.ProductPriceType(product, self);
+  self.variants = new ISnew.ProductVariants(product, self);
+};
+
+/**
+ * Обновления состояний товара
+ */
+ISnew.Product.prototype._updateStatus = function (status) {
+  var self = this;
+
+  status.product_id = self.product.id;
+
+  // Если у нас переключался вариант - обновляем тип цен
+  if (status.action == 'update_variant') {
+    self.price_kinds.setVariant(status.id);
+  };
+
+  // Трегирим нужное событие и сбрасываем состояние
+  Events(status.action +':insales:product').publish(status);
+  return;
+};
+
+/**
+ * Установка кол-ва товара
+ */
+ISnew.Product.prototype.setQuantity = function (quantity) {
+  var self = this;
+
+  self.quantity = parseFloat(quantity);
+
+  self.price_kinds.setQuantity(self.quantity);
+  return;
+};
+/**
+ * Variants tree
+ */
+ISnew.ProductVariants = function (product, _owner) {
+  var self = this;
+  self._owner = _owner;
+
+  self.variants = product.variants;
+  self.tree = self._initTree(product.variants);
+  self.options = self._initOptions(product.option_names);
+
+  self._update();
+};
+
+/**
+ * Строим дерево вариантов
+ */
+ISnew.ProductVariants.prototype._initTree = function (variants) {
+  var self = this;
+  var tree = {};
+
+  // Проходимся по вариантам
+  _.forEach(variants, function (variant) {
+    var variant_id = variant.id;
+    var leaf = tree;
+
+    // Разбираем опции
+    _.forEach(variant.option_values, function(option, index) {
+      var id;
+      var isAvailable;
+
+      // Если дошли до последней опции - выставляем вариант и доступность
+      if (index == (variant.option_values.length - 1)) {
+        id = variant_id;
+        isAvailable = variant.available;
+      }
+
+      // Если такую опцию мы еще не вносили - вбиваем все, что есть.
+      if (!leaf[option.position]) {
+        leaf[_.toInteger(option.position)] = {
+          id: _.toInteger(option.id),
+          tree: {},
+          title: option.title,
+          variant_id: id,
+          position: _.toInteger(option.position)
+        };
+
+        // Выставляем доступность
+        if( isAvailable !== undefined ){
+          leaf[option.position].available = isAvailable;
+        };
+      }
+
+      leaf = leaf[option.position].tree;
+    });
+  });
+
+  _.forEach(tree, function (leaf) {
+    self._nodeAvailable(leaf);
+  });
+
+  return tree;
+};
+
+/**
+ * Установка доступности вариантов
+ *
+ * Если все потомки узла недоступны - узел недоступен
+ */
+ISnew.ProductVariants.prototype._nodeAvailable = function (leaf) {
+  var self = this;
+
+  if (leaf.variant_id === undefined) {
+    var isAvailable = false;
+
+    _.forEach(leaf.tree, function (child){
+      if (self._nodeAvailable(child)) {
+        isAvailable = true;
+      };
+    });
+
+    leaf.available = isAvailable;
+  };
+
+  return leaf.available;
+};
+
+/**
+ * Обновляем состояние вариантов
+ */
+ISnew.ProductVariants.prototype._update = function () {
+  var self = this;
+  var status = self.getVariant();
+
+  status.action = 'update_variant';
+
+  self._owner._updateStatus(status);
+  return;
+};
+
+/**
+ * Получить значения с уровня
+ */
+ISnew.ProductVariants.prototype.getLevel = function (level) {
+  var self = this;
+  var leaf = self.tree;
+
+  _.forEach(self.options, function(option, option_level) {
+    if (level == option_level) {
+      return false;
+    }
+    leaf = leaf[option.selected].tree;
+  });
+
+  return leaf;
+};
+
+/**
+ * Получить первый элемент на уровне
+ */
+ISnew.ProductVariants.prototype.getFirst = function (leaf) {
+  var self = this;
+
+  var first = _.chain(leaf)
+    .toArray()
+    .first()
+    .value();
+
+  return first;
+};
+
+/**
+ * Получаем выбранный вариант
+ */
+ISnew.ProductVariants.prototype.getVariant = function () {
+  var self = this;
+  var branch = _.get(self, self._getSelectedVector());
+  var id;
+
+  id = _.findKey(self.variants, function(variant) {
+    return variant.id == branch.variant_id;
+  });
+
+  return self.variants[id];
+};
+
+/**
+ * Устанавливаем вариант
+ */
+ISnew.ProductVariants.prototype.setVariant = function (variant_id) {
+  var self = this;
+
+  self._setOptionByVariant(variant_id);
+
+  self._update();
+  return;
+};
+
+// ====================================================================================
+
+/**
+ * Подготовка опций
+ */
+ISnew.ProductVariants.prototype._initOptions = function (options) {
+  var self = this;
+  var leaf = self.tree;
+
+  _.forEach(options, function(option, index) {
+    var first = self.getFirst(leaf);
+
+    options[index].selected = first.position;
+    leaf = first.tree;
+  });
+
+  return options;
+};
+
+/**
+ * Устанавливаем опцию внешним обработчиком.
+ * АХТУНГ!!! Влечет обновление актуального варианта!
+ */
+ISnew.ProductVariants.prototype.setOption = function (option) {
+  var self = this;
+
+  var index = _.findKey(self.options, function (_option) {
+    return _option.id == option.option_name_id;
+  });
+
+  // Если не опцию не меняли - на выход
+  if (self.options[index].selected == option.position) {
+    return;
+  }
+
+  self.options[index].selected = option.position;
+
+  /**
+   * Проходим по выбранным опциям и фиксим неприавльно выбранные.
+   * Неправильные - если при текущем варианте мы уходм в лес.
+   */
+  _.forEach(self.options, function (_option, index) {
+    var isLeaf = _.get(self, self._getSelectedVector(index + 1));
+
+    // Если мы не можем найти такую ветку - вытаскиваем строение уровня
+    // и помечаем первое свойство как выбранное
+    if (isLeaf === undefined) {
+      var leaf = self.getLevel(index);
+      var first = self.getFirst(leaf);
+
+      _option.selected = first.position;
+    }
+  });
+
+  self._update();
+  return;
+};
+
+/**
+ * Получить опцию
+ */
+ISnew.ProductVariants.prototype.getOption = function (index) {
+  var self = this;
+
+  return self.options[index].selected;
+};
+
+/**
+ * Установить опции по варианту
+ */
+ISnew.ProductVariants.prototype._setOptionByVariant = function (variant_id) {
+  var self = this;
+
+  var index = _.findKey(self.variants, function (variant) {
+    return variant.id == variant_id;
+  });
+
+  _.forEach(self.variants[index].option_values, function(option, option_index) {
+    self.options[option_index].selected = option.position;
+  });
+
+  return;
+};
+
+/**
+ * генерим путь по выбранным опциям
+ */
+ISnew.ProductVariants.prototype._getSelectedVector = function (_length) {
+  var self = this;
+  var vector = '';
+  _length = (_length || self.options.length) - 1;
+
+  _.forEach(self.options, function(option, index) {
+    vector += '.tree['+ (option.selected) +']';
+    if (_length == index) {
+      return false;
+    }
+  });
+
+  return vector;
+};

@@ -7,3 +7,4 @@
 ## "Средний уровень" - компоненты
 * [Шина событий](events/events.md)
 * [Корзина](cart/cart.md)
+* [Товар](product/product.md)
