@@ -49,7 +49,12 @@
   <script type="text/javascript">
     $(function(){
       product = new ISnew.Product({{ collections.tovar-dnya.products.last | json }});
-    })
+    });
+
+  </script>
+
+  <script type="text/template" data-template-id="cart_widget">
+    hello!! <%- user %>!
   </script>
 </body>
 </html>
