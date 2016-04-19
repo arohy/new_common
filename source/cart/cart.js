@@ -227,7 +227,6 @@ ISnew.Cart.prototype._itemsPrice = function () {
   var self = this;
 
   self.items_price = _.reduce(self.order_lines, function (sum, item) {
-    console.log(item);
     return sum + item.sale_price * item.quantity;
   }, 0);
 
