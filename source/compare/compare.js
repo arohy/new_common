@@ -19,7 +19,7 @@ ISnew.Compare = function (options) {
 ISnew.Compare.prototype.add = function (task) {
   var self = this;
 
-  task.id = parseInt(task.id);
+  task.item = parseInt(task.item);
   task.method = 'add_item';
 
   // если достигли максимального кол-ва товаров
@@ -31,7 +31,7 @@ ISnew.Compare.prototype.add = function (task) {
     return;
   } else {
     self._before(task);
-    ISnew.json.addCompareItem(task.id)
+    ISnew.json.addCompareItem(task.item)
       .done(function (response) {
         self._update(task);
       })
@@ -50,11 +50,11 @@ ISnew.Compare.prototype.add = function (task) {
 ISnew.Compare.prototype.remove = function (task) {
   var self = this;
 
-  task.id = parseInt(task.id);
+  task.item = parseInt(task.item);
   task.method = 'remove_item';
 
   self._before(task);
-  ISnew.json.removeCompareItem(task.id)
+  ISnew.json.removeCompareItem(task.item)
     .done(function (response) {
       self._update(task);
     })
@@ -75,6 +75,15 @@ ISnew.Compare.prototype.update = function () {
   self._update({
     method: 'update_items'
   });
+};
+
+/**
+ *
+ */
+ISnew.Compare.prototype.getCompare = function () {
+  var self = this;
+
+  return self;
 };
 
 /**
