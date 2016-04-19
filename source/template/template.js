@@ -6,23 +6,38 @@ ISnew.Template = function () {
   var self = this;
   self.TemplateList = {};
 
-  self.render = function (data, template_id) {
-    return self.TemplateList[template_id](data);
-  };
+  self._init();
+};
 
-  self.load = function (template_body, template_id) {
-    self.TemplateList[template_id] = _.template(template_body);
+/**
+ * Вытаскиваем нужный шаблон
+ */
+ISnew.Template.prototype.render = function (data, template_id) {
+  var self = this;
 
-    return;
-  };
+  return self.TemplateList[template_id](data);
+};
 
-  console.log('loaded');
+/**
+ * Складываем шаблоны по местам, подготавливаем для работы
+ */
+ISnew.Template.prototype.load = function (template_body, template_id) {
+  var self = this;
+
+  self.TemplateList[template_id] = _.template(template_body);
+
+  return;
+};
+
+/**
+ * Автоматический сбор шаблонов в верстке
+ */
+ISnew.Template.prototype._init = function () {
+  var self = this;
 
   $(function () {
     $('[data-template-id]').each(function () {
-      Template.load($(this).html(), $(this).data('templateId'));
+      self.load($(this).html(), $(this).data('templateId'));
     });
   });
 };
-
-var Template = new ISnew.Template();

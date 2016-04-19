@@ -51,10 +51,13 @@
       product = new ISnew.Product({{ collections.tovar-dnya.products.last | json }});
     });
 
+    var Template = new ISnew.Template();
   </script>
 
   <script type="text/template" data-template-id="cart_widget">
-    hello!! <%- user %>!
+    <% if (user) { %>
+      hello!! <%- user %>!
+    <% } %>
   </script>
 </body>
 </html>
