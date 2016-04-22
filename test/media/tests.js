@@ -1,56 +1,72 @@
 var Cart = new ISnew.Cart();
 var $cart = $('.js-cart');
 
-Events('update_items:insales:cart').subscribe(function (data) {
+EventBus.subscribe('update_items:insales:cart', function (data) {
   console.log('update_items:insales:cart', data);
 });
 
-Events('add_items:insales:cart').subscribe(function (data) {
+EventBus.subscribe('add_items:insales:cart', function (data) {
   console.log('add_items:insales:cart', data);
 });
 
-Events('remove_items:insales:cart').subscribe(function (data) {
+EventBus.subscribe('remove_items:insales:cart', function (data) {
   console.log('remove_items:insales:cart', data);
 });
 
-Events('delete_items:insales:cart').subscribe(function (data) {
+EventBus.subscribe('delete_items:insales:cart', function (data) {
   console.log('delete_items:insales:cart', data);
 });
 
-Events('set_items:insales:cart').subscribe(function (data) {
+EventBus.subscribe('set_items:insales:cart', function (data) {
   console.log('set_items:insales:cart', data);
 });
 
-Events('before:insales:cart').subscribe(function (data) {
+EventBus.subscribe('before:insales:cart', function (data) {
   console.log('before:insales:cart', data);
 });
 
-Events('always:insales:cart').subscribe(function (data) {
+EventBus.subscribe('always:insales:cart', function (data) {
   console.log('always:insales:cart', data);
 });
 var Compare = new ISnew.Compare({
   maxItems: 2
 });
 
-Events('init:insales:compares').subscribe(function (data) {
+EventBus.subscribe('init:insales:compares', function (data) {
   console.log('init:insales:compares', data);
 });
 
-Events('update_items:insales:compares').subscribe(function (data) {
+EventBus.subscribe('update_items:insales:compares', function (data) {
   console.log('update_items:insales:compares', data);
 });
 
-Events('add_item:insales:compares').subscribe(function (data) {
+EventBus.subscribe('add_item:insales:compares', function (data) {
   console.log('add_item:insales:compares', data);
 });
 
-Events('remove_item:insales:compares').subscribe(function (data) {
+EventBus.subscribe('remove_item:insales:compares', function (data) {
   console.log('remove_item:insales:compares', data);
 });
 
-Events('overload:insales:compares').subscribe(function (data) {
+EventBus.subscribe('overload:insales:compares', function (data) {
   console.log('overload:insales:compares', data);
 });
+EventBus.subscribe('test', function(data) {
+  console.log('function 1:', data);
+});
+
+EventBus.publish('test', {test: 'ready'});
+EventBus.publish('test', {test: 'ready2'});
+
+EventBus.subscribe('test', function(data) {
+  console.log('function 2:', data);
+});
+
+EventBus.subscribe('test2', function(data) {
+  console.log('function 3:', data);
+});
+
+EventBus.publish('test2', {teeee: 'teeeeeepooooooot'});
 /*
  * Тест для addCartItems()
  */
@@ -224,10 +240,10 @@ testUpdateCartItems = function (items, comments) {
 }
 var product;
 
-Events('update_price:insales:product').subscribe(function (data) {
+EventBus.subscribe('update_price:insales:product', function (data) {
   console.log('update_price:insales:product', data);
 });
 
-Events('update_variant:insales:product').subscribe(function (data) {
+EventBus.subscribe('update_variant:insales:product', function (data) {
   console.log('update_variant:insales:product', data);
 });

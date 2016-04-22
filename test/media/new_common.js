@@ -23,13 +23,8 @@ if (!ISnew.tools) {
   ISnew.tools = {};
 }
 
-// Список событий и прикрученных колбеков
-if (!EventsList) {
-  var EventsList = {};
-}
-
-if (!Events) {
-  var Events;
+if (!EventBus) {
+  var EventBus;
 }
 /**
  * Cart
@@ -37,6 +32,7 @@ if (!Events) {
  * Зависит от ISnew.json, Events, ISnew.CartHelper
  */
 
+// TODO: сделать синглтон
 ISnew.Cart = function () {
   var self = this;
 
@@ -188,24 +184,24 @@ ISnew.Cart.prototype._setOrder = function (order, task) {
   data.action = task;
 
   if (task && task.method) {
-    Events(task.method +':insales:cart').publish(data);
+    EventBus.publish(task.method +':insales:cart', data);
   }
 
-  Events('update_items:insales:cart').publish(data);
+  EventBus.publish('update_items:insales:cart', data);
 };
 
 /**
  * Событие ПЕРЕД действием
  */
 ISnew.Cart.prototype._before = function (task) {
-  Events('before:insales:cart').publish(task);
+  EventBus.publish('before:insales:cart', task);
 };
 
 /**
  * Мы закончили что-то делать в корзине
  */
 ISnew.Cart.prototype._always = function (task) {
-  Events('always:insales:cart').publish(task);
+  EventBus.publish('always:insales:cart', task);
 };
 
 /**
@@ -306,6 +302,7 @@ ISnew.Cart.prototype._images = function () {
  * Сравнение товаров
  */
 
+// TODO: сделать синглтон
 ISnew.Compare = function (options) {
   options = options || {};
 
@@ -423,10 +420,10 @@ ISnew.Compare.prototype._events = function (task) {
   var self = this;
   var data = self;
   data.action = task;
-  Events(task.method +':insales:compares').publish(data);
+  EventBus.publish(task.method +':insales:compares', data);
 
   if (data.action.method != 'update_items' && data.action.method != 'overload') {
-    Events('update_items:insales:compares').publish(data);
+    EventBus.publish('update_items:insales:compares', data);
   }
 };
 
@@ -434,14 +431,14 @@ ISnew.Compare.prototype._events = function (task) {
  * Событие ПЕРЕД действием
  */
 ISnew.Compare.prototype._before = function (task) {
-  Events('before:insales:compares').publish(task);
+  EventBus.publish('before:insales:compares', task);
 };
 
 /**
  * Мы закончили что-то делать в сравнении
  */
 ISnew.Compare.prototype._always = function (task) {
-  Events('always:insales:compares').publish(task);
+  EventBus.publish('always:insales:compares', task);
 };
 /**
  * Event bus
@@ -449,31 +446,78 @@ ISnew.Compare.prototype._always = function (task) {
  * Шина событий. Построена на $.Callbacks;
  */
 
-Events = function (id) {
-  var id = _.toString(id);
-  var Event = id && EventsList[id];
-  var callbacks;
+/**
+ * Класс Шины Событий
+ */
+
+// TODO: сделать синглтон
+ISnew.EventBus = function () {
+  var self = this;
+
+  self.eventsList = {};
+
+  return;
+};
+
+EventBus = new ISnew.EventBus();
+
+/**
+ * Публикация события с данными
+ */
+ISnew.EventBus.prototype.publish = function (eventId, data) {
+  var self = this;
+
+  return self._selectEvent(eventId).fire(data);
+};
+
+/**
+ * Подписаться на событие
+ */
+ISnew.EventBus.prototype.subscribe = function (eventId, callback) {
+  var self = this;
+
+  return self._selectEvent(eventId).add(callback);
+};
+
+/**
+ * Отписаться от события
+ */
+ISnew.EventBus.prototype.unsubscribe = function (eventId, callback) {
+  var self = this;
+
+  return self._selectEvent(eventId).remove(callback);
+};
+
+/**
+ * Выбор нужного события
+ */
+ISnew.EventBus.prototype._selectEvent = function (eventId) {
+  var self = this;
+  var Event;
+
+  eventId = _.toString(eventId);
+  Event = self.eventsList[eventId];
 
   // Если у нас новое событие, создаем его и объявляем в системе.
   if (!Event) {
-    // Вешаем флаг того, что во вновь подключенные колбеки будет передана инфа
-    callbacks = $.Callbacks('memory');
-
     // Объявляем методы
-    Event = {
-      publish: callbacks.fire,
-      subscribe: callbacks.add,
-      unsubscribe: callbacks.remove
-    };
-
-    // Объявляем в системе
-    if (id) {
-      EventsList[id] = Event;
-    }
+    Event = $.Callbacks('memory');
+    self.eventsList[eventId] = Event;
   }
 
   return Event;
-}
+};
+
+var Events = function (id) {
+  var self = this;
+
+  self.publish = function (data) {
+    var _this = this;
+    console.log(_this, id);
+  };
+};
+
+//Events = new OldEvents();
 /*
  * Добавление товара в корзину
  */
@@ -850,7 +894,7 @@ ISnew.Product.prototype._updateStatus = function (status) {
   };
 
   // Трегирим нужное событие и сбрасываем состояние
-  Events(status.action +':insales:product').publish(status);
+  EventBus.publish(status.action +':insales:product', status);
   return;
 };
 

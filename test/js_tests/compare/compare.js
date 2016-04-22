@@ -2,22 +2,22 @@ var Compare = new ISnew.Compare({
   maxItems: 2
 });
 
-Events('init:insales:compares').subscribe(function (data) {
+EventBus.subscribe('init:insales:compares', function (data) {
   console.log('init:insales:compares', data);
 });
 
-Events('update_items:insales:compares').subscribe(function (data) {
+EventBus.subscribe('update_items:insales:compares', function (data) {
   console.log('update_items:insales:compares', data);
 });
 
-Events('add_item:insales:compares').subscribe(function (data) {
+EventBus.subscribe('add_item:insales:compares', function (data) {
   console.log('add_item:insales:compares', data);
 });
 
-Events('remove_item:insales:compares').subscribe(function (data) {
+EventBus.subscribe('remove_item:insales:compares', function (data) {
   console.log('remove_item:insales:compares', data);
 });
 
-Events('overload:insales:compares').subscribe(function (data) {
+EventBus.subscribe('overload:insales:compares', function (data) {
   console.log('overload:insales:compares', data);
 });

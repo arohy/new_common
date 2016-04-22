@@ -24,7 +24,7 @@ ISnew.Product.prototype._updateStatus = function (status) {
   };
 
   // Трегирим нужное событие и сбрасываем состояние
-  Events(status.action +':insales:product').publish(status);
+  EventBus.publish(status.action +':insales:product', status);
   return;
 };
 

@@ -4,6 +4,7 @@
  * Зависит от ISnew.json, Events, ISnew.CartHelper
  */
 
+// TODO: сделать синглтон
 ISnew.Cart = function () {
   var self = this;
 
@@ -155,24 +156,24 @@ ISnew.Cart.prototype._setOrder = function (order, task) {
   data.action = task;
 
   if (task && task.method) {
-    Events(task.method +':insales:cart').publish(data);
+    EventBus.publish(task.method +':insales:cart', data);
   }
 
-  Events('update_items:insales:cart').publish(data);
+  EventBus.publish('update_items:insales:cart', data);
 };
 
 /**
  * Событие ПЕРЕД действием
  */
 ISnew.Cart.prototype._before = function (task) {
-  Events('before:insales:cart').publish(task);
+  EventBus.publish('before:insales:cart', task);
 };
 
 /**
  * Мы закончили что-то делать в корзине
  */
 ISnew.Cart.prototype._always = function (task) {
-  Events('always:insales:cart').publish(task);
+  EventBus.publish('always:insales:cart', task);
 };
 
 /**

@@ -2,6 +2,7 @@
  * Сравнение товаров
  */
 
+// TODO: сделать синглтон
 ISnew.Compare = function (options) {
   options = options || {};
 
@@ -119,10 +120,10 @@ ISnew.Compare.prototype._events = function (task) {
   var self = this;
   var data = self;
   data.action = task;
-  Events(task.method +':insales:compares').publish(data);
+  EventBus.publish(task.method +':insales:compares', data);
 
   if (data.action.method != 'update_items' && data.action.method != 'overload') {
-    Events('update_items:insales:compares').publish(data);
+    EventBus.publish('update_items:insales:compares', data);
   }
 };
 
@@ -130,12 +131,12 @@ ISnew.Compare.prototype._events = function (task) {
  * Событие ПЕРЕД действием
  */
 ISnew.Compare.prototype._before = function (task) {
-  Events('before:insales:compares').publish(task);
+  EventBus.publish('before:insales:compares', task);
 };
 
 /**
  * Мы закончили что-то делать в сравнении
  */
 ISnew.Compare.prototype._always = function (task) {
-  Events('always:insales:compares').publish(task);
+  EventBus.publish('always:insales:compares', task);
 };
