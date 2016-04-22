@@ -8,28 +8,28 @@
 * обработчики событий сработают, даже если событие произошло раньше того, как мы к нему привязали обработчик.
 * не важен порядок объявления Издателя и Подпсичиков
 
-Работа с шиной производится через объект Events
+Работа с шиной производится через объект EventBus
 
 ## Пример
 
 ````javascript
 // Подключаем Подписчика №1
-Events('event1').subscribe(function (data) {
+EventBus.subscribe('event1', function (data) {
   console.log('event1:', data);
 });
 
 // Запускаем Издателя
-Events('event1').publish('hello World!');
+EventBus.publish('event1', 'hello World!');
 // -> event1:hello World!
 
 // Подключаем Подписчика №2
-Events('event1').subscribe(function (data) {
+EventBus.subscribe('event1', function (data) {
   console.log(data, 'Let\'s rock');
 })
 // -> hello World!Let's rock
 
 // Запускаем Издателя
-Events('event1').publish('hello Mars!');
+EventBus.publish('event1', 'hello Mars!');
 // -> event1:hello Mars!
 // -> hello Mars!Let's rock
 ````

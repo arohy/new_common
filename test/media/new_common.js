@@ -507,17 +507,6 @@ ISnew.EventBus.prototype._selectEvent = function (eventId) {
 
   return Event;
 };
-
-var Events = function (id) {
-  var self = this;
-
-  self.publish = function (data) {
-    var _this = this;
-    console.log(_this, id);
-  };
-};
-
-//Events = new OldEvents();
 /*
  * Добавление товара в корзину
  */
