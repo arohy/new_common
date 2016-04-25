@@ -1,0 +1,31 @@
+<form action="{{ cart_url }}" method="post">
+  <select name="variant_id" id="variant-select">
+    {% for variant in product.variants %}
+      <option value="{{ variant.id }}">{{ variant.title | escape }}</option>
+    {% endfor %}
+  </select>
+
+  <input type="text" name="quantity" value="1" />
+
+  <button type="" cart-item-add>
+    Добавь одну
+  </button>
+</form>
+<br />
+<br />
+<br />
+
+<form action="{{ cart_url }}" method="post">
+  {% for variant in product.variants %}
+    <div>
+      <label>{{ variant.title | escape }}</label>
+      <input type="text" name="variant_ids[{{ variant.id }}]" value="1">
+
+      <button cart-item-delete="{{ variant.id }}">X</button>
+    </div>
+  {% endfor %}
+
+  <button type="" cart-item-add>
+    Добавь все
+  </button>
+</form>

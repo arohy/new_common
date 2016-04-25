@@ -1,0 +1,35 @@
+<div class="" style="float: left; width: 50%">
+
+  <h2>products</h2>
+  {% for product in collections.sarome.products limit: 10 %}
+    {{ product.id }} ->
+    {% for variant in product.variants %}
+      {{ variant.id }} ||
+    {% endfor %}
+    <br />
+  {% endfor %}
+
+  ==================<br />
+  {% for product in collections.tovar-dnya.products limit: 10 %}
+    <a href="{{product.url}}">{{ product.id }}</a> ->
+    {% for variant in product.variants %}
+      {{ variant.id }} ||
+    {% endfor %}
+    <br />
+  {% endfor %}
+
+  <h2>delivery_id</h2>
+  {% for delivery in account.delivery_variants %}
+  {{ delivery.id }}
+  {% endfor %}
+
+  <h2>payment_id</h2>
+  {% for payment in account.payment_gateways %}
+  {{ payment.id }}
+  {% endfor %}
+</div>2
+
+<div class="" style="float: left; width: 50%">
+  cart
+  <pre class="prettyprint js-cart"></pre>
+</div>
