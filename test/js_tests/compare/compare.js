@@ -1,5 +1,5 @@
 var Compare = new ISnew.Compare({
-  maxItems: 2
+  //maxItems: 2
 });
 
 EventBus.subscribe('init:insales:compares', function (data) {
