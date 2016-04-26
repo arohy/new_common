@@ -1,5 +1,3 @@
-var CartUI = new ISnew.CartDOM();
-
 $(document).on('click', 'button', function (event) {
   event.preventDefault();
   console.log('click');

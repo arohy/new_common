@@ -36,6 +36,7 @@ if (!EventBus) {
 ISnew.Cart = function () {
   var self = this;
 
+  self.dom = new ISnew.CartDOM();
   self._get();
 }
 
@@ -360,7 +361,6 @@ ISnew.CartDOM.prototype._init = function (options) {
  */
 ISnew.CartDOM.prototype._addItem = function ($button) {
   var self = this;
-  var add = self.options.add;
 
   var $form = $button.parents('form:first');
   var $fields = $form.find('[name*="variant_ids"]');
@@ -384,7 +384,6 @@ ISnew.CartDOM.prototype._addItem = function ($button) {
   }
   _.assign(task.items, self._getItems($fields));
 
-  console.log('add_items:', task);
   // посылаем данные в корзину
   Cart.add(task);
   return;
@@ -395,6 +394,7 @@ ISnew.CartDOM.prototype._addItem = function ($button) {
  */
 ISnew.CartDOM.prototype._deleteItem = function ($button) {
   var self = this;
+
   var task = {
     items: [self._getId($button.attr(self.options.delete))],
     button: $button
@@ -415,6 +415,7 @@ ISnew.CartDOM.prototype.updateOrder = function () {
   var self = this;
   var $form = $('['+ self.options.form +']');
   var $fields = $form.find('input[name*="cart[quantity]"]');
+
   var task = {
     items: {},
     form: $form,
@@ -437,8 +438,9 @@ ISnew.CartDOM.prototype.updateOrder = function () {
  */
 ISnew.CartDOM.prototype.clearOder = function ($button) {
   var self = this;
-  var $form = $(self.options.form);
+  var $form = $('['+ self.options.form +']')
   var $fields = $form.find('input[name*="cart[quantity]"]');
+
   var task = {
     items: [],
     form: $form,
@@ -579,6 +581,7 @@ ISnew.CartDOM.prototype._bindUpdateCart = function () {
     if (event.keyCode == '13') {
       // блочим отправку формы и запускаем обработку
       event.preventDefault();
+
       self.updateOrder();
     }
   });
@@ -596,7 +599,7 @@ ISnew.CartDOM.prototype._bindUpdateCart = function () {
  */
 ISnew.CartDOM.prototype._bindClearOrder = function () {
   var self = this;
-  var $form = $(self.options.form);
+  //var $form = $('['+ self.options.form +']');
 
   // вешаем глобальный обработчик
   $(document).on('click', '['+ self.options.clear +']', function (event) {
@@ -608,8 +611,8 @@ ISnew.CartDOM.prototype._bindClearOrder = function () {
 
   // снимаем метку "в процессе" с кнопки
   EventBus.subscribe('always:insales:cart', function (data) {
-    if (data.method == 'delete_items') {
-      $form.prop(self.options.inProcess, false);
+    if (data.form && data.method == 'delete_items') {
+      data.form.prop(self.options.inProcess, false);
 
       // если дернули через стандартную кнопку - отжать её
       if (data.button) {
@@ -624,7 +627,7 @@ ISnew.CartDOM.prototype._bindClearOrder = function () {
  */
 ISnew.CartDOM.prototype._bindCoupon = function () {
   var self = this;
-  var $form = $(self.options.form);
+  var $form = $('['+ self.options.form +']');
 
   // вешаем глобальный обработчик
   $(document).on('click', '['+ self.options.coupon +']', function (event) {
