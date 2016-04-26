@@ -2,6 +2,9 @@ var Cart = new ISnew.Cart();
 var Compare = new ISnew.Compare({
   //maxItems: 2
 });
+EventBus._addLogger({
+  component: false
+});
 /*
  * Тест для addCartItems()
  */
