@@ -363,7 +363,7 @@ ISnew.CartDOM.prototype._addItem = function ($button) {
   var add = self.options.add;
 
   var $form = $button.parents('form:first');
-  var $fields = $form.find('[name="variant_ids"]');
+  var $fields = $form.find('[name*="variant_ids"]');
   var $one_variant = $form.find('[name="variant_id"]');
   var $quantity = $form.find('input[name="quantity"]');
 
@@ -384,6 +384,7 @@ ISnew.CartDOM.prototype._addItem = function ($button) {
   }
   _.assign(task.items, self._getItems($fields));
 
+  console.log('add_items:', task);
   // посылаем данные в корзину
   Cart.add(task);
   return;
@@ -850,6 +851,267 @@ ISnew.EventBus.prototype._selectEvent = function (eventId) {
 
   return Event;
 };
+/*
+ * Добавление товара в корзину
+ */
+
+/**
+ * Принимаем объект
+ *
+ * Внезапно, если это объект невалидного вида мы все равно получим ответ!!!
+ */
+
+ISnew.json.addCartItems = function (items, options) {
+  var fields = {};
+  options = options || {};
+
+  _.forIn(items, function (quantity, variant_id) {
+    fields['variant_ids['+ variant_id +']'] = _.toInteger(quantity);
+  });
+
+  _.forIn(options.comments, function (comment, variant_id) {
+    fields['cart[order_line_comments]['+ variant_id +']'] = comment;
+  });
+
+  if (options.coupon) {
+    fields['cart[coupon]'] = options.coupon;
+  }
+
+  return $.post('/cart_items.json', fields);
+}
+/**
+ * Добавление товара в сравнение
+ */
+
+ISnew.json.addCompareItem = function (id) {
+  var fields = {
+    'product[id]': _.toInteger(id)
+  };
+
+  return $.post('/compares.json', fields);
+};
+/*
+ * Получение состава корзины
+ */
+
+ISnew.json.getCartItems = function () {
+  var result = $.Deferred();
+  var cookieCart = $.cookie('cart');
+
+  /*
+   * В куке состав корзины хранится, если там не более 4х РАЗНЫХ модификаций
+   * Кука может быть пустой - дергаем инфу с сервера
+   * Если кука содержит строку 'json' - дергаю инфу с сервера
+   */
+  if (cookieCart && cookieCart != 'json') {
+    order = $.parseJSON(cookieCart) || null;
+    result.resolve(order);
+    // reject??
+  } else {
+    $.getJSON('/cart_items.json')
+      .done(function (order) {
+        result.resolve(order);
+      })
+      .fail(function (response) {
+        result.reject(response);
+      });
+  }
+
+  return result.promise();
+};
+ISnew.json.getClientInfo = function (){
+  return $.getJSON('/client_account/contacts.json');
+};
+/*
+ * Получение информации о коллекции
+ */
+
+ISnew.json.getCollection = function () {
+  var path = '/collection/'+ _.toString(arguments[0]) +'.json';
+  var fields = {};
+
+  _.chain(arguments)
+    .drop()
+    .compact()
+    .each(function (value) {
+      _.assign(fields, value)
+    })
+    .value();
+
+  return $.getJSON(path, fields);
+};
+/**
+ * Добавление товара в сравнение
+ */
+
+ISnew.json.getCompareItems = function (id) {
+
+  return $.getJSON('/compares.json');
+};
+/*
+ * Получение информации о товаре
+ */
+
+ISnew.json.getProduct = function (id) {
+  return $.getJSON('/product_by_id/'+ _.toInteger(id) +'.json');
+};
+/*
+ * Получение информации о списке товаров
+ */
+
+ISnew.json.getProductsList = function (id_array) {
+  // указваем, сколько id нужно отправить за раз
+  var query_limit = 25;
+
+  /**
+   * Генерим адреса для запросов
+   *
+   * Приводим к типу массив (мало ли что там прилетело)
+   * Разбиваем на пачки, делаем из них правильные адреса для запросов
+   */
+  var paths = _.chain(id_array)
+    .toArray()
+    .compact()
+    .chunk(query_limit)
+    .map(function (ids_list) {
+      return '/products_by_id/'+ ids_list.join() +'.json';
+    })
+    .value();
+
+  // собираем задачи
+  var promises = $.map(paths, function (path) {
+    return $.ajax(path).then(function (response) {
+        return response;
+      });
+  });
+
+  /**
+   * Склеиваем ответы.
+   *
+   * Проходимся по всем получившимся промисам, дергаем их
+   */
+  return $.when.apply(this, promises)
+    .then(function () {
+      /**
+       * Получаем ответы ото ВСЕХ промисов.
+       * Приводим к типу массив, на случай если ответы все кривые и там - пустота
+       * Вытаскиваем массив с продуктами, склеиваем все массивы и выдаем наружу
+       */
+      return _.chain(arguments)
+        .toArray()
+        .map(function (response) {
+          return response.products;
+        })
+        .flatten()
+        .union()
+        .value()
+    });
+};
+/**
+ * Оформление заказа
+ */
+
+ISnew.json.makeCheckout = function (client, order) {
+  console.log(client, order);
+  var dfd = $.Deferred();
+  var checkout = {
+    pid: 1,
+    'order[delivery_variant_id]': _.toInteger(order.delivery),
+    'order[payment_gateway_id]': _.toInteger(order.payment)
+  };
+
+  _.forIn(client, function (value, field) {
+    checkout['client['+ field +']'] = value;
+  });
+
+  console.log(checkout);
+
+  $.post('/fast_checkout.json', checkout)
+    .done(function (response) {
+      if (response.status == 'ok') {
+        dfd.resolve(response);
+      } else {
+        dfd.reject(response);
+      }
+    })
+    .fail(function (response) {
+      dfd.reject(response)
+    })
+
+  return dfd.promise();
+};
+/*
+ * Удаление товара из корзины
+ */
+
+ISnew.json.removeCartItem = function (variant_id) {
+  var path = '/cart_items/'+ _.toInteger(variant_id) +'.json';
+  var fields = {
+    '_method': 'delete'
+  };
+
+  return $.post(path, fields);
+};
+/*
+ * Удаление товара из сравнения
+ */
+
+ISnew.json.removeCompareItem = function (id) {
+  var fields = {
+      _method: 'delete',
+    };
+  var path   = '/compares/'+ _.toInteger(id) +'.json';
+
+  return $.post(path, fields);
+};
+/*
+ * Отправление сообщения
+ */
+
+ISnew.json.sendMessage = function (input) {
+  var result = $.Deferred();
+  var message = {};
+
+  _.forIn(input, function (value, key) {
+    message['feedback['+ key +']'] = value;
+  });
+
+  $.post('/client_account/feedback.json', message)
+    .done(function (response) {
+      if (message && response.status == 'ok') {
+        result.resolve(response);
+      } else {
+        response.message = message;
+        result.reject(response);
+      }
+    });
+
+  return result.promise();
+};
+/**
+ * Обновление корзины
+ */
+
+ISnew.json.updateCartItems = function (items, options) {
+  var fields = {
+    '_method': 'put'
+  };
+  options = options || {};
+
+  _.forIn(items, function(quantity, variant_id) {
+    fields['cart[quantity]['+ variant_id +']'] = _.toInteger(quantity);
+  });
+
+  _.forIn(options.comments, function(comment, variant_id) {
+    fields['cart[order_line_comments]['+ variant_id +']'] = comment;
+  });
+
+  if (options.coupon) {
+    fields['cart[coupon]'] = options.coupon;
+  }
+
+  return $.post('/cart_items.json', fields);
+};
 /**
  * Типы цен
  */
@@ -1248,267 +1510,6 @@ ISnew.ProductVariants.prototype._getSelectedVector = function (_length) {
   });
 
   return vector;
-};
-/*
- * Добавление товара в корзину
- */
-
-/**
- * Принимаем объект
- *
- * Внезапно, если это объект невалидного вида мы все равно получим ответ!!!
- */
-
-ISnew.json.addCartItems = function (items, options) {
-  var fields = {};
-  options = options || {};
-
-  _.forIn(items, function (quantity, variant_id) {
-    fields['variant_ids['+ variant_id +']'] = _.toInteger(quantity);
-  });
-
-  _.forIn(options.comments, function (comment, variant_id) {
-    fields['cart[order_line_comments]['+ variant_id +']'] = comment;
-  });
-
-  if (options.coupon) {
-    fields['cart[coupon]'] = options.coupon;
-  }
-
-  return $.post('/cart_items.json', fields);
-}
-/**
- * Добавление товара в сравнение
- */
-
-ISnew.json.addCompareItem = function (id) {
-  var fields = {
-    'product[id]': _.toInteger(id)
-  };
-
-  return $.post('/compares.json', fields);
-};
-/*
- * Получение состава корзины
- */
-
-ISnew.json.getCartItems = function () {
-  var result = $.Deferred();
-  var cookieCart = $.cookie('cart');
-
-  /*
-   * В куке состав корзины хранится, если там не более 4х РАЗНЫХ модификаций
-   * Кука может быть пустой - дергаем инфу с сервера
-   * Если кука содержит строку 'json' - дергаю инфу с сервера
-   */
-  if (cookieCart && cookieCart != 'json') {
-    order = $.parseJSON(cookieCart) || null;
-    result.resolve(order);
-    // reject??
-  } else {
-    $.getJSON('/cart_items.json')
-      .done(function (order) {
-        result.resolve(order);
-      })
-      .fail(function (response) {
-        result.reject(response);
-      });
-  }
-
-  return result.promise();
-};
-ISnew.json.getClientInfo = function (){
-  return $.getJSON('/client_account/contacts.json');
-};
-/*
- * Получение информации о коллекции
- */
-
-ISnew.json.getCollection = function () {
-  var path = '/collection/'+ _.toString(arguments[0]) +'.json';
-  var fields = {};
-
-  _.chain(arguments)
-    .drop()
-    .compact()
-    .each(function (value) {
-      _.assign(fields, value)
-    })
-    .value();
-
-  return $.getJSON(path, fields);
-};
-/**
- * Добавление товара в сравнение
- */
-
-ISnew.json.getCompareItems = function (id) {
-
-  return $.getJSON('/compares.json');
-};
-/*
- * Получение информации о товаре
- */
-
-ISnew.json.getProduct = function (id) {
-  return $.getJSON('/product_by_id/'+ _.toInteger(id) +'.json');
-};
-/*
- * Получение информации о списке товаров
- */
-
-ISnew.json.getProductsList = function (id_array) {
-  // указваем, сколько id нужно отправить за раз
-  var query_limit = 25;
-
-  /**
-   * Генерим адреса для запросов
-   *
-   * Приводим к типу массив (мало ли что там прилетело)
-   * Разбиваем на пачки, делаем из них правильные адреса для запросов
-   */
-  var paths = _.chain(id_array)
-    .toArray()
-    .compact()
-    .chunk(query_limit)
-    .map(function (ids_list) {
-      return '/products_by_id/'+ ids_list.join() +'.json';
-    })
-    .value();
-
-  // собираем задачи
-  var promises = $.map(paths, function (path) {
-    return $.ajax(path).then(function (response) {
-        return response;
-      });
-  });
-
-  /**
-   * Склеиваем ответы.
-   *
-   * Проходимся по всем получившимся промисам, дергаем их
-   */
-  return $.when.apply(this, promises)
-    .then(function () {
-      /**
-       * Получаем ответы ото ВСЕХ промисов.
-       * Приводим к типу массив, на случай если ответы все кривые и там - пустота
-       * Вытаскиваем массив с продуктами, склеиваем все массивы и выдаем наружу
-       */
-      return _.chain(arguments)
-        .toArray()
-        .map(function (response) {
-          return response.products;
-        })
-        .flatten()
-        .union()
-        .value()
-    });
-};
-/**
- * Оформление заказа
- */
-
-ISnew.json.makeCheckout = function (client, order) {
-  console.log(client, order);
-  var dfd = $.Deferred();
-  var checkout = {
-    pid: 1,
-    'order[delivery_variant_id]': _.toInteger(order.delivery),
-    'order[payment_gateway_id]': _.toInteger(order.payment)
-  };
-
-  _.forIn(client, function (value, field) {
-    checkout['client['+ field +']'] = value;
-  });
-
-  console.log(checkout);
-
-  $.post('/fast_checkout.json', checkout)
-    .done(function (response) {
-      if (response.status == 'ok') {
-        dfd.resolve(response);
-      } else {
-        dfd.reject(response);
-      }
-    })
-    .fail(function (response) {
-      dfd.reject(response)
-    })
-
-  return dfd.promise();
-};
-/*
- * Удаление товара из корзины
- */
-
-ISnew.json.removeCartItem = function (variant_id) {
-  var path = '/cart_items/'+ _.toInteger(variant_id) +'.json';
-  var fields = {
-    '_method': 'delete'
-  };
-
-  return $.post(path, fields);
-};
-/*
- * Удаление товара из сравнения
- */
-
-ISnew.json.removeCompareItem = function (id) {
-  var fields = {
-      _method: 'delete',
-    };
-  var path   = '/compares/'+ _.toInteger(id) +'.json';
-
-  return $.post(path, fields);
-};
-/*
- * Отправление сообщения
- */
-
-ISnew.json.sendMessage = function (input) {
-  var result = $.Deferred();
-  var message = {};
-
-  _.forIn(input, function (value, key) {
-    message['feedback['+ key +']'] = value;
-  });
-
-  $.post('/client_account/feedback.json', message)
-    .done(function (response) {
-      if (message && response.status == 'ok') {
-        result.resolve(response);
-      } else {
-        response.message = message;
-        result.reject(response);
-      }
-    });
-
-  return result.promise();
-};
-/**
- * Обновление корзины
- */
-
-ISnew.json.updateCartItems = function (items, options) {
-  var fields = {
-    '_method': 'put'
-  };
-  options = options || {};
-
-  _.forIn(items, function(quantity, variant_id) {
-    fields['cart[quantity]['+ variant_id +']'] = _.toInteger(quantity);
-  });
-
-  _.forIn(options.comments, function(comment, variant_id) {
-    fields['cart[order_line_comments]['+ variant_id +']'] = comment;
-  });
-
-  if (options.coupon) {
-    fields['cart[coupon]'] = options.coupon;
-  }
-
-  return $.post('/cart_items.json', fields);
 };
 /**
  * Обертка для шаблонизатора

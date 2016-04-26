@@ -46,7 +46,7 @@ ISnew.CartDOM.prototype._addItem = function ($button) {
   var add = self.options.add;
 
   var $form = $button.parents('form:first');
-  var $fields = $form.find('[name="variant_ids"]');
+  var $fields = $form.find('[name*="variant_ids"]');
   var $one_variant = $form.find('[name="variant_id"]');
   var $quantity = $form.find('input[name="quantity"]');
 
@@ -67,6 +67,7 @@ ISnew.CartDOM.prototype._addItem = function ($button) {
   }
   _.assign(task.items, self._getItems($fields));
 
+  console.log('add_items:', task);
   // посылаем данные в корзину
   Cart.add(task);
   return;
