@@ -36,7 +36,7 @@ if (!EventBus) {
 ISnew.Cart = function () {
   var self = this;
 
-  self.dom = new ISnew.CartDOM();
+  self.ui = new ISnew.CartDOM();
   self._get();
 }
 
