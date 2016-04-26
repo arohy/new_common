@@ -65,3 +65,33 @@ ISnew.EventBus.prototype._selectEvent = function (eventId) {
 
   return Event;
 };
+
+/**
+ * Logger
+ */
+ISnew.EventBus.prototype._addLogger = function (options) {
+  var self = this;
+  var options = options || {};
+  var method = options.method || false;
+  var component = options.component || false;
+
+  _.forEach(self.eventsList, function (item, eventName) {
+    var event = eventName.split(':');
+
+    if (event[0] == method && event[2] == component) {
+      EventBus.subscribe(eventName, function (data) {
+        console.log('Listner: Method', eventName, data);
+      });
+    } else if (!method && event[2] == component) {
+      EventBus.subscribe(eventName, function (data) {
+        console.log('Listner: Component ', eventName, data);
+      });
+    } else if (!method && !component) {
+      EventBus.subscribe(eventName, function (data) {
+        console.log('Listner: All:', eventName, data);
+      });
+    }
+  });
+
+  return;
+};
