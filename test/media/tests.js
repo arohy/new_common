@@ -2,6 +2,7 @@ var Cart = new ISnew.Cart();
 var Compare = new ISnew.Compare({
   //maxItems: 2
 });
+var product;
 /*
  * Тест для addCartItems()
  */
@@ -173,4 +174,3 @@ testUpdateCartItems = function (items, comments) {
       console.log('fail', response);
     })
 }
-var product;
