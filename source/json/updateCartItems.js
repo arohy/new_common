@@ -17,7 +17,7 @@ ISnew.json.updateCartItems = function (items, options) {
   });
 
   if (options.coupon) {
-    fields['cart[coupon]'] = coupon;
+    fields['cart[coupon]'] = options.coupon;
   }
 
   return $.post('/cart_items.json', fields);

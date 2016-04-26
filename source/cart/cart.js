@@ -104,6 +104,18 @@ ISnew.Cart.prototype.clear = function (task) {
 };
 
 /**
+ * Устанавливаем купон
+ */
+ISnew.Cart.prototype.setCoupon = function (task) {
+  var self = this;
+  var current_items = self._getItems();
+  task = task || {};
+  task.method = 'set_coupon';
+
+  self._update(current_items, task);
+};
+
+/**
  * Получить состав корзины
  */
 ISnew.Cart.prototype.getOrder = function () {
@@ -130,7 +142,7 @@ ISnew.Cart.prototype._update = function (items, task) {
   var self = this;
 
   self._before(task);
-  ISnew.json.updateCartItems(items, task.comments)
+  ISnew.json.updateCartItems(items, task)
     .done(function (response) {
       self._setOrder(response, task);
     })
@@ -157,6 +169,12 @@ ISnew.Cart.prototype._setOrder = function (order, task) {
 
   if (task && task.method) {
     EventBus.publish(task.method +':insales:cart', data);
+  }
+
+  if (task && task.coupon) {
+    var data = data;
+    data.action = 'set_coupon';
+    EventBus.publish('set_coupon:insales:cart', data);
   }
 
   EventBus.publish('update_items:insales:cart', data);
@@ -211,7 +229,6 @@ ISnew.Cart.prototype._patch = function (current_order) {
 
   self.discounts = current_order.discounts;
 
-  console.log('patch:', self);
   self._itemsPrice();
   self._deliveryPrice(current_order);
   self._url();
