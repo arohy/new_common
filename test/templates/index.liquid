@@ -2,11 +2,15 @@
 
   <h2>products</h2>
   {% for product in collections.sarome.products limit: 10 %}
-    {{ product.id }} ->
-    {% for variant in product.variants %}
-      {{ variant.id }} ||
-    {% endfor %}
-    <br />
+    <div class="">
+      <button compare-item-add="{{ product.id }}">+</button>
+      <button compare-item-delete="{{ product.id }}">-</button>
+      {{ product.id }} ->
+      {% for variant in product.variants %}
+        {{ variant.id }} ||
+      {% endfor %}
+
+    </div>
   {% endfor %}
 
   ==================<br />

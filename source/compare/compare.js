@@ -10,6 +10,8 @@ ISnew.Compare = function (options) {
   self.products = [];
   self.maxItems = options.maxItems || 4;
 
+  self.ui = new ISnew.CompareDOM(options);
+
   // Обновляемся
   self._update();
 };
@@ -28,6 +30,13 @@ ISnew.Compare.prototype.add = function (task) {
   if (self.products.length >= self.maxItems) {
     task.method = 'overload';
     self._events(task);
+    self._always(task);
+
+    return;
+  } else if (_.findIndex(self.products, task.item) != -1) {
+    task.method = 'in_list';
+    self._events(task);
+    self._always(task);
 
     return;
   } else {
