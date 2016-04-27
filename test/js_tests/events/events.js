@@ -1,5 +1,1 @@
-setTimeout(function () {
-  EventBus._addLogger({
-    component: 'compares'
-  });
-}, 2000);
+EventBus.logger.add('compares');

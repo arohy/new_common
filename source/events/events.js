@@ -13,17 +13,18 @@ ISnew.EventBus = function () {
   var self = this;
 
   self.eventsList = {};
+  self.logger = new ISnew.EventsLogger();
 
   return;
 };
-
-EventBus = new ISnew.EventBus();
 
 /**
  * Публикация события с данными
  */
 ISnew.EventBus.prototype.publish = function (eventId, data) {
   var self = this;
+
+  self.logger.addListner(eventId);
 
   return self._selectEvent(eventId).fire(data);
 };
@@ -64,34 +65,4 @@ ISnew.EventBus.prototype._selectEvent = function (eventId) {
   }
 
   return Event;
-};
-
-/**
- * Logger
- */
-ISnew.EventBus.prototype._addLogger = function (options) {
-  var self = this;
-  var options = options || {};
-  var method = options.method || false;
-  var component = options.component || false;
-
-  _.forEach(self.eventsList, function (item, eventName) {
-    var event = eventName.split(':');
-
-    if (event[0] == method && event[2] == component) {
-      EventBus.subscribe(eventName, function (data) {
-        console.log('Listner: Method', eventName, data);
-      });
-    } else if (!method && event[2] == component) {
-      EventBus.subscribe(eventName, function (data) {
-        console.log('Listner: Component ', eventName, data);
-      });
-    } else if (!method && !component) {
-      EventBus.subscribe(eventName, function (data) {
-        console.log('Listner: All:', eventName, data);
-      });
-    }
-  });
-
-  return;
 };
