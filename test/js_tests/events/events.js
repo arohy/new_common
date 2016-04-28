@@ -1,1 +1,1 @@
-EventBus.logger.add('compares');
+EventBus.logger.add('product');

@@ -4,7 +4,7 @@
 
 ISnew.Template = function () {
   var self = this;
-  self.TemplateList = {};
+  self._templateList = {};
 
   self._init();
 };
@@ -14,8 +14,16 @@ ISnew.Template = function () {
  */
 ISnew.Template.prototype.render = function (data, template_id) {
   var self = this;
+  var template = self._templateList[template_id];
+  var result;
 
-  return self.TemplateList[template_id](data);
+  if (template !== undefined) {
+    result = self._templateList[template_id](data);
+  } else {
+    result = false;
+  }
+
+  return result;
 };
 
 /**
@@ -24,7 +32,7 @@ ISnew.Template.prototype.render = function (data, template_id) {
 ISnew.Template.prototype.load = function (template_body, template_id) {
   var self = this;
 
-  self.TemplateList[template_id] = _.template(template_body);
+  self._templateList[template_id] = _.template(template_body);
 
   return;
 };

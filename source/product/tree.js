@@ -220,7 +220,7 @@ ISnew.ProductVariants.prototype.setOption = function (option) {
 ISnew.ProductVariants.prototype.getOption = function (index) {
   var self = this;
 
-  return self.options[index].selected;
+  return self.options[index];
 };
 
 /**

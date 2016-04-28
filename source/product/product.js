@@ -8,6 +8,7 @@ ISnew.Product = function (product) {
   self.quantity = 0;
   self.price_kinds = new ISnew.ProductPriceType(product, self);
   self.variants = new ISnew.ProductVariants(product, self);
+  self.OptionSelector = new ISnew.OptionSelector(product, self);
 };
 
 /**

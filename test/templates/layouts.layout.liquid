@@ -13,10 +13,6 @@
   {{ content_for_layout }}
   <script type="text/javascript" src="{{ 'tests.js' | asset_url }}"></script>
   <script type="text/javascript">
-    $(function(){
-      product = new ISnew.Product({{ collections.tovar-dnya.products.last | json }});
-    });
-
     var Template = new ISnew.Template();
     var cv_currency_format = '{{ money_with_currency_format }}';
     var money = new ISnew.Money();
@@ -27,6 +23,34 @@
     <% if (user) { %>
       hello!! <%- user %>!
     <% } %>
+  </script>
+
+  <script type="text/javascript">
+    $(function () {
+      product = new ISnew.Product({{ product | json }});
+    });
+  </script>
+
+  <script type="text/template" data-template-id="option-select">
+    <div>
+      <label><%= option.title %></label>
+      <select
+        data-option-selector
+        data-option-select
+        data-option_name_id="<%= option.id %>"
+      >
+        <% _.forEach(values, function (value){ %>
+          <option
+            data-selctor-variant="<%= value.id %>"
+            data-value-position="<%= value.position %>"
+            value="<%= value.position %>"
+            <% if (option.selected == value.position) { %>selected<% } %>
+          >
+            <%= value.title %>
+          </option>
+        <% }) %>
+      </select>
+    </div>
   </script>
 </body>
 </html>
