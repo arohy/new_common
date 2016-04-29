@@ -8,9 +8,9 @@
 ISnew.Cart = function () {
   var self = this;
 
-  self._ui = new ISnew.CartDOM();
+  self.ui = new ISnew.CartDOM();
   self.order = new ISnew.CartOrder(self);
-  self._tasks = new ISnew.CartTasks(self);
+  self.tasks = new ISnew.CartTasks(self);
 
   self.init();
 };
@@ -26,7 +26,7 @@ ISnew.Cart.prototype.init = function () {
     method: 'init'
   };
 
-  self._tasks.send(task);
+  self.tasks.send(task);
 };
 
 ISnew.Cart.prototype._get = function () {
@@ -47,7 +47,7 @@ ISnew.Cart.prototype.add = function (task) {
   task = task || {};
   task.method = 'add_items';
 
-  self._tasks.send(task);
+  self.tasks.send(task);
 };
 
 ISnew.Cart.prototype._add = function (task, current_items) {
@@ -72,7 +72,7 @@ ISnew.Cart.prototype.remove = function (task) {
   task = task || {};
   task.method = 'remove_items';
 
-  self._tasks.send(task);
+  self.tasks.send(task);
 };
 
 ISnew.Cart.prototype._remove = function (task, current_items) {
@@ -96,7 +96,7 @@ ISnew.Cart.prototype.set = function (task) {
   task = task || {};
   task.method = 'set_items';
 
-  self._tasks.send(task);
+  self.tasks.send(task);
 };
 
 ISnew.Cart.prototype._set = function (task, current_items) {
@@ -118,7 +118,7 @@ ISnew.Cart.prototype.delete = function (task) {
   task = task || {};
   task.method = 'delete_items';
 
-  self._tasks.send(task);
+  self.tasks.send(task);
 };
 
 ISnew.Cart.prototype._delete = function (task, current_items) {
@@ -142,7 +142,7 @@ ISnew.Cart.prototype.clear = function (task) {
   task = task || {};
   task.method = 'clear_items';
 
-  self._tasks.send(task);
+  self.tasks.send(task);
 };
 
 ISnew.Cart.prototype._clear = function (task, current_items) {
@@ -164,7 +164,7 @@ ISnew.Cart.prototype.setCoupon = function (task) {
   task = task || {};
   task.method = 'set_coupon';
 
-  self._tasks.send(task);
+  self.tasks.send(task);
 };
 
 ISnew.Cart.prototype._setCoupon = function (task, current_items) {
@@ -188,16 +188,16 @@ ISnew.Cart.prototype.getOrder = function () {
 ISnew.Cart.prototype._update = function (items, task) {
   var self = this;
 
-  self._tasks._before();
+  self.tasks._before();
 
   ISnew.json.updateCartItems(items, task)
     .done(function (response) {
-      self._tasks._done(response);
+      self.tasks._done(response);
     })
     .fail(function (response) {
-      self._tasks._fail(response);
+      self.tasks._fail(response);
     })
     .always(function () {
-      self._tasks._always();
+      self.tasks._always();
     });
 };
