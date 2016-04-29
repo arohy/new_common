@@ -78,7 +78,7 @@ ISnew.Cart.prototype.add = function (task) {
   self.tasks.send(task);
 };
 
-ISnew.Cart.prototype._add = function (task, current_items) {
+ISnew.Cart.prototype._add_items = function (task, current_items) {
   var self = this;
 
   _.forIn(task.items, function(quantity, variant_id) {
@@ -103,7 +103,7 @@ ISnew.Cart.prototype.remove = function (task) {
   self.tasks.send(task);
 };
 
-ISnew.Cart.prototype._remove = function (task, current_items) {
+ISnew.Cart.prototype._remove_items = function (task, current_items) {
   var self = this;
 
   _.forIn(task.items, function(quantity, variant_id) {
@@ -127,7 +127,7 @@ ISnew.Cart.prototype.set = function (task) {
   self.tasks.send(task);
 };
 
-ISnew.Cart.prototype._set = function (task, current_items) {
+ISnew.Cart.prototype._set_items = function (task, current_items) {
   var self = this;
 
   _.forIn(task.items, function(quantity, variant_id) {
@@ -149,7 +149,7 @@ ISnew.Cart.prototype.delete = function (task) {
   self.tasks.send(task);
 };
 
-ISnew.Cart.prototype._delete = function (task, current_items) {
+ISnew.Cart.prototype._delete_items = function (task, current_items) {
   var self = this;
 
   _.chain(task.items)
@@ -173,7 +173,7 @@ ISnew.Cart.prototype.clear = function (task) {
   self.tasks.send(task);
 };
 
-ISnew.Cart.prototype._clear = function (task, current_items) {
+ISnew.Cart.prototype._clear_items = function (task, current_items) {
   var self = this;
 
   _.forIn(current_items, function(quantity, variant_id) {
@@ -195,7 +195,7 @@ ISnew.Cart.prototype.setCoupon = function (task) {
   self.tasks.send(task);
 };
 
-ISnew.Cart.prototype._setCoupon = function (task, current_items) {
+ISnew.Cart.prototype._set_coupon = function (task, current_items) {
   var self = this;
 
   return current_items;
@@ -445,32 +445,14 @@ ISnew.CartTasks.prototype._send = function (items_set, task) {
  */
 ISnew.CartTasks.prototype._task = function (task, current_items) {
   var self = this;
-  var result;
+  var method = '_'+ task.method;
 
-  switch (task.method) {
-    case 'add_items':
-      result = self._owner._add(task, current_items);
-      break;
-    case 'remove_items':
-      result = self._owner._remove(task, current_items);
-      break;
-    case 'set_items':
-      result = self._owner._set(task, current_items);
-      break;
-    case 'delete_items':
-      result = self._owner._delete(task, current_items);
-      break;
-    case 'clear_items':
-      result = self._owner._clear(task, current_items);
-      break;
-    case 'set_coupon':
-      result = self._owner._setCoupon(task, current_items);
-      break;
-    default:
-      result = self._owner._get();
-  };
+  // если такого метода нет - тягаем обновление корзины.
+  if (!_.isFunction(self._owner[method])) {
+    method = '_get';
+  }
 
-  return result;
+  return self._owner[method](task, current_items);
 };
 
 /**

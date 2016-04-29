@@ -50,7 +50,7 @@ ISnew.Cart.prototype.add = function (task) {
   self.tasks.send(task);
 };
 
-ISnew.Cart.prototype._add = function (task, current_items) {
+ISnew.Cart.prototype._add_items = function (task, current_items) {
   var self = this;
 
   _.forIn(task.items, function(quantity, variant_id) {
@@ -75,7 +75,7 @@ ISnew.Cart.prototype.remove = function (task) {
   self.tasks.send(task);
 };
 
-ISnew.Cart.prototype._remove = function (task, current_items) {
+ISnew.Cart.prototype._remove_items = function (task, current_items) {
   var self = this;
 
   _.forIn(task.items, function(quantity, variant_id) {
@@ -99,7 +99,7 @@ ISnew.Cart.prototype.set = function (task) {
   self.tasks.send(task);
 };
 
-ISnew.Cart.prototype._set = function (task, current_items) {
+ISnew.Cart.prototype._set_items = function (task, current_items) {
   var self = this;
 
   _.forIn(task.items, function(quantity, variant_id) {
@@ -121,7 +121,7 @@ ISnew.Cart.prototype.delete = function (task) {
   self.tasks.send(task);
 };
 
-ISnew.Cart.prototype._delete = function (task, current_items) {
+ISnew.Cart.prototype._delete_items = function (task, current_items) {
   var self = this;
 
   _.chain(task.items)
@@ -145,7 +145,7 @@ ISnew.Cart.prototype.clear = function (task) {
   self.tasks.send(task);
 };
 
-ISnew.Cart.prototype._clear = function (task, current_items) {
+ISnew.Cart.prototype._clear_items = function (task, current_items) {
   var self = this;
 
   _.forIn(current_items, function(quantity, variant_id) {
@@ -167,7 +167,7 @@ ISnew.Cart.prototype.setCoupon = function (task) {
   self.tasks.send(task);
 };
 
-ISnew.Cart.prototype._setCoupon = function (task, current_items) {
+ISnew.Cart.prototype._set_coupon = function (task, current_items) {
   var self = this;
 
   return current_items;

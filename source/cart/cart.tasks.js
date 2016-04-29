@@ -95,32 +95,14 @@ ISnew.CartTasks.prototype._send = function (items_set, task) {
  */
 ISnew.CartTasks.prototype._task = function (task, current_items) {
   var self = this;
-  var result;
+  var method = '_'+ task.method;
 
-  switch (task.method) {
-    case 'add_items':
-      result = self._owner._add(task, current_items);
-      break;
-    case 'remove_items':
-      result = self._owner._remove(task, current_items);
-      break;
-    case 'set_items':
-      result = self._owner._set(task, current_items);
-      break;
-    case 'delete_items':
-      result = self._owner._delete(task, current_items);
-      break;
-    case 'clear_items':
-      result = self._owner._clear(task, current_items);
-      break;
-    case 'set_coupon':
-      result = self._owner._setCoupon(task, current_items);
-      break;
-    default:
-      result = self._owner._get();
-  };
+  // если такого метода нет - тягаем обновление корзины.
+  if (!_.isFunction(self._owner[method])) {
+    method = '_get';
+  }
 
-  return result;
+  return self._owner[method](task, current_items);
 };
 
 /**
