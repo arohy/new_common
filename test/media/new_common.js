@@ -641,9 +641,7 @@ ISnew.CartDOM.prototype._bindAddItem = function () {
 
   // снимаем с кнопки метку после операций с корзиной
   EventBus.subscribe('always:insales:cart', function (data) {
-    if (data.method == 'add_items' && data.button) {
-      data.button.prop(self.options.inProcess, false);
-    }
+    self._unlockButton(data, 'add_items');
   });
 };
 
@@ -683,9 +681,7 @@ ISnew.CartDOM.prototype._bindDeleteItem = function () {
 
   // снимаем метку "в процессе" с кнопки
   EventBus.subscribe('always:insales:cart', function (data) {
-    if (data.button && data.method == 'delete_items') {
-      data.button.prop(self.options.inProcess, false);
-    }
+    self._unlockButton(data, 'delete_items');
   });
 };
 
@@ -742,9 +738,7 @@ ISnew.CartDOM.prototype._bindUpdateCart = function () {
 
   // снимаем метку "в процессе" с кнопки
   EventBus.subscribe('always:insales:cart', function (data) {
-    if (data.button && data.method == 'set_items') {
-      data.button.prop(self.options.inProcess, false);
-    }
+    self._unlockButton(data, 'set_items');
   });
 };
 
@@ -791,10 +785,7 @@ ISnew.CartDOM.prototype._bindClearOrder = function () {
 
   // снимаем метку "в процессе" с кнопки
   EventBus.subscribe('always:insales:cart', function (data) {
-    if (data.button && data.method == 'delete_items') {
-      // если дернули через стандартную кнопку - отжать её
-      data.button.prop(self.options.inProcess, false);
-    }
+    self._unlockButton(data, 'delete_items');
   });
 };
 
@@ -829,9 +820,7 @@ ISnew.CartDOM.prototype._bindCoupon = function () {
 
   // снимаем метку "в процессе" с формы
   EventBus.subscribe('always:insales:cart', function (data) {
-    if (data.button && data.method == 'set_coupon') {
-      data.button.prop(self.options.inProcess, false);
-    }
+    self._unlockButton(data, 'set_coupon');
   });
   return;
 };
@@ -863,6 +852,16 @@ ISnew.CartDOM.prototype._getItems = function ($fields) {
  */
 ISnew.CartDOM.prototype._getCoupon = function ($form) {
   return $form.find('[name="cart[coupon]"]').val() || false;
+};
+
+ISnew.CartDOM.prototype._unlockButton = function (data, eventName) {
+  var self = this;
+
+  if (data.action && data.action.button && data.action.method == eventName) {
+    data.action.button.prop(self.options.inProcess, false);
+  }
+
+  return;
 };
 /**
  * Сравнение товаров
