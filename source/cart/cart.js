@@ -8,9 +8,12 @@
 ISnew.Cart = function () {
   var self = this;
 
-  self.ui = new ISnew.CartDOM();
+  self._ui = new ISnew.CartDOM();
+  self._order = new ISnew.CartOrder(self);
+  self._tasks = new ISnew.CartTasks();
+
   self._get();
-}
+};
 
 /**
  * Добавить в корзину заданное кол-во товаров
@@ -19,9 +22,17 @@ ISnew.Cart = function () {
  */
 ISnew.Cart.prototype.add = function (task) {
   var self = this;
-  var current_items = self._getItems();
+
   task = task || {};
   task.method = 'add_items';
+
+  self._tasks.send(task);
+  self._update(self._add(task), task);
+};
+
+ISnew.Cart.prototype._add = function (task) {
+  var self = this;
+  var current_items = self._order.getItems();
 
   _.forIn(task.items, function(quantity, variant_id) {
     var current_quantity = _.toInteger(current_items[variant_id]) + _.toInteger(quantity);
@@ -29,7 +40,7 @@ ISnew.Cart.prototype.add = function (task) {
     current_items[variant_id] = current_quantity;
   });
 
-  self._update(current_items, task);
+  return current_items;
 };
 
 /**
@@ -38,9 +49,17 @@ ISnew.Cart.prototype.add = function (task) {
  */
 ISnew.Cart.prototype.remove = function (task) {
   var self = this;
-  var current_items = self._getItems();
+
   task = task || {};
   task.method = 'remove_items';
+
+  self._tasks.send(task);
+  self._update(self._remove(task), task);
+};
+
+ISnew.Cart.prototype._remove = function (task) {
+  var self = this;
+  var current_items = self._order.getItems();
 
   _.forIn(task.items, function(quantity, variant_id) {
     var current_quantity = _.toInteger(current_items[variant_id]) - _.toInteger(quantity);
@@ -48,7 +67,7 @@ ISnew.Cart.prototype.remove = function (task) {
     current_items[variant_id] = current_quantity > 0 ? current_quantity : 0;
   });
 
-  self._update(current_items, task);
+  return current_items;
 };
 
 /**
@@ -57,15 +76,22 @@ ISnew.Cart.prototype.remove = function (task) {
  */
 ISnew.Cart.prototype.set = function (task) {
   var self = this;
-  var current_items = self._getItems();
   task = task || {};
   task.method = 'set_items';
+
+  self._tasks.send(task);
+  self._update(self._set(task), task);
+};
+
+ISnew.Cart.prototype._set = function (task) {
+  var self = this;
+  var current_items = self._order.getItems();
 
   _.forIn(task.items, function(quantity, variant_id) {
     current_items[variant_id] = _.toInteger(quantity);
   });
 
-  self._update(current_items, task);
+  return current_items;
 };
 
 /**
@@ -74,9 +100,16 @@ ISnew.Cart.prototype.set = function (task) {
  */
 ISnew.Cart.prototype.delete = function (task) {
   var self = this;
-  var current_items = self._getItems();
   task = task || {};
   task.method = 'delete_items';
+
+  self._tasks.send(task);
+  self._update(self._delete(task), task);
+};
+
+ISnew.Cart.prototype._delete = function (task) {
+  var self = this;
+  var current_items = self._order.getItems();
 
   _.chain(task.items)
     .toArray()
@@ -85,7 +118,7 @@ ISnew.Cart.prototype.delete = function (task) {
     })
     .value();
 
-  self._update(current_items, task);
+  return current_items;
 };
 
 /**
@@ -93,15 +126,22 @@ ISnew.Cart.prototype.delete = function (task) {
  */
 ISnew.Cart.prototype.clear = function (task) {
   var self = this;
-  var current_items = self._getItems();
   task = task || {};
   task.method = 'clear_items';
+
+  self._tasks.send(task);
+  self._update(self._clear(task), task);
+};
+
+ISnew.Cart.prototype._clear = function (task) {
+  var self = this;
+  var current_items = self._order.getItems();
 
   _.forIn(current_items, function(quantity, variant_id) {
     current_items[variant_id] = 0;
   });
 
-  self._update(current_items, task);
+  return current_items;
 };
 
 /**
@@ -109,11 +149,19 @@ ISnew.Cart.prototype.clear = function (task) {
  */
 ISnew.Cart.prototype.setCoupon = function (task) {
   var self = this;
-  var current_items = self._getItems();
+
   task = task || {};
   task.method = 'set_coupon';
 
-  self._update(current_items, task);
+  self._tasks.send(task);
+  self._update(self._setCoupon(task), task);
+};
+
+ISnew.Cart.prototype._setCoupon = function (task) {
+  var self = this;
+  var current_items = self._order.getItems();
+
+  return current_items;
 };
 
 /**
@@ -121,18 +169,21 @@ ISnew.Cart.prototype.setCoupon = function (task) {
  */
 ISnew.Cart.prototype.getOrder = function () {
   var self = this;
-  return self;
+
+  return self._order.get();
 };
 
 /**
  * Получить с сервера состав корзины
  */
 // TODO: изменить на нормальныйую логику после нормолизации ответов json
+// TODO: может не надо? у нас теперь появляется нормальный таск манагер :)
 ISnew.Cart.prototype._get = function () {
   var self = this;
   var task = {
     method: 'init'
   };
+
   self._update({}, task);
 };
 
@@ -156,16 +207,18 @@ ISnew.Cart.prototype._update = function (items, task) {
 };
 
 /**
-* Разбирает ответы и сохраняет в var cart
+* Разбирает ответы и сохраняет в cart._order
 */
 ISnew.Cart.prototype._setOrder = function (order, task) {
   var self = this;
   var data = {};
 
   // фиксим вид актуального состава корзины
-  self._patch(order);
+  //self._patch(order);
 
-  data = _.clone(self);
+  self._order.set(order);
+
+  data = _.clone(self._order.get());
   data.action = task;
 
   if (task && task.method) {
@@ -193,98 +246,4 @@ ISnew.Cart.prototype._before = function (task) {
  */
 ISnew.Cart.prototype._always = function (task) {
   EventBus.publish('always:insales:cart', task);
-};
-
-/**
- * Формируем инфу о позициях
- */
-ISnew.Cart.prototype._getItems = function () {
-  var self = this;
-  var items = {};
-
-  _.forEach(self.order_lines, function (item) {
-    items[item.variant_id] = item.quantity;
-  });
-
-  return items;
-};
-
-/**
- * ===============================================================================================================
- */
-/**
- * Фиксим инфу по корзине
- */
-ISnew.Cart.prototype._patch = function (current_order) {
-  var self = this;
-
-  self.order_lines = current_order.order_lines || current_order.items;
-  self.order_line_comments = current_order.order_line_comments || current_order.order.order_line_comments;
-
-  self.positions_count = self.order_lines.length;
-
-  self.items_count = current_order.items_count;
-  self.items_price = 0;
-
-  self.total_price = current_order.total_price;
-
-  self.discounts = current_order.discounts;
-
-  self._itemsPrice();
-  self._deliveryPrice(current_order);
-  self._url();
-  self._images();
-
-  //_.assign(self, order);
-  return;
-};
-
-/**
- * Добавляем поле с ценой только товаров, без доставки
- */
-ISnew.Cart.prototype._itemsPrice = function () {
-  var self = this;
-
-  self.items_price = _.reduce(self.order_lines, function (sum, item) {
-    return sum + item.sale_price * item.quantity;
-  }, 0);
-
-  return;
-};
-
-/**
- * Добавляем цену доставки
- * NOTE: в разных json лежит в разных местах
- */
-ISnew.Cart.prototype._deliveryPrice = function (current_order) {
-  var self = this;
-  var delivery_price = _.toString(current_order.delivery_price) || _.toString(current_order.order.delivery_price);
-
-  self.delivery_price = parseFloat(delivery_price);
-
-  return;
-};
-
-/**
- * Фиксим url с учетом языков
- */
-ISnew.Cart.prototype._url = function () {
-  var self = this;
-  _.forEach(self.order_lines, function (item) {
-    //console.log(item);
-    // TODO: пока хз. нужен язык
-  });
-  return;
-};
-
-/**
- * Фиксим картинки товаров
- */
-ISnew.Cart.prototype._images = function () {
-  var self = this;
-
-  _.forEach(self.order_lines, function (item) {
-    item.images = item.product.images;
-  });
-  return;
 };

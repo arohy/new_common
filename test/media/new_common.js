@@ -36,9 +36,12 @@ if (!EventBus) {
 ISnew.Cart = function () {
   var self = this;
 
-  self.ui = new ISnew.CartDOM();
+  self._ui = new ISnew.CartDOM();
+  self._order = new ISnew.CartOrder(self);
+  self._tasks = new ISnew.CartTasks();
+
   self._get();
-}
+};
 
 /**
  * Добавить в корзину заданное кол-во товаров
@@ -47,9 +50,17 @@ ISnew.Cart = function () {
  */
 ISnew.Cart.prototype.add = function (task) {
   var self = this;
-  var current_items = self._getItems();
+
   task = task || {};
   task.method = 'add_items';
+
+  self._tasks.send(task);
+  self._update(self._add(task), task);
+};
+
+ISnew.Cart.prototype._add = function (task) {
+  var self = this;
+  var current_items = self._order.getItems();
 
   _.forIn(task.items, function(quantity, variant_id) {
     var current_quantity = _.toInteger(current_items[variant_id]) + _.toInteger(quantity);
@@ -57,7 +68,7 @@ ISnew.Cart.prototype.add = function (task) {
     current_items[variant_id] = current_quantity;
   });
 
-  self._update(current_items, task);
+  return current_items;
 };
 
 /**
@@ -66,9 +77,17 @@ ISnew.Cart.prototype.add = function (task) {
  */
 ISnew.Cart.prototype.remove = function (task) {
   var self = this;
-  var current_items = self._getItems();
+
   task = task || {};
   task.method = 'remove_items';
+
+  self._tasks.send(task);
+  self._update(self._remove(task), task);
+};
+
+ISnew.Cart.prototype._remove = function (task) {
+  var self = this;
+  var current_items = self._order.getItems();
 
   _.forIn(task.items, function(quantity, variant_id) {
     var current_quantity = _.toInteger(current_items[variant_id]) - _.toInteger(quantity);
@@ -76,7 +95,7 @@ ISnew.Cart.prototype.remove = function (task) {
     current_items[variant_id] = current_quantity > 0 ? current_quantity : 0;
   });
 
-  self._update(current_items, task);
+  return current_items;
 };
 
 /**
@@ -85,15 +104,22 @@ ISnew.Cart.prototype.remove = function (task) {
  */
 ISnew.Cart.prototype.set = function (task) {
   var self = this;
-  var current_items = self._getItems();
   task = task || {};
   task.method = 'set_items';
+
+  self._tasks.send(task);
+  self._update(self._set(task), task);
+};
+
+ISnew.Cart.prototype._set = function (task) {
+  var self = this;
+  var current_items = self._order.getItems();
 
   _.forIn(task.items, function(quantity, variant_id) {
     current_items[variant_id] = _.toInteger(quantity);
   });
 
-  self._update(current_items, task);
+  return current_items;
 };
 
 /**
@@ -102,9 +128,16 @@ ISnew.Cart.prototype.set = function (task) {
  */
 ISnew.Cart.prototype.delete = function (task) {
   var self = this;
-  var current_items = self._getItems();
   task = task || {};
   task.method = 'delete_items';
+
+  self._tasks.send(task);
+  self._update(self._delete(task), task);
+};
+
+ISnew.Cart.prototype._delete = function (task) {
+  var self = this;
+  var current_items = self._order.getItems();
 
   _.chain(task.items)
     .toArray()
@@ -113,7 +146,7 @@ ISnew.Cart.prototype.delete = function (task) {
     })
     .value();
 
-  self._update(current_items, task);
+  return current_items;
 };
 
 /**
@@ -121,15 +154,22 @@ ISnew.Cart.prototype.delete = function (task) {
  */
 ISnew.Cart.prototype.clear = function (task) {
   var self = this;
-  var current_items = self._getItems();
   task = task || {};
   task.method = 'clear_items';
+
+  self._tasks.send(task);
+  self._update(self._clear(task), task);
+};
+
+ISnew.Cart.prototype._clear = function (task) {
+  var self = this;
+  var current_items = self._order.getItems();
 
   _.forIn(current_items, function(quantity, variant_id) {
     current_items[variant_id] = 0;
   });
 
-  self._update(current_items, task);
+  return current_items;
 };
 
 /**
@@ -137,11 +177,19 @@ ISnew.Cart.prototype.clear = function (task) {
  */
 ISnew.Cart.prototype.setCoupon = function (task) {
   var self = this;
-  var current_items = self._getItems();
+
   task = task || {};
   task.method = 'set_coupon';
 
-  self._update(current_items, task);
+  self._tasks.send(task);
+  self._update(self._setCoupon(task), task);
+};
+
+ISnew.Cart.prototype._setCoupon = function (task) {
+  var self = this;
+  var current_items = self._order.getItems();
+
+  return current_items;
 };
 
 /**
@@ -149,18 +197,21 @@ ISnew.Cart.prototype.setCoupon = function (task) {
  */
 ISnew.Cart.prototype.getOrder = function () {
   var self = this;
-  return self;
+
+  return self._order.get();
 };
 
 /**
  * Получить с сервера состав корзины
  */
 // TODO: изменить на нормальныйую логику после нормолизации ответов json
+// TODO: может не надо? у нас теперь появляется нормальный таск манагер :)
 ISnew.Cart.prototype._get = function () {
   var self = this;
   var task = {
     method: 'init'
   };
+
   self._update({}, task);
 };
 
@@ -184,16 +235,18 @@ ISnew.Cart.prototype._update = function (items, task) {
 };
 
 /**
-* Разбирает ответы и сохраняет в var cart
+* Разбирает ответы и сохраняет в cart._order
 */
 ISnew.Cart.prototype._setOrder = function (order, task) {
   var self = this;
   var data = {};
 
   // фиксим вид актуального состава корзины
-  self._patch(order);
+  //self._patch(order);
 
-  data = _.clone(self);
+  self._order.set(order);
+
+  data = _.clone(self._order.get());
   data.action = task;
 
   if (task && task.method) {
@@ -222,11 +275,30 @@ ISnew.Cart.prototype._before = function (task) {
 ISnew.Cart.prototype._always = function (task) {
   EventBus.publish('always:insales:cart', task);
 };
+ISnew.CartOrder = function (_cart) {
+  var self = this;
+
+  self._owner = _cart;
+};
+
+ISnew.CartOrder.prototype.set = function (order) {
+  var self = this;
+
+  self._patch(order);
+
+  return self;
+};
+
+ISnew.CartOrder.prototype.get = function () {
+  var self = this;
+
+  return self;
+};
 
 /**
  * Формируем инфу о позициях
  */
-ISnew.Cart.prototype._getItems = function () {
+ISnew.CartOrder.prototype.getItems = function () {
   var self = this;
   var items = {};
 
@@ -238,12 +310,9 @@ ISnew.Cart.prototype._getItems = function () {
 };
 
 /**
- * ===============================================================================================================
- */
-/**
  * Фиксим инфу по корзине
  */
-ISnew.Cart.prototype._patch = function (current_order) {
+ISnew.CartOrder.prototype._patch = function (current_order) {
   var self = this;
 
   self.order_lines = current_order.order_lines || current_order.items;
@@ -270,7 +339,7 @@ ISnew.Cart.prototype._patch = function (current_order) {
 /**
  * Добавляем поле с ценой только товаров, без доставки
  */
-ISnew.Cart.prototype._itemsPrice = function () {
+ISnew.CartOrder.prototype._itemsPrice = function () {
   var self = this;
 
   self.items_price = _.reduce(self.order_lines, function (sum, item) {
@@ -284,7 +353,7 @@ ISnew.Cart.prototype._itemsPrice = function () {
  * Добавляем цену доставки
  * NOTE: в разных json лежит в разных местах
  */
-ISnew.Cart.prototype._deliveryPrice = function (current_order) {
+ISnew.CartOrder.prototype._deliveryPrice = function (current_order) {
   var self = this;
   var delivery_price = _.toString(current_order.delivery_price) || _.toString(current_order.order.delivery_price);
 
@@ -296,7 +365,7 @@ ISnew.Cart.prototype._deliveryPrice = function (current_order) {
 /**
  * Фиксим url с учетом языков
  */
-ISnew.Cart.prototype._url = function () {
+ISnew.CartOrder.prototype._url = function () {
   var self = this;
   _.forEach(self.order_lines, function (item) {
     //console.log(item);
@@ -308,13 +377,103 @@ ISnew.Cart.prototype._url = function () {
 /**
  * Фиксим картинки товаров
  */
-ISnew.Cart.prototype._images = function () {
+ISnew.CartOrder.prototype._images = function () {
   var self = this;
 
   _.forEach(self.order_lines, function (item) {
     item.images = item.product.images;
   });
   return;
+};
+/**
+ * Менеджер задач для корзины
+ * Занимается контролем за задачами, склейкой и отправкой
+ */
+ISnew.CartTasks = function (_owner) {
+  var self = this;
+
+  self._owner = _owner;
+
+  self._lock = false;
+
+  self._taskToWork = [];
+  self._taskInWork = [];
+};
+
+/**
+ * Точка входа
+ *
+ * Если параметр передан, то добавляем таску в очередь.
+ *
+ * Если нет - пинаем оставшуюся очередь, может прилететь только от CART()!!!
+ * После получения ответа от сервера.
+ */
+ISnew.CartTasks.prototype.send = function (task) {
+  var self = this;
+
+  if (task) {
+    self._add(task);
+  } else {
+    self.push();
+  }
+
+  return;
+};
+
+/**
+ * Добавляем таску в очередь
+ */
+ISnew.CartTasks.prototype._add = function (task) {
+  var self = this;
+
+  self._taskToWork.push(task);
+
+  self._push();
+  return;
+};
+
+/**
+ * Пушим очередь на сервер
+ */
+ISnew.CartTasks.prototype._push = function () {
+  var self = this;
+  var tasks = self._taskToWork;
+  var new_items_set;
+
+  // если залокано запросом - посылаем в утиль
+  if (self._lock) {
+    return false;
+  }
+
+  // не залочен? решаем этот вопрос )
+  self._lock = true;
+
+  // перебрасываем накопившиеся таски в обработку
+  self._taskInWork = self._taskToWork;
+  self._taskToWork = [];
+
+  new_items_set = _.forEach(self._taskToWork, function(task) {
+
+  });
+
+  self._send();
+  return;
+};
+
+/**
+ * Отсылаем на сервак
+ */
+ISnew.CartTasks.prototype._send = function (task) {
+  var self = this;
+
+  return;
+};
+
+ISnew.CartTasks.prototype._task = function (task) {
+  var self = this;
+  var result;
+  
+  return result;
 };
 /**
  * Связка с DOM
