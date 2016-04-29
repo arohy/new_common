@@ -1,9 +1,16 @@
+/**
+ * Класс отвечает за работу и форматирование состава корзины
+ */
+
 ISnew.CartOrder = function (_cart) {
   var self = this;
 
   self._owner = _cart;
 };
 
+/**
+ * обновляем состав корзины
+ */
 ISnew.CartOrder.prototype.set = function (order) {
   var self = this;
 
@@ -12,6 +19,9 @@ ISnew.CartOrder.prototype.set = function (order) {
   return self;
 };
 
+/**
+ * забираем актуальный состав корзины
+ */
 ISnew.CartOrder.prototype.get = function () {
   var self = this;
 
@@ -55,7 +65,6 @@ ISnew.CartOrder.prototype._patch = function (current_order) {
   self._url();
   self._images();
 
-  //_.assign(self, order);
   return;
 };
 

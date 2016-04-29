@@ -9,10 +9,31 @@ ISnew.Cart = function () {
   var self = this;
 
   self._ui = new ISnew.CartDOM();
-  self._order = new ISnew.CartOrder(self);
-  self._tasks = new ISnew.CartTasks();
+  self.order = new ISnew.CartOrder(self);
+  self._tasks = new ISnew.CartTasks(self);
 
-  self._get();
+  self.init();
+};
+
+/**
+ * Получить с сервера состав корзины
+ */
+// TODO: изменить на нормальныйую логику после нормолизации ответов json
+// TODO: может не надо? у нас теперь появляется нормальный таск манагер :)
+ISnew.Cart.prototype.init = function () {
+  var self = this;
+  var task = {
+    method: 'init'
+  };
+
+  self._tasks.send(task);
+};
+
+ISnew.Cart.prototype._get = function () {
+  var self = this;
+  var current_items = {};
+
+  return current_items;
 };
 
 /**
@@ -27,12 +48,10 @@ ISnew.Cart.prototype.add = function (task) {
   task.method = 'add_items';
 
   self._tasks.send(task);
-  self._update(self._add(task), task);
 };
 
-ISnew.Cart.prototype._add = function (task) {
+ISnew.Cart.prototype._add = function (task, current_items) {
   var self = this;
-  var current_items = self._order.getItems();
 
   _.forIn(task.items, function(quantity, variant_id) {
     var current_quantity = _.toInteger(current_items[variant_id]) + _.toInteger(quantity);
@@ -54,12 +73,10 @@ ISnew.Cart.prototype.remove = function (task) {
   task.method = 'remove_items';
 
   self._tasks.send(task);
-  self._update(self._remove(task), task);
 };
 
-ISnew.Cart.prototype._remove = function (task) {
+ISnew.Cart.prototype._remove = function (task, current_items) {
   var self = this;
-  var current_items = self._order.getItems();
 
   _.forIn(task.items, function(quantity, variant_id) {
     var current_quantity = _.toInteger(current_items[variant_id]) - _.toInteger(quantity);
@@ -80,12 +97,10 @@ ISnew.Cart.prototype.set = function (task) {
   task.method = 'set_items';
 
   self._tasks.send(task);
-  self._update(self._set(task), task);
 };
 
-ISnew.Cart.prototype._set = function (task) {
+ISnew.Cart.prototype._set = function (task, current_items) {
   var self = this;
-  var current_items = self._order.getItems();
 
   _.forIn(task.items, function(quantity, variant_id) {
     current_items[variant_id] = _.toInteger(quantity);
@@ -104,12 +119,10 @@ ISnew.Cart.prototype.delete = function (task) {
   task.method = 'delete_items';
 
   self._tasks.send(task);
-  self._update(self._delete(task), task);
 };
 
-ISnew.Cart.prototype._delete = function (task) {
+ISnew.Cart.prototype._delete = function (task, current_items) {
   var self = this;
-  var current_items = self._order.getItems();
 
   _.chain(task.items)
     .toArray()
@@ -130,12 +143,10 @@ ISnew.Cart.prototype.clear = function (task) {
   task.method = 'clear_items';
 
   self._tasks.send(task);
-  self._update(self._clear(task), task);
 };
 
-ISnew.Cart.prototype._clear = function (task) {
+ISnew.Cart.prototype._clear = function (task, current_items) {
   var self = this;
-  var current_items = self._order.getItems();
 
   _.forIn(current_items, function(quantity, variant_id) {
     current_items[variant_id] = 0;
@@ -154,12 +165,10 @@ ISnew.Cart.prototype.setCoupon = function (task) {
   task.method = 'set_coupon';
 
   self._tasks.send(task);
-  self._update(self._setCoupon(task), task);
 };
 
-ISnew.Cart.prototype._setCoupon = function (task) {
+ISnew.Cart.prototype._setCoupon = function (task, current_items) {
   var self = this;
-  var current_items = self._order.getItems();
 
   return current_items;
 };
@@ -170,21 +179,7 @@ ISnew.Cart.prototype._setCoupon = function (task) {
 ISnew.Cart.prototype.getOrder = function () {
   var self = this;
 
-  return self._order.get();
-};
-
-/**
- * Получить с сервера состав корзины
- */
-// TODO: изменить на нормальныйую логику после нормолизации ответов json
-// TODO: может не надо? у нас теперь появляется нормальный таск манагер :)
-ISnew.Cart.prototype._get = function () {
-  var self = this;
-  var task = {
-    method: 'init'
-  };
-
-  self._update({}, task);
+  return self.order.get();
 };
 
 /**
@@ -193,57 +188,16 @@ ISnew.Cart.prototype._get = function () {
 ISnew.Cart.prototype._update = function (items, task) {
   var self = this;
 
-  self._before(task);
+  self._tasks._before();
+
   ISnew.json.updateCartItems(items, task)
     .done(function (response) {
-      self._setOrder(response, task);
+      self._tasks._done(response);
     })
     .fail(function (response) {
-      console.log('cart:update:fail', response);
+      self._tasks._fail(response);
     })
     .always(function () {
-      self._always(task);
+      self._tasks._always();
     });
-};
-
-/**
-* Разбирает ответы и сохраняет в cart._order
-*/
-ISnew.Cart.prototype._setOrder = function (order, task) {
-  var self = this;
-  var data = {};
-
-  // фиксим вид актуального состава корзины
-  //self._patch(order);
-
-  self._order.set(order);
-
-  data = _.clone(self._order.get());
-  data.action = task;
-
-  if (task && task.method) {
-    EventBus.publish(task.method +':insales:cart', data);
-  }
-
-  if (task && task.coupon) {
-    var data = data;
-    data.action = 'set_coupon';
-    EventBus.publish('set_coupon:insales:cart', data);
-  }
-
-  EventBus.publish('update_items:insales:cart', data);
-};
-
-/**
- * Событие ПЕРЕД действием
- */
-ISnew.Cart.prototype._before = function (task) {
-  EventBus.publish('before:insales:cart', task);
-};
-
-/**
- * Мы закончили что-то делать в корзине
- */
-ISnew.Cart.prototype._always = function (task) {
-  EventBus.publish('always:insales:cart', task);
 };

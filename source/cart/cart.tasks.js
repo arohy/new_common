@@ -27,7 +27,7 @@ ISnew.CartTasks.prototype.send = function (task) {
   if (task) {
     self._add(task);
   } else {
-    self.push();
+    self._push();
   }
 
   return;
@@ -51,10 +51,11 @@ ISnew.CartTasks.prototype._add = function (task) {
 ISnew.CartTasks.prototype._push = function () {
   var self = this;
   var tasks = self._taskToWork;
-  var new_items_set;
+  var items_set = self._owner.order.getItems();
+  var result_task = {};
 
   // если залокано запросом - посылаем в утиль
-  if (self._lock) {
+  if (self._lock || tasks.length == 0) {
     return false;
   }
 
@@ -65,26 +66,130 @@ ISnew.CartTasks.prototype._push = function () {
   self._taskInWork = self._taskToWork;
   self._taskToWork = [];
 
-  new_items_set = _.forEach(self._taskToWork, function(task) {
+  // проходим по таскам
+  _.forEach(self._taskInWork, function(task) {
+    // применяем таски на актуальный состав
+    items_set = self._task(task, items_set);
 
-  });
+    // комбайним комменты и купоны
+    _.assign(result_task.comments, task.comments);
+    result_task.coupon = task.coupon;
+  }, items_set);
 
-  self._send();
+  self._send(items_set, result_task);
   return;
 };
 
 /**
  * Отсылаем на сервак
  */
-ISnew.CartTasks.prototype._send = function (task) {
+ISnew.CartTasks.prototype._send = function (items_set, task) {
   var self = this;
+
+  self._owner._update(items_set, task);
+  return;
+};
+
+/**
+ * Применяем таски на местность
+ */
+ISnew.CartTasks.prototype._task = function (task, current_items) {
+  var self = this;
+  var result;
+
+  switch (task.method) {
+    case 'add_items':
+      result = self._owner._add(task, current_items);
+      break;
+    case 'remove_items':
+      result = self._owner._remove(task, current_items);
+      break;
+    case 'set_items':
+      result = self._owner._set(task, current_items);
+      break;
+    case 'delete_items':
+      result = self._owner._delete(task, current_items);
+      break;
+    case 'clear_items':
+      result = self._owner._clear(task, current_items);
+      break;
+    case 'set_coupon':
+      result = self._owner._setCoupon(task, current_items);
+      break;
+    default:
+      result = self._owner._get();
+  };
+
+  return result;
+};
+
+/**
+ * Действия при успешном обновлении
+ */
+ISnew.CartTasks.prototype._done = function (order) {
+  var self = this;
+  var data = {};
+
+  // ставим актуальные данные в корзину
+  self._owner.order.set(order);
+
+  data = _.clone(self._owner.order.get());
+
+  _.forEach(self._taskInWork, function (task) {
+    data.action = task || {};
+    EventBus.publish(task.method +':insales:cart', data);
+  });
+
+  EventBus.publish('update_items:insales:cart', data);
+  return;
+};
+
+/**
+ * Действия при фейле
+ */
+ISnew.CartTasks.prototype._fail = function (response) {
+  var self = this;
+
+  console.log('cart:update:fail', response);
+
+  // если не прокатило - заливаем обратно таски
+  if (self._taskInWork.length != 0) {
+    _.concat(self._taskToWork, self._taskInWork);
+  }
 
   return;
 };
 
-ISnew.CartTasks.prototype._task = function (task) {
+/**
+ * Действия "всегда"
+ */
+ISnew.CartTasks.prototype._always = function () {
   var self = this;
-  var result;
-  
-  return result;
+  var data = {};
+
+  // снимаем лок
+  self._lock = false;
+
+  _.forEach(self._taskInWork, function (task) {
+    data.action = task || {};
+    EventBus.publish('always:insales:cart', data);
+  });
+
+  // всё ок, удаляем задачи
+  self._taskInWork = [];
+
+  // погнали все кругом
+  self.send();
+  return;
+};
+
+ISnew.CartTasks.prototype._before = function () {
+  var self = this;
+  var data = {};
+
+  _.forEach(self._taskInWork, function (task) {
+    data.action = task || {};
+    EventBus.publish('before:insales:cart', data);
+  })
+  return;
 };

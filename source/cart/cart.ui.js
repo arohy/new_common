@@ -1,7 +1,6 @@
 /**
  * Связка с DOM
  */
-
 ISnew.CartDOM = function (options) {
   var self = this;
 
@@ -21,9 +20,10 @@ ISnew.CartDOM.prototype._init = function (options) {
     form: 'cart-form',
     add: 'cart-item-add',
     delete: 'cart-item-delete',
-    update: 'cart-form-submit',
+    update: 'cart-itme-update',
+    submit: 'cart-form-submit',
     clear: 'cart-form-clear',
-    coupon: 'cart-coupon-submit',
+    coupon: 'cart-coupon-submit'
   };
 
   _.assign(self.options, options);
@@ -56,9 +56,6 @@ ISnew.CartDOM.prototype._addItem = function ($button) {
     coupon: self._getCoupon($form)
   };
 
-  // вешаем на кнопку метку "В обработке"
-  $button.prop(self.options.inProcess, true);
-
   // складываем данные в объект
   // если в форме был стандартный селектор модификаций, кладем отдельно
   if ($one_variant.length == 1) {
@@ -72,6 +69,40 @@ ISnew.CartDOM.prototype._addItem = function ($button) {
 };
 
 /**
+ * Обработка добавления товара в корзину
+ */
+ISnew.CartDOM.prototype._bindAddItem = function () {
+  var self = this;
+
+  $(document).on('click', '['+ self.options.add +']', function (event) {
+    event.preventDefault();
+    var $button = $(this);
+
+    if (!$button.prop(self.options.inProcess)) {
+      // если эту кнопку еще не жали
+      if (!$button.prop(self.options.disabled)) {
+        // если кнопка не заблочена - делаем добавление
+        // вешаем на кнопку метку "В обработке"
+        $button.prop(self.options.inProcess, true);
+        self._addItem($button);
+      } else {
+        // иначе - дергаем событие
+        EventBus.publish('add_disabled:insales:product', {
+          button: $button,
+        });
+      }
+    }
+  });
+
+  // снимаем с кнопки метку после операций с корзиной
+  EventBus.subscribe('always:insales:cart', function (data) {
+    if (data.method == 'add_items' && data.button) {
+      data.button.prop(self.options.inProcess, false);
+    }
+  });
+};
+
+/**
  * Удаляем один элемент из корзины по клику на кнопке "Удалить"
  */
 ISnew.CartDOM.prototype._deleteItem = function ($button) {
@@ -82,18 +113,41 @@ ISnew.CartDOM.prototype._deleteItem = function ($button) {
     button: $button
   };
 
-  // Вешаем метку "в обработке"
-  $button.prop(self.options.inProcess, true);
-
   // посылаем данные в корзину
   Cart.delete(task);
   return;
 };
 
 /**
+ * Обработка удаления товара из корзины
+ */
+ISnew.CartDOM.prototype._bindDeleteItem = function () {
+  var self = this;
+
+  // вешаем глобальный обработчик
+  $(document).on('click', '['+ self.options.delete +']', function (event) {
+    event.preventDefault();
+    var $button = $(this);
+
+    if (!$button.prop(self.options.inProcess)) {
+      // Вешаем метку "в обработке"
+      $button.prop(self.options.inProcess, true);
+      self._deleteItem($button);
+    }
+  });
+
+  // снимаем метку "в процессе" с кнопки
+  EventBus.subscribe('always:insales:cart', function (data) {
+    if (data.button && data.method == 'delete_items') {
+      data.button.prop(self.options.inProcess, false);
+    }
+  });
+};
+
+/**
  * Пересчет корзины из формы
  */
-ISnew.CartDOM.prototype.updateOrder = function () {
+ISnew.CartDOM.prototype.updateOrder = function ($button) {
   var self = this;
   var $form = $('['+ self.options.form +']');
   var $fields = $form.find('input[name*="cart[quantity]"]');
@@ -104,15 +158,49 @@ ISnew.CartDOM.prototype.updateOrder = function () {
     coupon: self._getCoupon($form)
   };
 
-  // т.к. этот метод можно дергать из разных мест
-  // проверку на метку ставим тут
-  if (!$form.prop(self.options.inProcess)) {
-    $form.prop(self.options.inProcess, true);
-    task.items = self._getItems($fields);
-    Cart.set(task);
-  };
+  if ($button && $button.length != 0) {
+    task.button = $button;
+  }
 
+  task.items = self._getItems($fields);
+
+  Cart.set(task);
   return;
+};
+
+/**
+ * Обновление корзины
+ */
+ISnew.CartDOM.prototype._bindUpdateCart = function () {
+  var self = this;
+  var $form = $('['+ self.options.form +']');
+
+  // обработчик нажатия enter в форме корзины
+  $(document).on('keypress', $form, function (event) {
+    if (event.keyCode == '13') {
+      // блочим отправку формы и запускаем обработку
+      event.preventDefault();
+
+      self.updateOrder();
+    }
+  });
+
+  $(document).on('click', '['+ self.options.update +']', function (event) {
+    event.preventDefault()
+
+    var $button = $(this);
+    if (!$button.prop(self.options.inProcess)) {
+      $button.prop(self.options.inProcess, true);
+      self.updateOrder();
+    }
+  });
+
+  // снимаем метку "в процессе" с кнопки
+  EventBus.subscribe('always:insales:cart', function (data) {
+    if (data.button && data.method == 'set_items') {
+      data.button.prop(self.options.inProcess, false);
+    }
+  });
 };
 
 /**
@@ -128,21 +216,41 @@ ISnew.CartDOM.prototype.clearOder = function ($button) {
     form: $form,
   };
 
-  // лочим форму, собираем инфу по товарам
-  if (!$form.prop(self.options.inProcess)) {
-    // вешаем метку на кнопку, добавляем ее в таску
-    if ($button && $button.length != 0) {
-      $button.prop(self.options.inProcess, true);
-      task.button = $button;
-    }
-
-    $form.prop(self.options.inProcess, true);
-    task.items = _.keys(self._getItems($fields));
-
-    Cart.delete(task);
+  // вешаем метку на кнопку, добавляем ее в таску
+  if ($button && $button.length != 0) {
+    task.button = $button;
   }
 
+  task.items = _.keys(self._getItems($fields));
+
+  Cart.delete(task);
   return;
+};
+
+/**
+ * Обработка полной очистки корзины
+ */
+ISnew.CartDOM.prototype._bindClearOrder = function () {
+  var self = this;
+
+  // вешаем глобальный обработчик
+  $(document).on('click', '['+ self.options.clear +']', function (event) {
+    event.preventDefault();
+    var $button = $(this);
+
+    if (!$button.prop(self.options.inProcess)) {
+      $button.prop(self.options.inProcess, true);
+      self.clearOder($button);
+    }
+  });
+
+  // снимаем метку "в процессе" с кнопки
+  EventBus.subscribe('always:insales:cart', function (data) {
+    if (data.button && data.method == 'delete_items') {
+      // если дернули через стандартную кнопку - отжать её
+      data.button.prop(self.options.inProcess, false);
+    }
+  });
 };
 
 /**
@@ -156,11 +264,30 @@ ISnew.CartDOM.prototype.setCoupon = function ($form) {
     coupon: self._getCoupon($form)
   };
 
-  if (!$form.prop(self.options.inProcess)) {
-    $form.prop(self.options.inProcess, true);
-    Cart.setCoupon(task);
-  }
+  Cart.setCoupon(task);
+  return;
+};
 
+/**
+ * Обработчики работы с купоном
+ */
+ISnew.CartDOM.prototype._bindCoupon = function () {
+  var self = this;
+
+  // вешаем глобальный обработчик
+  $(document).on('click', '['+ self.options.coupon +']', function (event) {
+    event.preventDefault();
+    var $button = $(this);
+
+    self.setCoupon($button.parents('form:first'), $button);
+  });
+
+  // снимаем метку "в процессе" с формы
+  EventBus.subscribe('always:insales:cart', function (data) {
+    if (data.button && data.method == 'set_coupon') {
+      data.button.prop(self.options.inProcess, false);
+    }
+  });
   return;
 };
 
@@ -191,139 +318,4 @@ ISnew.CartDOM.prototype._getItems = function ($fields) {
  */
 ISnew.CartDOM.prototype._getCoupon = function ($form) {
   return $form.find('[name="cart[coupon]"]').val() || false;
-};
-
-/**
- * Обработка добавления товара в корзину
- */
-ISnew.CartDOM.prototype._bindAddItem = function () {
-  var self = this;
-
-  $(document).on('click', '['+ self.options.add +']', function (event) {
-    event.preventDefault();
-    var $button = $(this);
-
-    if (!$button.prop(self.options.inProcess)) {
-      // если эту кнопку еще не жали
-      if (!$button.prop(self.options.disabled)) {
-        // если кнопка не заблочена - делаем добавление
-        self._addItem($button);
-      } else {
-        // иначе - дергаем событие
-        EventBus.publish('add_disabled:insales:product', {
-          button: $button,
-        });
-      }
-    }
-  });
-
-  // снимаем с кнопки метку после операций с корзиной
-  EventBus.subscribe('always:insales:cart', function (data) {
-    if (data.method == 'add_items' && data.button) {
-      data.button.prop(self.options.inProcess, false);
-    }
-  });
-};
-
-/**
- * Обработка удаления товара из корзины
- */
-ISnew.CartDOM.prototype._bindDeleteItem = function () {
-  var self = this;
-
-  // вешаем глобальный обработчик
-  $(document).on('click', '['+ self.options.delete +']', function (event) {
-    event.preventDefault();
-    var $button = $(this);
-
-    if (!$button.prop(self.options.inProcess)) {
-      // если не в обработке,
-      // то удаляем товар
-      self._deleteItem($button);
-    }
-  });
-
-  // снимаем метку "в процессе" с кнопки
-  EventBus.subscribe('always:insales:cart', function (data) {
-    if (data.button && data.method == 'delete_items') {
-      data.button.prop(self.options.inProcess, false);
-    }
-  });
-};
-
-/**
- * Обновление корзины
- */
-ISnew.CartDOM.prototype._bindUpdateCart = function () {
-  var self = this;
-  var $form = $('['+ self.options.form +']');
-
-  // обработчик нажатия enter в форме корзины
-  $(document).on('keypress', $form, function (event) {
-    if (event.keyCode == '13') {
-      // блочим отправку формы и запускаем обработку
-      event.preventDefault();
-
-      self.updateOrder();
-    }
-  });
-
-  // снимаем метку "в процессе" с кнопки
-  EventBus.subscribe('always:insales:cart', function (data) {
-    if (data.form && data.method == 'set_items') {
-      $form.prop(self.options.inProcess, false);
-    }
-  });
-};
-
-/**
- * Обработка полной очистки корзины
- */
-ISnew.CartDOM.prototype._bindClearOrder = function () {
-  var self = this;
-  //var $form = $('['+ self.options.form +']');
-
-  // вешаем глобальный обработчик
-  $(document).on('click', '['+ self.options.clear +']', function (event) {
-    event.preventDefault();
-    var $button = $(this);
-
-    self.clearOder($button);
-  });
-
-  // снимаем метку "в процессе" с кнопки
-  EventBus.subscribe('always:insales:cart', function (data) {
-    if (data.form && data.method == 'delete_items') {
-      data.form.prop(self.options.inProcess, false);
-
-      // если дернули через стандартную кнопку - отжать её
-      if (data.button) {
-        data.button.prop(self.options.inProcess, false);
-      }
-    }
-  });
-};
-
-/**
- * Обработчики работы с купоном
- */
-ISnew.CartDOM.prototype._bindCoupon = function () {
-  var self = this;
-  var $form = $('['+ self.options.form +']');
-
-  // вешаем глобальный обработчик
-  $(document).on('click', '['+ self.options.coupon +']', function (event) {
-    event.preventDefault();
-    var $button = $(this);
-
-    self.setCoupon($button.parents('form:first'));
-  });
-
-  // снимаем метку "в процессе" с формы
-  EventBus.subscribe('always:insales:cart', function (data) {
-    if (data.method == 'set_coupon') {
-      $form.prop(self.options.inProcess, false);
-    }
-  });
-  return;
 };
