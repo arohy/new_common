@@ -44,16 +44,21 @@ ISnew.Template.prototype._init = function (_owner) {
   var self = this;
   self._owner = _owner;
 
+  //  устанавливаем lock пока не собирем все шаблоны
   self._lock = true;
   self._templateList = {};
 
   $(function () {
-    self._templateCount = $('script[data-template-id]').length - 1;
+    var templateCount = $('script[data-template-id]').length - 1;
+
     $('[data-template-id]').each(function (index, el) {
+
       self.load($(el).html(), $(el).data('templateId'));
-      if (self._templateCount === index) {
+      if (templateCount === index) {
         self._lock = false;
       }
+
     });
+
   });
 };
