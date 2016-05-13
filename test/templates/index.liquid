@@ -37,6 +37,8 @@
   </button>
 </form>
   {% endfor %}
+<br>
+  <button class="btn" data-cart-remove>Очистить корзину</button>
 
   <h2>delivery_id</h2>
   {% for delivery in account.delivery_variants %}
@@ -57,10 +59,44 @@
 
 <script type="text/javascript">
 $(function(){
+  var selectorArray = [];
+  var selectorCollection = {};
+  var selectorCount = $('[data-product-variants]').length - 1;
 
-  {% for product in collections.all.products limit: 10 %}
-     var product{{ forloop.index }} = new ISnew.Product({{product | json }});
-  {% endfor %}
+  $('[data-product-variants]').each(function(index, el) {
+     var thisParents = $(el).parents('form:first');
+     var thatProductId = thisParents.data('product-id');
+     selectorArray.push(thatProductId);
 
+     if (index === selectorCount) {
+      initSelector(selectorArray);
+     }
+  });
+
+  function initSelector(_selectorArray) {
+    ISnew.json.getProductsList(_selectorArray)
+      .done(function (_newSelectors) {
+        $.each(_newSelectors, function(index, _new_product) {
+           selectorCollection[_new_product.id] = new ISnew.Product( _new_product );
+        });
+      })
+      .fail(function (response) {
+        console.log('что-то пошло не так!! ', response);
+      });
+  }
+
+
+  $('[data-cart-remove]').click(function(event) {
+    var orderNow = Cart.getOrder();
+    var variantTask = [];
+    var orderLineCount = orderNow.order_lines.length - 1;
+
+    $.each(orderNow.order_lines, function(index, _order_line) {
+       variantTask.push( _order_line.variant_id )
+       if (orderLineCount === index ) {
+        Cart.clear( variantTask );
+       }
+    });
+  });
 });
 </script>

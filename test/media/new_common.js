@@ -144,9 +144,10 @@ ISnew.Cart.prototype._set_items = function (task, current_items) {
 ISnew.Cart.prototype.delete = function (task) {
   var self = this;
   task = task || {};
+
   task.method = 'delete_items';
 
-  self.tasks.send(task);
+  self.tasks.send(taskUpdate);
 };
 
 ISnew.Cart.prototype._delete_items = function (task, current_items) {
@@ -1511,66 +1512,6 @@ ISnew.json.updateCartItems = function (items, options) {
   return $.post('/cart_items.json', fields);
 };
 /**
- * Обертка для шаблонизатора
- */
-
-ISnew.Template = function () {
-  var self = this;
-
-  self._init(self);
-};
-
-/**
- * Вытаскиваем нужный шаблон
- */
-ISnew.Template.prototype.render = function (data, template_id) {
-  var self = this;
-
-  var templateHtml = self._templateList[template_id];
-  var result;
-
-  if (templateHtml !== undefined) {
-    result = self._templateList[template_id](data);
-  } else {
-    result = false;
-  }
-
-  return result;
-};
-
-/**
- * Складываем шаблоны по местам, подготавливаем для работы
- */
-ISnew.Template.prototype.load = function (template_body, template_id) {
-  var self = this;
-
-  self._templateList[template_id] = _.template(template_body);
-
-  return;
-};
-
-/**
- * Автоматический сбор шаблонов в верстке
- */
-ISnew.Template.prototype._init = function (_owner) {
-  var self = this;
-  self._owner = _owner;
-
-  self._lock = true;
-  self._templateList = {};
-
-  $(function () {
-    self._templateCount = $('script[data-template-id]').length - 1;
-    $('[data-template-id]').each(function (index, el) {
-      self.load($(el).html(), $(el).data('templateId'));
-      if (self._templateCount === index) {
-        self._lock = false;
-      }
-    });
-  });
-};
-
-/**
  * OptionSelector
  */
 ISnew.OptionSelector = function (product, _owner) {
@@ -2128,6 +2069,66 @@ ISnew.ProductVariants.prototype._getSelectedVector = function (_length) {
 
   return vector;
 };
+/**
+ * Обертка для шаблонизатора
+ */
+
+ISnew.Template = function () {
+  var self = this;
+
+  self._init(self);
+};
+
+/**
+ * Вытаскиваем нужный шаблон
+ */
+ISnew.Template.prototype.render = function (data, template_id) {
+  var self = this;
+
+  var templateHtml = self._templateList[template_id];
+  var result;
+
+  if (templateHtml !== undefined) {
+    result = self._templateList[template_id](data);
+  } else {
+    result = false;
+  }
+
+  return result;
+};
+
+/**
+ * Складываем шаблоны по местам, подготавливаем для работы
+ */
+ISnew.Template.prototype.load = function (template_body, template_id) {
+  var self = this;
+
+  self._templateList[template_id] = _.template(template_body);
+
+  return;
+};
+
+/**
+ * Автоматический сбор шаблонов в верстке
+ */
+ISnew.Template.prototype._init = function (_owner) {
+  var self = this;
+  self._owner = _owner;
+
+  self._lock = true;
+  self._templateList = {};
+
+  $(function () {
+    self._templateCount = $('script[data-template-id]').length - 1;
+    $('[data-template-id]').each(function (index, el) {
+      self.load($(el).html(), $(el).data('templateId'));
+      if (self._templateCount === index) {
+        self._lock = false;
+      }
+    });
+  });
+};
+
 /**
  * Тул для вывода ошибок.
  */
