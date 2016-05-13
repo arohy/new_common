@@ -119,7 +119,7 @@ ISnew.Cart.prototype.delete = function (task) {
 
   task.method = 'delete_items';
 
-  self.tasks.send(taskUpdate);
+  self.tasks.send(task);
 };
 
 ISnew.Cart.prototype._delete_items = function (task, current_items) {
