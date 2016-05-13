@@ -1,5 +1,5 @@
 <form action="{{ cart_url }}" method="post" data-product-id="{{ product.id }}">
-  <select name="variant_id" id="variant-select" data-product-variants>
+  <select name="variant_id"  data-product-variants>
     {% for variant in product.variants %}
       <option value="{{ variant.id }}">{{ variant.title | escape }}</option>
     {% endfor %}

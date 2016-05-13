@@ -7,11 +7,15 @@
 
   <script type="text/javascript" src="{{ 'lodash.js' | asset_url }}"></script>
   <script type="text/javascript" src="{{ 'new_common.js' | asset_url }}"></script>
+  <script type="text/javascript" src="{{ 'tests.js' | asset_url }}"></script>
+  <link rel="stylesheet" href="{{ 'core.css' | asset_url }}">
+  <link rel="stylesheet" href="{{ 'main.css' | asset_url }}">
 </head>
 
 <body class="adaptive">
-  {{ content_for_layout }}
-  <script type="text/javascript" src="{{ 'tests.js' | asset_url }}"></script>
+  <div class="container">
+    {{ content_for_layout }}
+  </div>
   <script type="text/javascript">
     var Template = new ISnew.Template();
     var cv_currency_format = '{{ money_with_currency_format }}';
@@ -20,10 +24,39 @@
   </script>
 
   <script type="text/template" data-template-id="cart_widget">
-    <% if (user) { %>
-      hello!! <%- user %>!
+    <% if (order_lines.length > 0) { %>
+
+
+    <% _.each(order_lines, function(item) { %>
+    <div class="row-flex cart-item">
+      <div class="flex-xl-4"><%- item.title %></div>
+      <div class="flex-xl-4">
+        <%- item.quantity %>
+        &times;
+        <%- item.sale_price %>
+        =
+        <%- item.total_price %>
+        </div>
+      <div class="flex-xl-4"><%- item.comment %></div>
+    </div>
+    <% }); %>
+
+    <div>
+      <div>Итого: <%- total_price %></div>
+      <div>Товаров в корзине: <%- items_count %></div>
+    </div>
+
+    <% }else{ %>
+
+    <div>
+      Корзина пуста
+    </div>
+
     <% } %>
+
   </script>
+
+  {% if template == 'product' %}
 
   <script type="text/javascript">
     $(function () {
@@ -31,11 +64,14 @@
     });
   </script>
 
+  {% endif %}
+
   <script type="text/template" data-template-id="option-select">
-    <div>
+    <div class="option-item">
       <label><%= option.title %></label>
       <select
-        data-option-selector
+        class="select-field"
+        data-option-selector=""
         data-option-select
         data-option_name_id="<%= option.id %>"
       >

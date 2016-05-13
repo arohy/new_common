@@ -1,7 +1,9 @@
-<div class="" style="float: left; width: 50%">
+<div class="row-flex">
+
+<div class="flex-xl-6">
 
   <h2>products</h2>
-  {% for product in collections.sarome.products limit: 10 %}
+  {% for product in collections.all.products limit: 10 %}
     <div class="">
       <button compare-item-add="{{ product.id }}">+</button>
       <button compare-item-delete="{{ product.id }}">-</button>
@@ -14,12 +16,26 @@
   {% endfor %}
 
   ==================<br />
-  {% for product in collections.tovar-dnya.products limit: 10 %}
-    <a href="{{product.url}}">{{ product.id }}</a> ->
-    {% for variant in product.variants %}
-      {{ variant.id }} ||
-    {% endfor %}
-    <br />
+  {% for product in collections.all.products limit: 10 %}
+    <a class="super-title" href="{{ product.url }}">====== {{ product.title }} ========</a>
+    <form action="{{ cart_url }}" method="post" data-collection-variant data-product-id="{{ product.id }}">
+    {% if product.show_variants? %}
+
+    <select name="variant_id" data-product-variants>
+      {% for variant in product.variants %}
+        <option value="{{ variant.id }}">{{ variant.title | escape }}</option>
+      {% endfor %}
+    </select>
+  {% else %}
+  <input type="hidden" name="variant_id" value="{{product.variants.first.id}}" >
+    {% endif %}
+    <input class="input-field" type="number" name="quantity" value="1" />
+
+
+  <button type="" cart-item-add class="btn">
+    Добавь одну
+  </button>
+</form>
   {% endfor %}
 
   <h2>delivery_id</h2>
@@ -31,15 +47,20 @@
   {% for payment in account.payment_gateways %}
   {{ payment.id }}
   {% endfor %}
-</div>2
+</div>
 
-<div class="" style="float: left; width: 50%">
+<div class="flex-xl-6">
   cart
-  <pre class="prettyprint js-cart"></pre>
+  <pre class="cart-widget js-cart"></pre>
+</div>
 </div>
 
 <script type="text/javascript">
 $(function(){
-  product = new ISnew.Product({{ collections.tovar-dnya.products.last | json }});
+
+  {% for product in collections.all.products limit: 10 %}
+     var product{{ forloop.index }} = new ISnew.Product({{product | json }});
+  {% endfor %}
+
 });
 </script>

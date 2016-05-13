@@ -6,7 +6,7 @@ var combine = require('stream-combiner');
 var shell = require('gulp-shell');
 
 // ==============================
-gulp.task('default', ['insup-load','common-watch', 'test-watch'], function() {
+gulp.task('default', ['common-watch', 'test-watch'], function() {
   // пустая таска, главное - просто работает )
 });
 

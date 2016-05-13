@@ -5,9 +5,6 @@ ISnew.OptionSelector = function (product, _owner) {
   var self = this;
 
   self._init(product, _owner);
-  self._renderSelector();
-
-  self._bindSelect();
 }
 
 /**
@@ -17,6 +14,7 @@ ISnew.OptionSelector.prototype._init = function (_product, _owner) {
   var self = this;
 
   self.selector = {
+    product_selector: '[data-product-id="'+ _product.id +'"] [data-option-select]',
     product: 'data-product-id',
     native_select: 'data-product-variants',
 
@@ -29,8 +27,18 @@ ISnew.OptionSelector.prototype._init = function (_product, _owner) {
   // находим опорный DOM-узел, который описывает товар
   self.$product = $('['+ self.selector.product +'="'+ _product.id +'"]');
 
+  // если DOM-узла нет, выходим
+  if (self.$product.length == 0) {
+    return;
+  }
+
   // находим там нативный селектор/точку для рендера
   self.$native_select = self.$product.find('['+ self.selector.native_select +']');
+
+  // если нативного селектора нет, выходим
+  if (self.$native_select.length == 0) {
+    return;
+  }
 
   // создаем контейнер и сохраняем линк на него
   self.$native_select.after('<div class="option-selector" '+ self.selector.option_selector +'/>');
@@ -38,6 +46,11 @@ ISnew.OptionSelector.prototype._init = function (_product, _owner) {
 
   // привязываем экземпляр Класса к товару
   self.$product[0]['OptionSelector'] = self;
+
+  self._renderSelector();
+
+  self._bindSelect(self.selector.product_selector);
+
   return;
 };
 
@@ -47,8 +60,15 @@ ISnew.OptionSelector.prototype._init = function (_product, _owner) {
 ISnew.OptionSelector.prototype._renderSelector = function () {
   var self = this;
 
+  if (Template._lock) {
+    setTimeout(function(){
+      self._renderSelector();
+    }, 300)
+  }
+
   var variants = self._owner.variants;
   var deep = variants.options.length;
+
 
   var optionsHTML = '';
 
@@ -72,15 +92,15 @@ ISnew.OptionSelector.prototype._renderOption = function (option) {
 
   //console.log(option);
 
-  optionHTML = Template.render(option,'option-select');
+  optionHTML = Template.render(option, 'option-select');
 
   return optionHTML;
 };
 
-ISnew.OptionSelector.prototype._bindSelect = function () {
+ISnew.OptionSelector.prototype._bindSelect = function (_productSelector) {
   var self = this;
 
-  $(document).on('click change', '[data-option-select]', function (event) {
+  $(document).on('click change', _productSelector , function (event) {
     event.preventDefault();
 
     var $select = $(this);
@@ -103,7 +123,9 @@ ISnew.OptionSelector.prototype._bindSelect = function () {
     var $product = $('['+ self.selector.product +'='+ data.product_id +']');
     var OptionSelector = $product[0]['OptionSelector'];
 
-    OptionSelector.$native_select.val(data.id);
-    OptionSelector._renderSelector();
+    if ( OptionSelector ) {
+      OptionSelector.$native_select.val(data.id);
+      OptionSelector._renderSelector();
+    }
   });
 };

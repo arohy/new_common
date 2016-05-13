@@ -4,9 +4,8 @@
 
 ISnew.Template = function () {
   var self = this;
-  self._templateList = {};
 
-  self._init();
+  self._init(self);
 };
 
 /**
@@ -14,10 +13,11 @@ ISnew.Template = function () {
  */
 ISnew.Template.prototype.render = function (data, template_id) {
   var self = this;
-  var template = self._templateList[template_id];
+
+  var templateHtml = self._templateList[template_id];
   var result;
 
-  if (template !== undefined) {
+  if (templateHtml !== undefined) {
     result = self._templateList[template_id](data);
   } else {
     result = false;
@@ -40,12 +40,20 @@ ISnew.Template.prototype.load = function (template_body, template_id) {
 /**
  * Автоматический сбор шаблонов в верстке
  */
-ISnew.Template.prototype._init = function () {
+ISnew.Template.prototype._init = function (_owner) {
   var self = this;
+  self._owner = _owner;
+
+  self._lock = true;
+  self._templateList = {};
 
   $(function () {
-    $('[data-template-id]').each(function () {
-      self.load($(this).html(), $(this).data('templateId'));
+    self._templateCount = $('script[data-template-id]').length - 1;
+    $('[data-template-id]').each(function (index, el) {
+      self.load($(el).html(), $(el).data('templateId'));
+      if (self._templateCount === index) {
+        self._lock = false;
+      }
     });
   });
 };

@@ -1,4 +1,10 @@
 var Cart = new ISnew.Cart();
+
+EventBus.subscribe('update_items:insales:cart', function (data) {
+  var cart_widget_html = Template.render(data, 'cart_widget')
+
+  $('.js-cart').html(cart_widget_html);
+});
 var Compare = new ISnew.Compare({
   //maxItems: 2
 });
@@ -174,4 +180,4 @@ testUpdateCartItems = function (items, comments) {
       console.log('fail', response);
     })
 }
-var product;
+//var product;

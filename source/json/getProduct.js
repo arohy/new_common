@@ -3,5 +3,5 @@
  */
 
 ISnew.json.getProduct = function (id) {
-  return $.getJSON('/product_by_id/'+ _.toInteger(id) +'.json');
+  return $.getJSON('/product_by_id/'+ _.toInteger(id) +'.json', {format: 'json'});
 };

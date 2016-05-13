@@ -1351,7 +1351,7 @@ ISnew.json.getCompareItems = function (id) {
  */
 
 ISnew.json.getProduct = function (id) {
-  return $.getJSON('/product_by_id/'+ _.toInteger(id) +'.json');
+  return $.getJSON('/product_by_id/'+ _.toInteger(id) +'.json', {format: 'json'});
 };
 /*
  * Получение информации о списке товаров
@@ -1511,15 +1511,72 @@ ISnew.json.updateCartItems = function (items, options) {
   return $.post('/cart_items.json', fields);
 };
 /**
+ * Обертка для шаблонизатора
+ */
+
+ISnew.Template = function () {
+  var self = this;
+
+  self._init(self);
+};
+
+/**
+ * Вытаскиваем нужный шаблон
+ */
+ISnew.Template.prototype.render = function (data, template_id) {
+  var self = this;
+
+  var templateHtml = self._templateList[template_id];
+  var result;
+
+  if (templateHtml !== undefined) {
+    result = self._templateList[template_id](data);
+  } else {
+    result = false;
+  }
+
+  return result;
+};
+
+/**
+ * Складываем шаблоны по местам, подготавливаем для работы
+ */
+ISnew.Template.prototype.load = function (template_body, template_id) {
+  var self = this;
+
+  self._templateList[template_id] = _.template(template_body);
+
+  return;
+};
+
+/**
+ * Автоматический сбор шаблонов в верстке
+ */
+ISnew.Template.prototype._init = function (_owner) {
+  var self = this;
+  self._owner = _owner;
+
+  self._lock = true;
+  self._templateList = {};
+
+  $(function () {
+    self._templateCount = $('script[data-template-id]').length - 1;
+    $('[data-template-id]').each(function (index, el) {
+      self.load($(el).html(), $(el).data('templateId'));
+      if (self._templateCount === index) {
+        self._lock = false;
+      }
+    });
+  });
+};
+
+/**
  * OptionSelector
  */
 ISnew.OptionSelector = function (product, _owner) {
   var self = this;
 
   self._init(product, _owner);
-  self._renderSelector();
-
-  self._bindSelect();
 }
 
 /**
@@ -1529,6 +1586,7 @@ ISnew.OptionSelector.prototype._init = function (_product, _owner) {
   var self = this;
 
   self.selector = {
+    product_selector: '[data-product-id="'+ _product.id +'"] [data-option-select]',
     product: 'data-product-id',
     native_select: 'data-product-variants',
 
@@ -1541,8 +1599,18 @@ ISnew.OptionSelector.prototype._init = function (_product, _owner) {
   // находим опорный DOM-узел, который описывает товар
   self.$product = $('['+ self.selector.product +'="'+ _product.id +'"]');
 
+  // если DOM-узла нет, выходим
+  if (self.$product.length == 0) {
+    return;
+  }
+
   // находим там нативный селектор/точку для рендера
   self.$native_select = self.$product.find('['+ self.selector.native_select +']');
+
+  // если нативного селектора нет, выходим
+  if (self.$native_select.length == 0) {
+    return;
+  }
 
   // создаем контейнер и сохраняем линк на него
   self.$native_select.after('<div class="option-selector" '+ self.selector.option_selector +'/>');
@@ -1550,6 +1618,11 @@ ISnew.OptionSelector.prototype._init = function (_product, _owner) {
 
   // привязываем экземпляр Класса к товару
   self.$product[0]['OptionSelector'] = self;
+
+  self._renderSelector();
+
+  self._bindSelect(self.selector.product_selector);
+
   return;
 };
 
@@ -1559,8 +1632,15 @@ ISnew.OptionSelector.prototype._init = function (_product, _owner) {
 ISnew.OptionSelector.prototype._renderSelector = function () {
   var self = this;
 
+  if (Template._lock) {
+    setTimeout(function(){
+      self._renderSelector();
+    }, 300)
+  }
+
   var variants = self._owner.variants;
   var deep = variants.options.length;
+
 
   var optionsHTML = '';
 
@@ -1584,15 +1664,15 @@ ISnew.OptionSelector.prototype._renderOption = function (option) {
 
   //console.log(option);
 
-  optionHTML = Template.render(option,'option-select');
+  optionHTML = Template.render(option, 'option-select');
 
   return optionHTML;
 };
 
-ISnew.OptionSelector.prototype._bindSelect = function () {
+ISnew.OptionSelector.prototype._bindSelect = function (_productSelector) {
   var self = this;
 
-  $(document).on('click change', '[data-option-select]', function (event) {
+  $(document).on('click change', _productSelector , function (event) {
     event.preventDefault();
 
     var $select = $(this);
@@ -1615,8 +1695,10 @@ ISnew.OptionSelector.prototype._bindSelect = function () {
     var $product = $('['+ self.selector.product +'='+ data.product_id +']');
     var OptionSelector = $product[0]['OptionSelector'];
 
-    OptionSelector.$native_select.val(data.id);
-    OptionSelector._renderSelector();
+    if ( OptionSelector ) {
+      OptionSelector.$native_select.val(data.id);
+      OptionSelector._renderSelector();
+    }
   });
 };
 /**
@@ -1723,13 +1805,31 @@ ISnew.ProductPriceType.prototype.setVariant = function (variant_id) {
  */
 ISnew.Product = function (product) {
   var self = this;
-  self.product = product;
+
+  if (!product) {
+    throw new ISnew.tools.Error('ErrorProduct', 'ошибка в передаче аргумента');
+  }
+
+  self._init(product, self);
+};
+
+/**
+ * Настройки
+ */
+ISnew.Product.prototype._init = function (_product, _owner){
+  var self = this;
+
+  self.product = _product;
+  self._owner = _owner;
 
   self.quantity = 0;
-  self.price_kinds = new ISnew.ProductPriceType(product, self);
-  self.variants = new ISnew.ProductVariants(product, self);
-  self.OptionSelector = new ISnew.OptionSelector(product, self);
-};
+  self.price_kinds = new ISnew.ProductPriceType(_product, _owner);
+
+  if (self._owner._isVariants(_product)) {
+    self.variants = new ISnew.ProductVariants(_product, _owner);
+    self.OptionSelector = new ISnew.OptionSelector(_product, _owner);
+  }
+}
 
 /**
  * Обновления состояний товара
@@ -1759,6 +1859,15 @@ ISnew.Product.prototype.setQuantity = function (quantity) {
 
   self.price_kinds.setQuantity(self.quantity);
   return;
+};
+
+/**
+ * Проверка на наличие модификаций
+ */
+ISnew.Product.prototype._isVariants = function (_product) {
+  var optionCount = _product.option_names.length;
+
+  return optionCount > 0;
 };
 /**
  * Variants tree
@@ -2020,55 +2129,25 @@ ISnew.ProductVariants.prototype._getSelectedVector = function (_length) {
   return vector;
 };
 /**
- * Обертка для шаблонизатора
+ * Тул для вывода ошибок.
  */
-
-ISnew.Template = function () {
+ISnew.tools.Error = function (name, message) {
   var self = this;
-  self._templateList = {};
+  var errorObject = new Error(message);
 
-  self._init();
-};
+  errorObject.name = name || 'Ошибка';
 
-/**
- * Вытаскиваем нужный шаблон
- */
-ISnew.Template.prototype.render = function (data, template_id) {
-  var self = this;
-  var template = self._templateList[template_id];
-  var result;
+  self.name = errorObject.name;
+  self.message = errorObject.message;
 
-  if (template !== undefined) {
-    result = self._templateList[template_id](data);
-  } else {
-    result = false;
+  if (errorObject.stack) {
+    self.stack = errorObject.stack;
   }
 
-  return result;
-};
-
-/**
- * Складываем шаблоны по местам, подготавливаем для работы
- */
-ISnew.Template.prototype.load = function (template_body, template_id) {
-  var self = this;
-
-  self._templateList[template_id] = _.template(template_body);
-
-  return;
-};
-
-/**
- * Автоматический сбор шаблонов в верстке
- */
-ISnew.Template.prototype._init = function () {
-  var self = this;
-
-  $(function () {
-    $('[data-template-id]').each(function () {
-      self.load($(this).html(), $(this).data('templateId'));
-    });
-  });
+  //Вывод в консоль
+  self.toString = function() {
+   return self.name + ': ' + self.message;
+  };
 };
 /**
  * Класс для работы с валютой.
