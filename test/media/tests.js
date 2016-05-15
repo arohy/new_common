@@ -1,4 +1,5 @@
 var Cart = new ISnew.Cart();
+var Collection = new ISnew.Collection();
 
 EventBus.subscribe('update_items:insales:cart', function (data) {
   var cart_widget_html = Template.render(data, 'cart_widget')
@@ -8,7 +9,7 @@ EventBus.subscribe('update_items:insales:cart', function (data) {
 var Compare = new ISnew.Compare({
   //maxItems: 2
 });
-EventBus.logger.add('cart');
+EventBus.logger.add('product');
 /*
  * Тест для addCartItems()
  */

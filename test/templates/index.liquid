@@ -59,33 +59,6 @@
 
 <script type="text/javascript">
 $(function(){
-  var selectorArray = [];
-  var selectorCollection = {};
-  var selectorCount = $('[data-product-variants]').length - 1;
-
-  $('[data-product-variants]').each(function(index, el) {
-     var thisParents = $(el).parents('form:first');
-     var thatProductId = thisParents.data('product-id');
-     selectorArray.push(thatProductId);
-
-     if (index === selectorCount) {
-      initSelector(selectorArray);
-     }
-  });
-
-  function initSelector(_selectorArray) {
-    ISnew.json.getProductsList(_selectorArray)
-      .done(function (_newSelectors) {
-        $.each(_newSelectors, function(index, _new_product) {
-           selectorCollection[_new_product.id] = new ISnew.Product( _new_product );
-        });
-      })
-      .fail(function (response) {
-        console.log('что-то пошло не так!! ', response);
-      });
-  }
-
-
   $('[data-cart-remove]').click(function(event) {
     var orderNow = Cart.getOrder();
     var variantTask = [];

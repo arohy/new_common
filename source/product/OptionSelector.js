@@ -49,9 +49,10 @@ ISnew.OptionSelector.prototype._init = function (_product, _owner) {
   // привязываем экземпляр Класса к товару
   self.$product[0]['OptionSelector'] = self;
 
+  //  вызов рендера и слушателя
   self._renderSelector();
 
-  self._bindSelect(self.selector.product_selector);
+  self._bindSelect();
 
   return;
 };
@@ -106,7 +107,7 @@ ISnew.OptionSelector.prototype._renderOption = function (option) {
 /**
  * Биндинг селекторов
  */
-ISnew.OptionSelector.prototype._bindSelect = function (_productSelector) {
+ISnew.OptionSelector.prototype._bindSelect = function () {
   var self = this;
 
   //  Слушаем изменения в нативном селекте
@@ -115,17 +116,17 @@ ISnew.OptionSelector.prototype._bindSelect = function (_productSelector) {
 
     var $select = $(this);
     var variantId = parseInt($(this).val());
-    var OptionSelector = self._getOptionSelector($(this))
+    var OptionSelector = self.$product[0]['OptionSelector'];
 
     OptionSelector._owner.variants.setVariant(variantId);
   });
 
   //  Слушаем изменения в селекторах модификаций
-  $(document).on('click change', _productSelector , function (event) {
+  $(document).on('click change', self.selector.product_selector, function (event) {
     event.preventDefault();
 
     var $select = $(this);
-    var OptionSelector = self._getOptionSelector($(this))
+    var OptionSelector = self.$product[0]['OptionSelector'];
 
 
     var option = {
@@ -150,17 +151,4 @@ ISnew.OptionSelector.prototype._bindSelect = function (_productSelector) {
       OptionSelector._renderSelector();
     }
   });
-};
-
-/**
- * Получаем ссылку на OptionSelector
- */
-ISnew.OptionSelector.prototype._getOptionSelector = function (_selector) {
-  var self = this;
-
-  var $select = _selector;
-  var $product = $select.parents('['+ self.selector.product +']:first');
-  var OptionSelector = $product[0]['OptionSelector'];
-
-  return OptionSelector;
 };

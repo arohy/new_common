@@ -13,15 +13,18 @@ if (!Site) {
   var Site = {};
 }
 
+// Место для всяких утилиток
+if (!ISnew.tools) {
+  ISnew.tools = {};
+  ISnew.tools.URL = {};
+  ISnew.tools.Error = {};
+}
+
 // Место для всех оберток json
 if (!ISnew.json) {
   ISnew.json = {};
 }
 
-// Место для всяких утилиток
-if (!ISnew.tools) {
-  ISnew.tools = {};
-}
 
 if (!EventBus) {
   var EventBus;

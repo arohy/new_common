@@ -13,15 +13,18 @@ if (!Site) {
   var Site = {};
 }
 
+// Место для всяких утилиток
+if (!ISnew.tools) {
+  ISnew.tools = {};
+  ISnew.tools.URL = {};
+  ISnew.tools.Error = {};
+}
+
 // Место для всех оберток json
 if (!ISnew.json) {
   ISnew.json = {};
 }
 
-// Место для всяких утилиток
-if (!ISnew.tools) {
-  ISnew.tools = {};
-}
 
 if (!EventBus) {
   var EventBus;
@@ -1512,6 +1515,68 @@ ISnew.json.updateCartItems = function (items, options) {
   return $.post('/cart_items.json', fields);
 };
 /**
+ * Создание новых продуктов
+ */
+ISnew.Collection = function () {
+  var self = this;
+
+  // объект для создаваемых продуктов
+  self.products = {}
+
+  self._init(self);
+};
+
+ISnew.Collection.prototype._init = function (owner){
+  var self = this;
+  self._owner = owner;
+
+  self.push()
+}
+
+/**
+ * Добавление новых продуктов
+ */
+ISnew.Collection.prototype.push = function (){
+  var self = this;
+
+  $(function () {
+    var variantsName = 'product-variants'
+    var variantsSelector = $('[data-' + variantsName + ']');
+    var variantsCount = $('[data-product-variants]').length - 1;
+    var variantsId = [];
+
+    variantsSelector.each(function(index, el) {
+       var thisParents = $(el).parents('form:first');
+       var thatProductId = thisParents.data('product-id');
+       variantsId.push(thatProductId);
+
+       if (index === variantsCount) {
+        self._create(variantsId);
+       }
+    });
+  })
+}
+
+/**
+ * Инизиализация объекта Product
+ */
+ISnew.Collection.prototype._create = function(variantsId){
+  var self = this;
+
+  ISnew.json.getProductsList(variantsId)
+      .done(function (_newSelectors) {
+
+        _.forEach(_newSelectors, function(_new_product) {
+           self.products[_new_product.id] = new ISnew.Product( _new_product );
+        });
+
+      })
+      .fail(function (response) {
+        throw new ISnew.tools.Error('ErrorJson', 'ошибка при выполнени ajax запроса');
+      });
+}
+
+/**
  * OptionSelector
  */
 ISnew.OptionSelector = function (product, _owner) {
@@ -1562,9 +1627,10 @@ ISnew.OptionSelector.prototype._init = function (_product, _owner) {
   // привязываем экземпляр Класса к товару
   self.$product[0]['OptionSelector'] = self;
 
+  //  вызов рендера и слушателя
   self._renderSelector();
 
-  self._bindSelect(self.selector.product_selector);
+  self._bindSelect();
 
   return;
 };
@@ -1619,7 +1685,7 @@ ISnew.OptionSelector.prototype._renderOption = function (option) {
 /**
  * Биндинг селекторов
  */
-ISnew.OptionSelector.prototype._bindSelect = function (_productSelector) {
+ISnew.OptionSelector.prototype._bindSelect = function () {
   var self = this;
 
   //  Слушаем изменения в нативном селекте
@@ -1628,17 +1694,17 @@ ISnew.OptionSelector.prototype._bindSelect = function (_productSelector) {
 
     var $select = $(this);
     var variantId = parseInt($(this).val());
-    var OptionSelector = self._getOptionSelector($(this))
+    var OptionSelector = self.$product[0]['OptionSelector'];
 
     OptionSelector._owner.variants.setVariant(variantId);
   });
 
   //  Слушаем изменения в селекторах модификаций
-  $(document).on('click change', _productSelector , function (event) {
+  $(document).on('click change', self.selector.product_selector, function (event) {
     event.preventDefault();
 
     var $select = $(this);
-    var OptionSelector = self._getOptionSelector($(this))
+    var OptionSelector = self.$product[0]['OptionSelector'];
 
 
     var option = {
@@ -1665,18 +1731,6 @@ ISnew.OptionSelector.prototype._bindSelect = function (_productSelector) {
   });
 };
 
-/**
- * Получаем ссылку на OptionSelector
- */
-ISnew.OptionSelector.prototype._getOptionSelector = function (_selector) {
-  var self = this;
-
-  var $select = _selector;
-  var $product = $select.parents('['+ self.selector.product +']:first');
-  var OptionSelector = $product[0]['OptionSelector'];
-
-  return OptionSelector;
-};
 /**
  * Типы цен
  */
@@ -1846,6 +1900,7 @@ ISnew.Product.prototype._isVariants = function (_product) {
 
   return optionCount > 0;
 };
+
 /**
  * Variants tree
  */
@@ -1856,6 +1911,9 @@ ISnew.ProductVariants = function (product, _owner) {
   self.variants = product.variants;
   self.tree = self._initTree(product.variants);
   self.options = self._initOptions(product.option_names);
+
+  //  id варианта из урла
+  self.urlVariant = ISnew.tools.URL.getKeyValue('variant_id');
 
   self._update();
 };
@@ -1943,6 +2001,12 @@ ISnew.ProductVariants.prototype._update = function () {
   status.action = 'update_variant';
 
   self._owner._updateStatus(status);
+
+  //  если есть id в урле обновляем вариант
+  if (self.urlVariant) {
+    self._setOptionByVariant(self.urlVariant);
+    self.urlVariant = false;
+  }
   return;
 };
 
@@ -1983,11 +2047,24 @@ ISnew.ProductVariants.prototype.getFirst = function (leaf) {
 ISnew.ProductVariants.prototype.getVariant = function () {
   var self = this;
   var branch = _.get(self, self._getSelectedVector());
+  var branchId = branch.variant_id;
   var id;
 
+  //  если есть id в урле подменяем вариант
+  if (self.urlVariant) {
+    branchId = self.urlVariant;
+  }
+
   id = _.findKey(self.variants, function(variant) {
-    return variant.id == branch.variant_id;
+    return variant.id == branchId;
   });
+
+  //  если поиск по варианту из урла ничего не выдал
+  if (!id) {
+    id = _.findKey(self.variants, function(variant) {
+      return variant.id == branch.variant_id;
+    });
+  }
 
   return self.variants[id];
 };
@@ -2014,6 +2091,7 @@ ISnew.ProductVariants.prototype._initOptions = function (options) {
   var leaf = self.tree;
 
   _.forEach(options, function(option, index) {
+    console.log(leaf)
     var first = self.getFirst(leaf);
 
     options[index].selected = first.position;
@@ -2081,10 +2159,12 @@ ISnew.ProductVariants.prototype._setOptionByVariant = function (variant_id) {
     return variant.id == variant_id;
   });
 
-  _.forEach(self.variants[index].option_values, function(option, option_index) {
-    self.options[option_index].selected = option.position;
-  });
 
+  if (self.variants[index]) {
+    _.forEach(self.variants[index].option_values, function(option, option_index) {
+      self.options[option_index].selected = option.position;
+    });
+  }
   return;
 };
 
@@ -2246,15 +2326,16 @@ ISnew.tools.URL = function () {
 /**
  * Разбор урла
  */
-ISnew.tools.URL.prototype._init = function () {
+ISnew.tools.URL.init = function () {
   var self = this;
-  var self = window.location;
+  self.keys = {};
+
+  var windowLocation = window.location;
   var temp;
 
   //self.search = self.search;
-  self.keys = {};
 
-  _.chain(self.search.replace('?', ''))
+  _.chain(windowLocation.search.replace('?', ''))
     .split('&')
     .forEach(function (part) {
       if (part !== '') {
@@ -2266,12 +2347,16 @@ ISnew.tools.URL.prototype._init = function () {
 
   return;
 };
-
 /**
  * Вытаскиваем значение ключа
  */
-ISnew.tools.URL.prototype.getKeyValue = function (key) {
+ISnew.tools.URL.getKeyValue = function (key) {
   var self = this;
 
   return self.keys[key];
 };
+
+/**
+ * Запуск тулзы
+ */
+ISnew.tools.URL.init();

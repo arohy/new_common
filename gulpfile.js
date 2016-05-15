@@ -4,6 +4,7 @@ var concat = require('gulp-concat');
 var plumber = require('gulp-plumber');
 var combine = require('stream-combiner');
 var shell = require('gulp-shell');
+var browserify = require('gulp-browserify');
 
 // ==============================
 gulp.task('default', ['common-watch', 'test-watch'], function() {
@@ -35,6 +36,7 @@ gulp.task('build-common', function() {
 
 gulp.task('build-tests', function() {
   return gulp.src(['test/js_tests/**/*.js'])
+    .pipe(browserify())
     .pipe(combine(
       plumber(),
       concat('tests.js'),

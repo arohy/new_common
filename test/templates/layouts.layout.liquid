@@ -56,15 +56,6 @@
 
   </script>
 
-  {% if template == 'product' %}
-
-  <script type="text/javascript">
-    $(function () {
-      product = new ISnew.Product({{ product | json }});
-    });
-  </script>
-
-  {% endif %}
 
   <script type="text/template" data-template-id="option-select">
     <div class="option-item">

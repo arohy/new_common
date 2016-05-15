@@ -9,6 +9,9 @@ ISnew.ProductVariants = function (product, _owner) {
   self.tree = self._initTree(product.variants);
   self.options = self._initOptions(product.option_names);
 
+  //  id варианта из урла
+  self.urlVariant = ISnew.tools.URL.getKeyValue('variant_id');
+
   self._update();
 };
 
@@ -95,6 +98,12 @@ ISnew.ProductVariants.prototype._update = function () {
   status.action = 'update_variant';
 
   self._owner._updateStatus(status);
+
+  //  если есть id в урле обновляем вариант
+  if (self.urlVariant) {
+    self._setOptionByVariant(self.urlVariant);
+    self.urlVariant = false;
+  }
   return;
 };
 
@@ -135,11 +144,24 @@ ISnew.ProductVariants.prototype.getFirst = function (leaf) {
 ISnew.ProductVariants.prototype.getVariant = function () {
   var self = this;
   var branch = _.get(self, self._getSelectedVector());
+  var branchId = branch.variant_id;
   var id;
 
+  //  если есть id в урле подменяем вариант
+  if (self.urlVariant) {
+    branchId = self.urlVariant;
+  }
+
   id = _.findKey(self.variants, function(variant) {
-    return variant.id == branch.variant_id;
+    return variant.id == branchId;
   });
+
+  //  если поиск по варианту из урла ничего не выдал
+  if (!id) {
+    id = _.findKey(self.variants, function(variant) {
+      return variant.id == branch.variant_id;
+    });
+  }
 
   return self.variants[id];
 };
@@ -166,6 +188,7 @@ ISnew.ProductVariants.prototype._initOptions = function (options) {
   var leaf = self.tree;
 
   _.forEach(options, function(option, index) {
+    console.log(leaf)
     var first = self.getFirst(leaf);
 
     options[index].selected = first.position;
@@ -233,10 +256,12 @@ ISnew.ProductVariants.prototype._setOptionByVariant = function (variant_id) {
     return variant.id == variant_id;
   });
 
-  _.forEach(self.variants[index].option_values, function(option, option_index) {
-    self.options[option_index].selected = option.position;
-  });
 
+  if (self.variants[index]) {
+    _.forEach(self.variants[index].option_values, function(option, option_index) {
+      self.options[option_index].selected = option.position;
+    });
+  }
   return;
 };
 

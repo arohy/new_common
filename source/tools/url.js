@@ -10,15 +10,16 @@ ISnew.tools.URL = function () {
 /**
  * Разбор урла
  */
-ISnew.tools.URL.prototype._init = function () {
+ISnew.tools.URL.init = function () {
   var self = this;
-  var self = window.location;
+  self.keys = {};
+
+  var windowLocation = window.location;
   var temp;
 
   //self.search = self.search;
-  self.keys = {};
 
-  _.chain(self.search.replace('?', ''))
+  _.chain(windowLocation.search.replace('?', ''))
     .split('&')
     .forEach(function (part) {
       if (part !== '') {
@@ -30,12 +31,16 @@ ISnew.tools.URL.prototype._init = function () {
 
   return;
 };
-
 /**
  * Вытаскиваем значение ключа
  */
-ISnew.tools.URL.prototype.getKeyValue = function (key) {
+ISnew.tools.URL.getKeyValue = function (key) {
   var self = this;
 
   return self.keys[key];
 };
+
+/**
+ * Запуск тулзы
+ */
+ISnew.tools.URL.init();
