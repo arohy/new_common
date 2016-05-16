@@ -20,6 +20,7 @@ ISnew.Product.prototype._init = function (_product, _owner){
   self.product = _product;
   self._owner = _owner;
 
+
   self.quantity = 0;
   self.price_kinds = new ISnew.ProductPriceType(_product, _owner);
 

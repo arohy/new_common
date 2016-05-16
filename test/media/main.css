@@ -932,3 +932,11 @@ hr {
 .option-item{
   margin-bottom: 0.5rem;
 }
+.option-image.option-active {
+  border: 1px solid #D3D3D3;
+}
+.option-image{
+  display: inline-block;
+  vertical-align: top;
+  padding: 5px;
+}

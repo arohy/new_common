@@ -1,16 +1,32 @@
 /**
  * Variants tree
  */
-ISnew.ProductVariants = function (product, _owner) {
+ISnew.ProductVariants = function (product, _owner, param) {
   var self = this;
   self._owner = _owner;
 
   self.variants = product.variants;
-  self.tree = self._initTree(product.variants);
-  self.options = self._initOptions(product.option_names);
+  //  тут хранятся картики продукта
+  self.images = self._getImage(product);
+
+  //  инизиализация параметров
+  self.param = {};
+
+  var setiing = {
+    options: {
+      'Цвет': 'option-image'
+    }
+  }
+  self.param = setiing || {};
+  self.param.options['default'] = 'option-select';
+
 
   //  id варианта из урла
   self.urlVariant = ISnew.tools.URL.getKeyValue('variant_id');
+
+
+  self.tree = self._initTree(product.variants);
+  self.options = self._initOptions(product.option_names);
 
   self._update();
 };
@@ -44,6 +60,7 @@ ISnew.ProductVariants.prototype._initTree = function (variants) {
           id: _.toInteger(option.id),
           tree: {},
           title: option.title,
+          name: option.title.toLowerCase(),
           variant_id: id,
           position: _.toInteger(option.position)
         };
@@ -186,10 +203,20 @@ ISnew.ProductVariants.prototype.setVariant = function (variant_id) {
 ISnew.ProductVariants.prototype._initOptions = function (options) {
   var self = this;
   var leaf = self.tree;
+  var paramOptions = self.param.options;
 
   _.forEach(options, function(option, index) {
-    console.log(leaf)
     var first = self.getFirst(leaf);
+    var optionTitle = options[index].title;
+
+    var renderType = paramOptions[optionTitle];
+
+    //  если название шаблона для опции передано в параметрах
+    if (renderType) {
+      options[index].render_type = renderType;
+    }else{
+      options[index].render_type = paramOptions['default']
+    }
 
     options[index].selected = first.position;
     leaf = first.tree;
@@ -282,3 +309,37 @@ ISnew.ProductVariants.prototype._getSelectedVector = function (_length) {
 
   return vector;
 };
+
+/**
+ * Получаем картинки продукта
+ */
+ISnew.ProductVariants.prototype._getImage = function (product) {
+  var self = this;
+
+  var images = {};
+  var productImages = product.images;
+
+  //  если у продукта есть картинки
+  if (productImages.length > 0) {
+
+  _.forEach(productImages, function(value, key) {
+
+    //  если у картинки есть title
+    if(value['title']){
+      var imageName = value['title'].toLowerCase();
+      images[imageName] = {};
+      images[imageName].thumb_url = value['thumb_url'];
+      images[imageName].small_url = value['small_url'];
+      images[imageName].medium_url = value['medium_url'];
+      images[imageName].large_url = value['large_url'];
+      images[imageName].original_url = value['original_url'];
+    }
+
+  });
+
+  }else{
+    images = false;
+  }
+
+  return images;
+}
