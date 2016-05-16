@@ -1,8 +1,17 @@
 /**
  * Создание новых продуктов
  */
-ISnew.Collection = function () {
+ISnew.Collection = function (settings) {
   var self = this;
+
+  //получаем настройки
+  /*
+    Опции варантов:
+    options: {
+      'Цвет': 'option-image'
+    }
+   */
+  self.settings = settings || {};
 
   // объект для создаваемых продуктов
   self.products = {}
@@ -51,7 +60,7 @@ ISnew.Collection.prototype._create = function(variantsId){
       .done(function (_newSelectors) {
 
         _.forEach(_newSelectors, function(_new_product) {
-           self.products[_new_product.id] = new ISnew.Product( _new_product );
+           self.products[_new_product.id] = new ISnew.Product( _new_product , self.settings);
         });
 
       })

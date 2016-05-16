@@ -88,7 +88,7 @@
       <div
         class=""
         data-option-selector=""
-        data-option-span
+        data-option-click
         data-position-id=""
         data-option_name_id="<%= option.id %>"
       >
@@ -103,6 +103,29 @@
             <% }else{ %>
               <span><%= value.title %></span>
             <% } %>
+          </span>
+        <% }) %>
+      </div>
+    </div>
+  </script>
+
+  <script type="text/template" data-template-id="option-span">
+    <div class="option-item">
+      <label><%= option.title %></label>
+      <div
+        class=""
+        data-option-selector=""
+        data-option-click
+        data-position-id=""
+        data-option_name_id="<%= option.id %>"
+      >
+        <% _.forEach(values, function (value){ %>
+          <span
+            data-selector-variant="<%= value.id %>"
+            data-value-position="<%= value.position %>"
+            class="btn <% if (option.selected == value.position) { %>active<% } %>"
+          >
+              <span><%= value.title %></span>
           </span>
         <% }) %>
       </div>

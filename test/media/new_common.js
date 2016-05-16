@@ -850,6 +850,161 @@ ISnew.CartDOM.prototype._unlockButton = function (data, eventName) {
   return;
 };
 /**
+ * Event bus
+ *
+ * Шина событий. Построена на $.Callbacks;
+ */
+
+/**
+ * Класс Шины Событий
+ */
+
+// TODO: сделать синглтон
+ISnew.EventBus = function () {
+  var self = this;
+
+  self.eventsList = {};
+  self.logger = new ISnew.EventsLogger();
+
+  return;
+};
+
+/**
+ * Публикация события с данными
+ */
+ISnew.EventBus.prototype.publish = function (eventId, data) {
+  var self = this;
+
+  self.logger.addListner(eventId);
+
+  return self._selectEvent(eventId).fire(data);
+};
+
+/**
+ * Подписаться на событие
+ */
+ISnew.EventBus.prototype.subscribe = function (eventId, callback) {
+  var self = this;
+
+  return self._selectEvent(eventId).add(callback);
+};
+
+/**
+ * Отписаться от события
+ */
+ISnew.EventBus.prototype.unsubscribe = function (eventId, callback) {
+  var self = this;
+
+  return self._selectEvent(eventId).remove(callback);
+};
+
+/**
+ * Выбор нужного события
+ */
+ISnew.EventBus.prototype._selectEvent = function (eventId) {
+  var self = this;
+  var Event;
+
+  eventId = _.toString(eventId);
+  Event = self.eventsList[eventId];
+
+  // Если у нас новое событие, создаем его и объявляем в системе.
+  if (!Event) {
+    // Объявляем методы
+    Event = $.Callbacks('memory');
+    self.eventsList[eventId] = Event;
+  }
+
+  return Event;
+};
+/**
+ * Logger на шине событий
+ *
+ * Позволяет одной командой перехватывать все события, порождаемые компонентом
+ */
+ISnew.EventsLogger = function () {
+  var self = this;
+
+  self.loggersList = {};
+};
+
+/**
+ * Добавляем прослушку компонента
+ */
+ISnew.EventsLogger.prototype.add = function (component) {
+  var self = this;
+
+  self.loggersList[component] = {};
+  self._init(component);
+
+  return;
+};
+
+/**
+ * Проходим по уже существующим событиям и вешаемся на них
+ */
+ISnew.EventsLogger.prototype._init = function (component) {
+  var self = this;
+
+  _.forEach(EventBus.eventsList, function (item, eventName) {
+    self.addListner(eventName)
+  });
+
+  return;
+};
+
+/**
+ * Вешаем слушателя на событие
+ */
+ISnew.EventsLogger.prototype.addListner = function (eventName) {
+  var self = this;
+  var component = self._component(eventName);
+
+  // если такой
+  if (self._inList(component) && !self._isListen(eventName)) {
+    self.loggersList[component][eventName] = true;
+
+    EventBus.subscribe(eventName, function (data) {
+      console.log('LISTNER: ', eventName, data);
+    });
+  }
+
+  return;
+};
+
+/**
+ * Проверяем, слушаем ли мы такой компонент?
+ */
+ISnew.EventsLogger.prototype._inList = function (component) {
+  var self = this;
+
+  return _.has(self.loggersList, component) ? true : false;
+};
+
+/**
+ * Проверка
+ */
+ISnew.EventsLogger.prototype._isListen = function (eventName) {
+  var self = this;
+  var component = self._component(eventName);
+  var status = false;
+
+  if (self._inList(component)) {
+    status = _.has(self.loggersList[component], eventName);
+  }
+
+  return status;
+};
+
+/**
+ * Вытаскиваем название компонента из события
+ */
+ISnew.EventsLogger.prototype._component = function (eventName) {
+  return _.last(eventName.split(':'));
+};
+
+EventBus = new ISnew.EventBus();
+/**
  * Сравнение товаров
  */
 
@@ -1098,161 +1253,6 @@ ISnew.CompareDOM.prototype._deleteItem = function ($button) {
 
   Compare.remove(task);
 };
-/**
- * Event bus
- *
- * Шина событий. Построена на $.Callbacks;
- */
-
-/**
- * Класс Шины Событий
- */
-
-// TODO: сделать синглтон
-ISnew.EventBus = function () {
-  var self = this;
-
-  self.eventsList = {};
-  self.logger = new ISnew.EventsLogger();
-
-  return;
-};
-
-/**
- * Публикация события с данными
- */
-ISnew.EventBus.prototype.publish = function (eventId, data) {
-  var self = this;
-
-  self.logger.addListner(eventId);
-
-  return self._selectEvent(eventId).fire(data);
-};
-
-/**
- * Подписаться на событие
- */
-ISnew.EventBus.prototype.subscribe = function (eventId, callback) {
-  var self = this;
-
-  return self._selectEvent(eventId).add(callback);
-};
-
-/**
- * Отписаться от события
- */
-ISnew.EventBus.prototype.unsubscribe = function (eventId, callback) {
-  var self = this;
-
-  return self._selectEvent(eventId).remove(callback);
-};
-
-/**
- * Выбор нужного события
- */
-ISnew.EventBus.prototype._selectEvent = function (eventId) {
-  var self = this;
-  var Event;
-
-  eventId = _.toString(eventId);
-  Event = self.eventsList[eventId];
-
-  // Если у нас новое событие, создаем его и объявляем в системе.
-  if (!Event) {
-    // Объявляем методы
-    Event = $.Callbacks('memory');
-    self.eventsList[eventId] = Event;
-  }
-
-  return Event;
-};
-/**
- * Logger на шине событий
- *
- * Позволяет одной командой перехватывать все события, порождаемые компонентом
- */
-ISnew.EventsLogger = function () {
-  var self = this;
-
-  self.loggersList = {};
-};
-
-/**
- * Добавляем прослушку компонента
- */
-ISnew.EventsLogger.prototype.add = function (component) {
-  var self = this;
-
-  self.loggersList[component] = {};
-  self._init(component);
-
-  return;
-};
-
-/**
- * Проходим по уже существующим событиям и вешаемся на них
- */
-ISnew.EventsLogger.prototype._init = function (component) {
-  var self = this;
-
-  _.forEach(EventBus.eventsList, function (item, eventName) {
-    self.addListner(eventName)
-  });
-
-  return;
-};
-
-/**
- * Вешаем слушателя на событие
- */
-ISnew.EventsLogger.prototype.addListner = function (eventName) {
-  var self = this;
-  var component = self._component(eventName);
-
-  // если такой
-  if (self._inList(component) && !self._isListen(eventName)) {
-    self.loggersList[component][eventName] = true;
-
-    EventBus.subscribe(eventName, function (data) {
-      console.log('LISTNER: ', eventName, data);
-    });
-  }
-
-  return;
-};
-
-/**
- * Проверяем, слушаем ли мы такой компонент?
- */
-ISnew.EventsLogger.prototype._inList = function (component) {
-  var self = this;
-
-  return _.has(self.loggersList, component) ? true : false;
-};
-
-/**
- * Проверка
- */
-ISnew.EventsLogger.prototype._isListen = function (eventName) {
-  var self = this;
-  var component = self._component(eventName);
-  var status = false;
-
-  if (self._inList(component)) {
-    status = _.has(self.loggersList[component], eventName);
-  }
-
-  return status;
-};
-
-/**
- * Вытаскиваем название компонента из события
- */
-ISnew.EventsLogger.prototype._component = function (eventName) {
-  return _.last(eventName.split(':'));
-};
-
-EventBus = new ISnew.EventBus();
 /*
  * Добавление товара в корзину
  */
@@ -1517,8 +1517,17 @@ ISnew.json.updateCartItems = function (items, options) {
 /**
  * Создание новых продуктов
  */
-ISnew.Collection = function () {
+ISnew.Collection = function (settings) {
   var self = this;
+
+  //получаем настройки
+  /*
+    Опции варантов:
+    options: {
+      'Цвет': 'option-image'
+    }
+   */
+  self.settings = settings || {};
 
   // объект для создаваемых продуктов
   self.products = {}
@@ -1567,7 +1576,7 @@ ISnew.Collection.prototype._create = function(variantsId){
       .done(function (_newSelectors) {
 
         _.forEach(_newSelectors, function(_new_product) {
-           self.products[_new_product.id] = new ISnew.Product( _new_product );
+           self.products[_new_product.id] = new ISnew.Product( _new_product , self.settings);
         });
 
       })
@@ -1591,18 +1600,20 @@ ISnew.OptionSelector = function (product, _owner) {
 ISnew.OptionSelector.prototype._init = function (_product, _owner) {
   var self = this;
 
-  self.selector = {
-    //  селектор опции типа select
-    selector_select: '[data-product-id="'+ _product.id +'"] [data-option-select]',
-    //  селектор опции типа span
-    selector_span: '[data-product-id="'+ _product.id +'"] [data-option-span] [data-selector-variant]',
-    //  селектор формы
-    product: 'data-product-id',
-    // селектор нативного селекта
-    native_select: 'data-product-variants',
-    // селектор блока в который происходит рендер модификаций
-    option_selector: 'data-option-selector'
-  };
+  self.selector = {};
+
+  //  селектор формы
+  self.selector['product'] = 'data-product-id'
+  //  селектор опции типа select
+  self.selector['selector_select'] = '['+ self.selector.product +'="'+ _product.id +'"] [data-option-select]';
+  //  селектор опции типа click
+  self.selector['selector_click'] = '['+ self.selector.product +'="'+ _product.id +'"] [data-option-click] [data-selector-variant]';
+  // селектор нативного селекта
+  self.selector['native_select'] = 'data-product-variants';
+  // селектор блока в который происходит рендер модификаций
+  self.selector['option_selector'] = 'data-option-selector';
+
+
 
   self._owner = _owner;
 
@@ -1724,11 +1735,11 @@ ISnew.OptionSelector.prototype._bindSelect = function () {
   });
 
   //  Слушаем изменения в селекторах модификаций типа span
-  $(document).on('click', self.selector.selector_span, function (event) {
+  $(document).on('click', self.selector.selector_click, function (event) {
     event.preventDefault();
 
     var $span = $(this);
-    var $spanParent = $(this).parents('[data-option-span]:first');
+    var $spanParent = $(this).parents('[data-option-click]:first');
     var positionId = $span.data('value-position');
     var optionNameId = $spanParent.data('option_name_id');
     var OptionSelector = self.$product[0]['OptionSelector'];
@@ -1857,8 +1868,10 @@ ISnew.ProductPriceType.prototype.setVariant = function (variant_id) {
 /**
  * Product
  */
-ISnew.Product = function (product) {
+ISnew.Product = function (product, settings) {
   var self = this;
+
+  self.settings = settings;
 
   if (!product) {
     throw new ISnew.tools.Error('ErrorProduct', 'ошибка в передаче аргумента');
@@ -1878,12 +1891,12 @@ ISnew.Product.prototype._init = function (_product, _owner){
 
 
   self.quantity = 0;
-  self.price_kinds = new ISnew.ProductPriceType(_product, _owner);
+  self.price_kinds = new ISnew.ProductPriceType(_product, _owner, self.settings);
 
   //  если есть модификации запускаем создание OptionSelector
   if (self._owner._isVariants(_product)) {
-    self.variants = new ISnew.ProductVariants(_product, _owner);
-    self.OptionSelector = new ISnew.OptionSelector(_product, _owner);
+    self.variants = new ISnew.ProductVariants(_product, _owner, self.settings);
+    self.OptionSelector = new ISnew.OptionSelector(_product, _owner, self.settings);
   }
 }
 
@@ -1929,7 +1942,7 @@ ISnew.Product.prototype._isVariants = function (_product) {
 /**
  * Variants tree
  */
-ISnew.ProductVariants = function (product, _owner, param) {
+ISnew.ProductVariants = function (product, _owner, settings) {
   var self = this;
   self._owner = _owner;
 
@@ -1938,15 +1951,11 @@ ISnew.ProductVariants = function (product, _owner, param) {
   self.images = self._getImage(product);
 
   //  инизиализация параметров
-  self.param = {};
+  self.settings = {};
 
-  var setiing = {
-    options: {
-      'Цвет': 'option-image'
-    }
-  }
-  self.param = setiing || {};
-  self.param.options['default'] = 'option-select';
+  console.log(settings)
+  self.settings = settings || {};
+  self.settings.options['default'] = 'option-select';
 
 
   //  id варианта из урла
@@ -2131,7 +2140,7 @@ ISnew.ProductVariants.prototype.setVariant = function (variant_id) {
 ISnew.ProductVariants.prototype._initOptions = function (options) {
   var self = this;
   var leaf = self.tree;
-  var paramOptions = self.param.options;
+  var paramOptions = self.settings.options;
 
   _.forEach(options, function(option, index) {
     var first = self.getFirst(leaf);
@@ -2406,7 +2415,7 @@ ISnew.Money.prototype.format = function (amount) {
 ISnew.tools.URL = function () {
   var self = this;
 
-  self._init();
+  //self.init();
 };
 
 /**

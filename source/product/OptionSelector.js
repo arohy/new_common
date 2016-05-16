@@ -13,18 +13,20 @@ ISnew.OptionSelector = function (product, _owner) {
 ISnew.OptionSelector.prototype._init = function (_product, _owner) {
   var self = this;
 
-  self.selector = {
-    //  селектор опции типа select
-    selector_select: '[data-product-id="'+ _product.id +'"] [data-option-select]',
-    //  селектор опции типа span
-    selector_span: '[data-product-id="'+ _product.id +'"] [data-option-span] [data-selector-variant]',
-    //  селектор формы
-    product: 'data-product-id',
-    // селектор нативного селекта
-    native_select: 'data-product-variants',
-    // селектор блока в который происходит рендер модификаций
-    option_selector: 'data-option-selector'
-  };
+  self.selector = {};
+
+  //  селектор формы
+  self.selector['product'] = 'data-product-id'
+  //  селектор опции типа select
+  self.selector['selector_select'] = '['+ self.selector.product +'="'+ _product.id +'"] [data-option-select]';
+  //  селектор опции типа click
+  self.selector['selector_click'] = '['+ self.selector.product +'="'+ _product.id +'"] [data-option-click] [data-selector-variant]';
+  // селектор нативного селекта
+  self.selector['native_select'] = 'data-product-variants';
+  // селектор блока в который происходит рендер модификаций
+  self.selector['option_selector'] = 'data-option-selector';
+
+
 
   self._owner = _owner;
 
@@ -146,11 +148,11 @@ ISnew.OptionSelector.prototype._bindSelect = function () {
   });
 
   //  Слушаем изменения в селекторах модификаций типа span
-  $(document).on('click', self.selector.selector_span, function (event) {
+  $(document).on('click', self.selector.selector_click, function (event) {
     event.preventDefault();
 
     var $span = $(this);
-    var $spanParent = $(this).parents('[data-option-span]:first');
+    var $spanParent = $(this).parents('[data-option-click]:first');
     var positionId = $span.data('value-position');
     var optionNameId = $spanParent.data('option_name_id');
     var OptionSelector = self.$product[0]['OptionSelector'];

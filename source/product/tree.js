@@ -1,7 +1,7 @@
 /**
  * Variants tree
  */
-ISnew.ProductVariants = function (product, _owner, param) {
+ISnew.ProductVariants = function (product, _owner, settings) {
   var self = this;
   self._owner = _owner;
 
@@ -10,15 +10,11 @@ ISnew.ProductVariants = function (product, _owner, param) {
   self.images = self._getImage(product);
 
   //  инизиализация параметров
-  self.param = {};
+  self.settings = {};
 
-  var setiing = {
-    options: {
-      'Цвет': 'option-image'
-    }
-  }
-  self.param = setiing || {};
-  self.param.options['default'] = 'option-select';
+  console.log(settings)
+  self.settings = settings || {};
+  self.settings.options['default'] = 'option-select';
 
 
   //  id варианта из урла
@@ -203,7 +199,7 @@ ISnew.ProductVariants.prototype.setVariant = function (variant_id) {
 ISnew.ProductVariants.prototype._initOptions = function (options) {
   var self = this;
   var leaf = self.tree;
-  var paramOptions = self.param.options;
+  var paramOptions = self.settings.options;
 
   _.forEach(options, function(option, index) {
     var first = self.getFirst(leaf);

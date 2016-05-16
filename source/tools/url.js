@@ -4,7 +4,7 @@
 ISnew.tools.URL = function () {
   var self = this;
 
-  self._init();
+  //self.init();
 };
 
 /**
