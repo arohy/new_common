@@ -18,7 +18,7 @@ ISnew.ProductVariants = function (product, _owner, settings) {
 
 
   //  id варианта из урла
-  self.urlVariant = ISnew.tools.URL.getKeyValue('variant_id');
+  self.urlVariant = Site.URL.getKeyValue('variant_id');
 
 
   self.tree = self._initTree(product.variants);

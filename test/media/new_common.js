@@ -8,17 +8,16 @@ if (!ISnew) {
   var ISnew = {};
 }
 
+// Место для всяких утилиток
+if (!ISnew.tools) {
+  ISnew.tools = {};
+}
+
 // Глобальная информация о сайте.
 if (!Site) {
   var Site = {};
 }
 
-// Место для всяких утилиток
-if (!ISnew.tools) {
-  ISnew.tools = {};
-  ISnew.tools.URL = {};
-  ISnew.tools.Error = {};
-}
 
 // Место для всех оберток json
 if (!ISnew.json) {
@@ -29,6 +28,594 @@ if (!ISnew.json) {
 if (!EventBus) {
   var EventBus;
 }
+
+/**
+ * Event bus
+ *
+ * Шина событий. Построена на $.Callbacks;
+ */
+
+/**
+ * Класс Шины Событий
+ */
+
+// TODO: сделать синглтон
+ISnew.EventBus = function () {
+  var self = this;
+
+  self.eventsList = {};
+  self.logger = new ISnew.EventsLogger();
+
+  return;
+};
+
+/**
+ * Публикация события с данными
+ */
+ISnew.EventBus.prototype.publish = function (eventId, data) {
+  var self = this;
+
+  self.logger.addListner(eventId);
+
+  return self._selectEvent(eventId).fire(data);
+};
+
+/**
+ * Подписаться на событие
+ */
+ISnew.EventBus.prototype.subscribe = function (eventId, callback) {
+  var self = this;
+
+  return self._selectEvent(eventId).add(callback);
+};
+
+/**
+ * Отписаться от события
+ */
+ISnew.EventBus.prototype.unsubscribe = function (eventId, callback) {
+  var self = this;
+
+  return self._selectEvent(eventId).remove(callback);
+};
+
+/**
+ * Выбор нужного события
+ */
+ISnew.EventBus.prototype._selectEvent = function (eventId) {
+  var self = this;
+  var Event;
+
+  eventId = _.toString(eventId);
+  Event = self.eventsList[eventId];
+
+  // Если у нас новое событие, создаем его и объявляем в системе.
+  if (!Event) {
+    // Объявляем методы
+    Event = $.Callbacks('memory');
+    self.eventsList[eventId] = Event;
+  }
+
+  return Event;
+};
+/**
+ * Logger на шине событий
+ *
+ * Позволяет одной командой перехватывать все события, порождаемые компонентом
+ */
+ISnew.EventsLogger = function () {
+  var self = this;
+
+  self.loggersList = {};
+};
+
+/**
+ * Добавляем прослушку компонента
+ */
+ISnew.EventsLogger.prototype.add = function (component) {
+  var self = this;
+
+  self.loggersList[component] = {};
+  self._init(component);
+
+  return;
+};
+
+/**
+ * Проходим по уже существующим событиям и вешаемся на них
+ */
+ISnew.EventsLogger.prototype._init = function (component) {
+  var self = this;
+
+  _.forEach(EventBus.eventsList, function (item, eventName) {
+    self.addListner(eventName)
+  });
+
+  return;
+};
+
+/**
+ * Вешаем слушателя на событие
+ */
+ISnew.EventsLogger.prototype.addListner = function (eventName) {
+  var self = this;
+  var component = self._component(eventName);
+
+  // если такой
+  if (self._inList(component) && !self._isListen(eventName)) {
+    self.loggersList[component][eventName] = true;
+
+    EventBus.subscribe(eventName, function (data) {
+      console.log('LISTNER: ', eventName, data);
+    });
+  }
+
+  return;
+};
+
+/**
+ * Проверяем, слушаем ли мы такой компонент?
+ */
+ISnew.EventsLogger.prototype._inList = function (component) {
+  var self = this;
+
+  return _.has(self.loggersList, component) ? true : false;
+};
+
+/**
+ * Проверка
+ */
+ISnew.EventsLogger.prototype._isListen = function (eventName) {
+  var self = this;
+  var component = self._component(eventName);
+  var status = false;
+
+  if (self._inList(component)) {
+    status = _.has(self.loggersList[component], eventName);
+  }
+
+  return status;
+};
+
+/**
+ * Вытаскиваем название компонента из события
+ */
+ISnew.EventsLogger.prototype._component = function (eventName) {
+  return _.last(eventName.split(':'));
+};
+
+EventBus = new ISnew.EventBus();
+/**
+ * Тул для вывода ошибок.
+ */
+ISnew.tools.Error = function (name, message) {
+  var self = this;
+  var errorObject = new Error(message);
+
+  errorObject.name = name || 'Ошибка';
+
+  self.name = errorObject.name;
+  self.message = errorObject.message;
+
+  if (errorObject.stack) {
+    self.stack = errorObject.stack;
+  }
+
+  //Вывод в консоль
+  self.toString = function() {
+   return self.name + ': ' + self.message;
+  };
+};
+/**
+ * Класс для работы с валютой.
+ */
+ISnew.Money = function () {
+  var self = this;
+};
+
+/**
+ * Разбиралка настроек
+ */
+ISnew.Money.prototype._init = function (params) {
+  var self = this;
+  self.options = $.parseJSON(params);
+  return;
+};
+
+ISnew.Money.prototype.set = function (params) {
+  var self = this;
+  self._init(params);
+};
+
+ISnew.Money.prototype.format = function (amount) {
+  var self = this;
+  var value = amount;
+  var patern = /(\d)(?=(\d\d\d)+(?!\d))/g;
+
+  if (amount === null || amount === undefined) {
+    return '';
+  }
+
+  value = value.toString().replace(',', '.');
+  value = parseFloat(value).toFixed(2) || 0;
+  value = value.toString().split('.');
+  value[0] = value[0].replace(patern, '$1'+ self.options.delimiter);
+
+  if (self.options.show_price_without_cents) {
+    value = value[0];
+  } else {
+    value = value.join(self.options.separator);
+  }
+
+  return self.options.format.replace('%n', value).replace('%n', self.options.unit);
+};
+/**
+ * Тул для разбора url.
+ */
+ISnew.tools.URL = function () {
+  var self = this;
+
+  self.init();
+
+  return self;
+};
+
+/**
+ * Разбор урла
+ */
+ISnew.tools.URL.prototype.init = function () {
+  var self = this;
+  self.keys = {};
+
+  var windowLocation = window.location;
+  var temp;
+
+  //self.search = self.search;
+
+  _.chain(windowLocation.search.replace('?', ''))
+    .split('&')
+    .forEach(function (part) {
+      if (part !== '') {
+        part = part.split('=');
+        self.keys[part[0]] = part[1];
+      }
+    })
+    .value();
+
+  return;
+};
+/**
+ * Вытаскиваем значение ключа
+ */
+ISnew.tools.URL.prototype.getKeyValue = function (key) {
+  var self = this;
+
+  return self.keys[key];
+};
+/*
+ * Добавление товара в корзину
+ */
+
+/**
+ * Принимаем объект
+ *
+ * Внезапно, если это объект невалидного вида мы все равно получим ответ!!!
+ */
+
+ISnew.json.addCartItems = function (items, options) {
+  var fields = {};
+  options = options || {};
+
+  _.forIn(items, function (quantity, variant_id) {
+    fields['variant_ids['+ variant_id +']'] = _.toInteger(quantity);
+  });
+
+  _.forIn(options.comments, function (comment, variant_id) {
+    fields['cart[order_line_comments]['+ variant_id +']'] = comment;
+  });
+
+  if (options.coupon) {
+    fields['cart[coupon]'] = options.coupon;
+  }
+
+  return $.post('/cart_items.json', fields);
+}
+/**
+ * Добавление товара в сравнение
+ */
+
+ISnew.json.addCompareItem = function (id) {
+  var fields = {
+    'product[id]': _.toInteger(id)
+  };
+
+  return $.post('/compares.json', fields);
+};
+/*
+ * Получение состава корзины
+ */
+
+ISnew.json.getCartItems = function () {
+  var result = $.Deferred();
+  var cookieCart = $.cookie('cart');
+
+  /*
+   * В куке состав корзины хранится, если там не более 4х РАЗНЫХ модификаций
+   * Кука может быть пустой - дергаем инфу с сервера
+   * Если кука содержит строку 'json' - дергаю инфу с сервера
+   */
+  if (cookieCart && cookieCart != 'json') {
+    order = $.parseJSON(cookieCart) || null;
+    result.resolve(order);
+    // reject??
+  } else {
+    $.getJSON('/cart_items.json')
+      .done(function (order) {
+        result.resolve(order);
+      })
+      .fail(function (response) {
+        result.reject(response);
+      });
+  }
+
+  return result.promise();
+};
+ISnew.json.getClientInfo = function (){
+  return $.getJSON('/client_account/contacts.json');
+};
+/*
+ * Получение информации о коллекции
+ */
+
+ISnew.json.getCollection = function () {
+  var path = '/collection/'+ _.toString(arguments[0]) +'.json';
+  var fields = {};
+
+  _.chain(arguments)
+    .drop()
+    .compact()
+    .each(function (value) {
+      _.assign(fields, value)
+    })
+    .value();
+
+  return $.getJSON(path, fields);
+};
+/**
+ * Добавление товара в сравнение
+ */
+
+ISnew.json.getCompareItems = function (id) {
+
+  return $.getJSON('/compares.json');
+};
+/*
+ * Получение информации о товаре
+ */
+
+ISnew.json.getProduct = function (id) {
+  return $.getJSON('/product_by_id/'+ _.toInteger(id) +'.json', {format: 'json'});
+};
+/*
+ * Получение информации о списке товаров
+ */
+
+ISnew.json.getProductsList = function (id_array) {
+  // указваем, сколько id нужно отправить за раз
+  var query_limit = 25;
+
+  /**
+   * Генерим адреса для запросов
+   *
+   * Приводим к типу массив (мало ли что там прилетело)
+   * Разбиваем на пачки, делаем из них правильные адреса для запросов
+   */
+  var paths = _.chain(id_array)
+    .toArray()
+    .compact()
+    .chunk(query_limit)
+    .map(function (ids_list) {
+      return '/products_by_id/'+ ids_list.join() +'.json';
+    })
+    .value();
+
+  // собираем задачи
+  var promises = $.map(paths, function (path) {
+    return $.ajax(path).then(function (response) {
+        return response;
+      });
+  });
+
+  /**
+   * Склеиваем ответы.
+   *
+   * Проходимся по всем получившимся промисам, дергаем их
+   */
+  return $.when.apply(this, promises)
+    .then(function () {
+      /**
+       * Получаем ответы ото ВСЕХ промисов.
+       * Приводим к типу массив, на случай если ответы все кривые и там - пустота
+       * Вытаскиваем массив с продуктами, склеиваем все массивы и выдаем наружу
+       */
+      return _.chain(arguments)
+        .toArray()
+        .map(function (response) {
+          return response.products;
+        })
+        .flatten()
+        .union()
+        .value()
+    });
+};
+/**
+ * Оформление заказа
+ */
+
+ISnew.json.makeCheckout = function (client, order) {
+  console.log(client, order);
+  var dfd = $.Deferred();
+  var checkout = {
+    pid: 1,
+    'order[delivery_variant_id]': _.toInteger(order.delivery),
+    'order[payment_gateway_id]': _.toInteger(order.payment)
+  };
+
+  _.forIn(client, function (value, field) {
+    checkout['client['+ field +']'] = value;
+  });
+
+  console.log(checkout);
+
+  $.post('/fast_checkout.json', checkout)
+    .done(function (response) {
+      if (response.status == 'ok') {
+        dfd.resolve(response);
+      } else {
+        dfd.reject(response);
+      }
+    })
+    .fail(function (response) {
+      dfd.reject(response)
+    })
+
+  return dfd.promise();
+};
+/*
+ * Удаление товара из корзины
+ */
+
+ISnew.json.removeCartItem = function (variant_id) {
+  var path = '/cart_items/'+ _.toInteger(variant_id) +'.json';
+  var fields = {
+    '_method': 'delete'
+  };
+
+  return $.post(path, fields);
+};
+/*
+ * Удаление товара из сравнения
+ */
+
+ISnew.json.removeCompareItem = function (id) {
+  var fields = {
+      _method: 'delete',
+    };
+  var path   = '/compares/'+ _.toInteger(id) +'.json';
+
+  return $.post(path, fields);
+};
+/*
+ * Отправление сообщения
+ */
+
+ISnew.json.sendMessage = function (input) {
+  var result = $.Deferred();
+  var message = {};
+
+  _.forIn(input, function (value, key) {
+    message['feedback['+ key +']'] = value;
+  });
+
+  $.post('/client_account/feedback.json', message)
+    .done(function (response) {
+      if (message && response.status == 'ok') {
+        result.resolve(response);
+      } else {
+        response.message = message;
+        result.reject(response);
+      }
+    });
+
+  return result.promise();
+};
+/**
+ * Обновление корзины
+ */
+
+ISnew.json.updateCartItems = function (items, options) {
+  var fields = {
+    '_method': 'put'
+  };
+  options = options || {};
+
+  _.forIn(items, function(quantity, variant_id) {
+    fields['cart[quantity]['+ variant_id +']'] = _.toInteger(quantity);
+  });
+
+  _.forIn(options.comments, function(comment, variant_id) {
+    fields['cart[order_line_comments]['+ variant_id +']'] = comment;
+  });
+
+  if (options.coupon) {
+    fields['cart[coupon]'] = options.coupon;
+  }
+
+  return $.post('/cart_items.json', fields);
+};
+/**
+ * Обертка для шаблонизатора
+ */
+
+ISnew.Template = function () {
+  var self = this;
+
+  self._init(self);
+};
+
+/**
+ * Вытаскиваем нужный шаблон
+ */
+ISnew.Template.prototype.render = function (data, template_id) {
+  var self = this;
+
+  var templateHtml = self._templateList[template_id];
+  var result;
+
+  if (templateHtml !== undefined) {
+    result = self._templateList[template_id](data);
+  } else {
+    result = false;
+  }
+
+  return result;
+};
+
+/**
+ * Складываем шаблоны по местам, подготавливаем для работы
+ */
+ISnew.Template.prototype.load = function (template_body, template_id) {
+  var self = this;
+
+  self._templateList[template_id] = _.template(template_body);
+
+  return;
+};
+
+/**
+ * Автоматический сбор шаблонов в верстке
+ */
+ISnew.Template.prototype._init = function (_owner) {
+  var self = this;
+  self._owner = _owner;
+
+  //  устанавливаем lock пока не собирем все шаблоны
+  self._lock = true;
+  self._templateList = {};
+
+  $(function () {
+    var templateCount = $('script[data-template-id]').length - 1;
+
+    $('[data-template-id]').each(function (index, el) {
+
+      self.load($(el).html(), $(el).data('templateId'));
+      if (templateCount === index) {
+        self._lock = false;
+      }
+
+    });
+
+  });
+};
 /**
  * Cart
  *
@@ -850,742 +1437,6 @@ ISnew.CartDOM.prototype._unlockButton = function (data, eventName) {
   return;
 };
 /**
- * Event bus
- *
- * Шина событий. Построена на $.Callbacks;
- */
-
-/**
- * Класс Шины Событий
- */
-
-// TODO: сделать синглтон
-ISnew.EventBus = function () {
-  var self = this;
-
-  self.eventsList = {};
-  self.logger = new ISnew.EventsLogger();
-
-  return;
-};
-
-/**
- * Публикация события с данными
- */
-ISnew.EventBus.prototype.publish = function (eventId, data) {
-  var self = this;
-
-  self.logger.addListner(eventId);
-
-  return self._selectEvent(eventId).fire(data);
-};
-
-/**
- * Подписаться на событие
- */
-ISnew.EventBus.prototype.subscribe = function (eventId, callback) {
-  var self = this;
-
-  return self._selectEvent(eventId).add(callback);
-};
-
-/**
- * Отписаться от события
- */
-ISnew.EventBus.prototype.unsubscribe = function (eventId, callback) {
-  var self = this;
-
-  return self._selectEvent(eventId).remove(callback);
-};
-
-/**
- * Выбор нужного события
- */
-ISnew.EventBus.prototype._selectEvent = function (eventId) {
-  var self = this;
-  var Event;
-
-  eventId = _.toString(eventId);
-  Event = self.eventsList[eventId];
-
-  // Если у нас новое событие, создаем его и объявляем в системе.
-  if (!Event) {
-    // Объявляем методы
-    Event = $.Callbacks('memory');
-    self.eventsList[eventId] = Event;
-  }
-
-  return Event;
-};
-/**
- * Logger на шине событий
- *
- * Позволяет одной командой перехватывать все события, порождаемые компонентом
- */
-ISnew.EventsLogger = function () {
-  var self = this;
-
-  self.loggersList = {};
-};
-
-/**
- * Добавляем прослушку компонента
- */
-ISnew.EventsLogger.prototype.add = function (component) {
-  var self = this;
-
-  self.loggersList[component] = {};
-  self._init(component);
-
-  return;
-};
-
-/**
- * Проходим по уже существующим событиям и вешаемся на них
- */
-ISnew.EventsLogger.prototype._init = function (component) {
-  var self = this;
-
-  _.forEach(EventBus.eventsList, function (item, eventName) {
-    self.addListner(eventName)
-  });
-
-  return;
-};
-
-/**
- * Вешаем слушателя на событие
- */
-ISnew.EventsLogger.prototype.addListner = function (eventName) {
-  var self = this;
-  var component = self._component(eventName);
-
-  // если такой
-  if (self._inList(component) && !self._isListen(eventName)) {
-    self.loggersList[component][eventName] = true;
-
-    EventBus.subscribe(eventName, function (data) {
-      console.log('LISTNER: ', eventName, data);
-    });
-  }
-
-  return;
-};
-
-/**
- * Проверяем, слушаем ли мы такой компонент?
- */
-ISnew.EventsLogger.prototype._inList = function (component) {
-  var self = this;
-
-  return _.has(self.loggersList, component) ? true : false;
-};
-
-/**
- * Проверка
- */
-ISnew.EventsLogger.prototype._isListen = function (eventName) {
-  var self = this;
-  var component = self._component(eventName);
-  var status = false;
-
-  if (self._inList(component)) {
-    status = _.has(self.loggersList[component], eventName);
-  }
-
-  return status;
-};
-
-/**
- * Вытаскиваем название компонента из события
- */
-ISnew.EventsLogger.prototype._component = function (eventName) {
-  return _.last(eventName.split(':'));
-};
-
-EventBus = new ISnew.EventBus();
-/**
- * Сравнение товаров
- */
-
-// TODO: сделать синглтон
-ISnew.Compare = function (options) {
-  options = options || {};
-
-  var self = this;
-  self.products = [];
-  self.maxItems = options.maxItems || 4;
-
-  self.ui = new ISnew.CompareDOM(options);
-
-  // Обновляемся
-  self._update();
-};
-
-/**
- * Добавляем товар
- */
-ISnew.Compare.prototype.add = function (task) {
-  var self = this;
-
-  task.item = parseInt(task.item);
-  task.method = 'add_item';
-
-  // если достигли максимального кол-ва товаров
-  // кидаем остановку
-  if (self.products.length >= self.maxItems) {
-    task.method = 'overload';
-    self._events(task);
-    self._always(task);
-
-    return;
-  } else if (_.findIndex(self.products, task.item) != -1) {
-    task.method = 'in_list';
-    self._events(task);
-    self._always(task);
-
-    return;
-  } else {
-    self._before(task);
-    ISnew.json.addCompareItem(task.item)
-      .done(function (response) {
-        self._update(task);
-      })
-      .fail(function (response) {
-        console.log('fail: ', response);
-        // Завернуто сюда, потому что в done идет ещё один
-        // ajax запрос. Нужно сделать удобные ответы на эти запросы
-        self._always(task);
-      });
-  }
-};
-
-/**
- * Удаляем товар
- */
-ISnew.Compare.prototype.remove = function (task) {
-  var self = this;
-
-  task.item = parseInt(task.item);
-  task.method = 'remove_item';
-
-  self._before(task);
-  ISnew.json.removeCompareItem(task.item)
-    .done(function (response) {
-      self._update(task);
-    })
-    .fail(function (response) {
-      console.log('fail: ', response);
-      // Завернуто сюда, потому что в done идет ещё один
-      // ajax запрос. Нужно сделать удобные ответы на эти запросы
-      self._always(task);
-    });
-};
-
-/**
- * Обновляем состояние сравнения
- */
-ISnew.Compare.prototype.update = function () {
-  var self = this;
-
-  self._update({
-    method: 'update_items'
-  });
-};
-
-/**
- *
- */
-ISnew.Compare.prototype.getCompare = function () {
-  var self = this;
-
-  return self;
-};
-
-/**
- * Получение актуальной инфы с сервера
- */
-ISnew.Compare.prototype._update = function (task) {
-  var self = this;
-
-  task = task || {};
-  task.method = task.method || 'init';
-
-  if (task.method == 'init' || task.method == 'update_items') {
-    self._before(task);
-  }
-
-  ISnew.json.getCompareItems()
-    .done(function (response) {
-      self.products = response.products;
-      self._events(task);
-    })
-    .fail(function (response) {
-      console.log('fail: ', response);
-    })
-    .always(function () {
-      self._always(task);
-    });
-};
-
-/**
- * Вызов событий
- */
-ISnew.Compare.prototype._events = function (task) {
-  var self = this;
-  var data = self;
-  data.action = task;
-  EventBus.publish(task.method +':insales:compares', data);
-
-  if (data.action.method != 'update_items' && data.action.method != 'overload') {
-    EventBus.publish('update_items:insales:compares', data);
-  }
-};
-
-/**
- * Событие ПЕРЕД действием
- */
-ISnew.Compare.prototype._before = function (task) {
-  EventBus.publish('before:insales:compares', task);
-};
-
-/**
- * Мы закончили что-то делать в сравнении
- */
-ISnew.Compare.prototype._always = function (task) {
-  EventBus.publish('always:insales:compares', task);
-};
-/**
- * DOM + ISnew.Compare
- */
-
-ISnew.CompareDOM = function (options) {
-  var self = this;
-
-  self._init(options);
-}
-
-ISnew.CompareDOM.prototype._init = function (options) {
-  var self = this;
-
-  self.options = {
-    add: 'compare-item-add',
-    delete: 'compare-item-delete',
-
-    disabled: 'disabled',
-    inProcess: 'inProcess'
-  };
-
-  self._bindAddItem();
-  self._bindDelteItem();
-};
-
-/**
- * Обработчик добавления
- */
-ISnew.CompareDOM.prototype._bindAddItem = function () {
-  var self = this;
-
-  $(document).on('click', '['+ self.options.add +']', function (event) {
-    event.preventDefault();
-    var $button = $(this);
-
-    if (!$button.prop(self.options.inProcess)) {
-      $button.prop(self.options.inProcess, true);
-      self._addItem($button);
-    }
-  });
-
-  EventBus.subscribe('always:insales:compares', function (data) {
-    var try_added = (data.method == 'add_item' || data.method == 'overload');
-    if (data.button && try_added) {
-      data.button.prop(self.options.inProcess, false);
-    }
-  });
-};
-
-/**
- * Основаня логика добавления товара в сравнение по кнопке
- */
-ISnew.CompareDOM.prototype._addItem = function ($button) {
-  var self = this;
-  var task = {
-    button: $button,
-    item: parseInt($button.attr(self.options.add))
-  };
-
-  Compare.add(task);
-  return;
-};
-
-/**
- * Обработчик удаления
- */
-ISnew.CompareDOM.prototype._bindDelteItem = function () {
-  var self = this;
-
-  $(document).on('click', '['+ self.options.delete +']', function (event) {
-    event.preventDefault();
-    var $button = $(this);
-
-    if (!$button.prop(self.options.inProcess)) {
-      $button.prop(self.options.inProcess, true);
-      self._deleteItem($button);
-    }
-  });
-
-  EventBus.subscribe('always:insales:compares', function (data) {
-    if (data.button && data.method == 'remove_item') {
-      data.button.prop(self.options.inProcess, false);
-    }
-  });
-};
-
-/**
- * Основаня логика удаления товара из сравнения по кнопке
- */
-ISnew.CompareDOM.prototype._deleteItem = function ($button) {
-  var self = this;
-  var task = {
-    button: $button,
-    item: parseInt($button.attr(self.options.delete))
-  };
-
-  Compare.remove(task);
-};
-/*
- * Добавление товара в корзину
- */
-
-/**
- * Принимаем объект
- *
- * Внезапно, если это объект невалидного вида мы все равно получим ответ!!!
- */
-
-ISnew.json.addCartItems = function (items, options) {
-  var fields = {};
-  options = options || {};
-
-  _.forIn(items, function (quantity, variant_id) {
-    fields['variant_ids['+ variant_id +']'] = _.toInteger(quantity);
-  });
-
-  _.forIn(options.comments, function (comment, variant_id) {
-    fields['cart[order_line_comments]['+ variant_id +']'] = comment;
-  });
-
-  if (options.coupon) {
-    fields['cart[coupon]'] = options.coupon;
-  }
-
-  return $.post('/cart_items.json', fields);
-}
-/**
- * Добавление товара в сравнение
- */
-
-ISnew.json.addCompareItem = function (id) {
-  var fields = {
-    'product[id]': _.toInteger(id)
-  };
-
-  return $.post('/compares.json', fields);
-};
-/*
- * Получение состава корзины
- */
-
-ISnew.json.getCartItems = function () {
-  var result = $.Deferred();
-  var cookieCart = $.cookie('cart');
-
-  /*
-   * В куке состав корзины хранится, если там не более 4х РАЗНЫХ модификаций
-   * Кука может быть пустой - дергаем инфу с сервера
-   * Если кука содержит строку 'json' - дергаю инфу с сервера
-   */
-  if (cookieCart && cookieCart != 'json') {
-    order = $.parseJSON(cookieCart) || null;
-    result.resolve(order);
-    // reject??
-  } else {
-    $.getJSON('/cart_items.json')
-      .done(function (order) {
-        result.resolve(order);
-      })
-      .fail(function (response) {
-        result.reject(response);
-      });
-  }
-
-  return result.promise();
-};
-ISnew.json.getClientInfo = function (){
-  return $.getJSON('/client_account/contacts.json');
-};
-/*
- * Получение информации о коллекции
- */
-
-ISnew.json.getCollection = function () {
-  var path = '/collection/'+ _.toString(arguments[0]) +'.json';
-  var fields = {};
-
-  _.chain(arguments)
-    .drop()
-    .compact()
-    .each(function (value) {
-      _.assign(fields, value)
-    })
-    .value();
-
-  return $.getJSON(path, fields);
-};
-/**
- * Добавление товара в сравнение
- */
-
-ISnew.json.getCompareItems = function (id) {
-
-  return $.getJSON('/compares.json');
-};
-/*
- * Получение информации о товаре
- */
-
-ISnew.json.getProduct = function (id) {
-  return $.getJSON('/product_by_id/'+ _.toInteger(id) +'.json', {format: 'json'});
-};
-/*
- * Получение информации о списке товаров
- */
-
-ISnew.json.getProductsList = function (id_array) {
-  // указваем, сколько id нужно отправить за раз
-  var query_limit = 25;
-
-  /**
-   * Генерим адреса для запросов
-   *
-   * Приводим к типу массив (мало ли что там прилетело)
-   * Разбиваем на пачки, делаем из них правильные адреса для запросов
-   */
-  var paths = _.chain(id_array)
-    .toArray()
-    .compact()
-    .chunk(query_limit)
-    .map(function (ids_list) {
-      return '/products_by_id/'+ ids_list.join() +'.json';
-    })
-    .value();
-
-  // собираем задачи
-  var promises = $.map(paths, function (path) {
-    return $.ajax(path).then(function (response) {
-        return response;
-      });
-  });
-
-  /**
-   * Склеиваем ответы.
-   *
-   * Проходимся по всем получившимся промисам, дергаем их
-   */
-  return $.when.apply(this, promises)
-    .then(function () {
-      /**
-       * Получаем ответы ото ВСЕХ промисов.
-       * Приводим к типу массив, на случай если ответы все кривые и там - пустота
-       * Вытаскиваем массив с продуктами, склеиваем все массивы и выдаем наружу
-       */
-      return _.chain(arguments)
-        .toArray()
-        .map(function (response) {
-          return response.products;
-        })
-        .flatten()
-        .union()
-        .value()
-    });
-};
-/**
- * Оформление заказа
- */
-
-ISnew.json.makeCheckout = function (client, order) {
-  console.log(client, order);
-  var dfd = $.Deferred();
-  var checkout = {
-    pid: 1,
-    'order[delivery_variant_id]': _.toInteger(order.delivery),
-    'order[payment_gateway_id]': _.toInteger(order.payment)
-  };
-
-  _.forIn(client, function (value, field) {
-    checkout['client['+ field +']'] = value;
-  });
-
-  console.log(checkout);
-
-  $.post('/fast_checkout.json', checkout)
-    .done(function (response) {
-      if (response.status == 'ok') {
-        dfd.resolve(response);
-      } else {
-        dfd.reject(response);
-      }
-    })
-    .fail(function (response) {
-      dfd.reject(response)
-    })
-
-  return dfd.promise();
-};
-/*
- * Удаление товара из корзины
- */
-
-ISnew.json.removeCartItem = function (variant_id) {
-  var path = '/cart_items/'+ _.toInteger(variant_id) +'.json';
-  var fields = {
-    '_method': 'delete'
-  };
-
-  return $.post(path, fields);
-};
-/*
- * Удаление товара из сравнения
- */
-
-ISnew.json.removeCompareItem = function (id) {
-  var fields = {
-      _method: 'delete',
-    };
-  var path   = '/compares/'+ _.toInteger(id) +'.json';
-
-  return $.post(path, fields);
-};
-/*
- * Отправление сообщения
- */
-
-ISnew.json.sendMessage = function (input) {
-  var result = $.Deferred();
-  var message = {};
-
-  _.forIn(input, function (value, key) {
-    message['feedback['+ key +']'] = value;
-  });
-
-  $.post('/client_account/feedback.json', message)
-    .done(function (response) {
-      if (message && response.status == 'ok') {
-        result.resolve(response);
-      } else {
-        response.message = message;
-        result.reject(response);
-      }
-    });
-
-  return result.promise();
-};
-/**
- * Обновление корзины
- */
-
-ISnew.json.updateCartItems = function (items, options) {
-  var fields = {
-    '_method': 'put'
-  };
-  options = options || {};
-
-  _.forIn(items, function(quantity, variant_id) {
-    fields['cart[quantity]['+ variant_id +']'] = _.toInteger(quantity);
-  });
-
-  _.forIn(options.comments, function(comment, variant_id) {
-    fields['cart[order_line_comments]['+ variant_id +']'] = comment;
-  });
-
-  if (options.coupon) {
-    fields['cart[coupon]'] = options.coupon;
-  }
-
-  return $.post('/cart_items.json', fields);
-};
-/**
- * Создание новых продуктов
- */
-ISnew.Collection = function (settings) {
-  var self = this;
-
-  //получаем настройки
-  /*
-    Опции варантов:
-    options: {
-      'Цвет': 'option-image'
-    }
-   */
-  self.settings = settings || {};
-
-  // объект для создаваемых продуктов
-  self.products = {}
-
-  self._init(self);
-};
-
-ISnew.Collection.prototype._init = function (owner){
-  var self = this;
-  self._owner = owner;
-
-  self.push()
-}
-
-/**
- * Добавление новых продуктов
- */
-ISnew.Collection.prototype.push = function (){
-  var self = this;
-
-  $(function () {
-    var variantsName = 'product-variants'
-    var variantsSelector = $('[data-' + variantsName + ']');
-    var variantsCount = $('[data-product-variants]').length - 1;
-    var variantsId = [];
-
-    variantsSelector.each(function(index, el) {
-       var thisParents = $(el).parents('form:first');
-       var thatProductId = thisParents.data('product-id');
-       variantsId.push(thatProductId);
-
-       if (index === variantsCount) {
-        self._create(variantsId);
-       }
-    });
-  })
-}
-
-/**
- * Инизиализация объекта Product
- */
-ISnew.Collection.prototype._create = function(variantsId){
-  var self = this;
-
-  ISnew.json.getProductsList(variantsId)
-      .done(function (_newSelectors) {
-
-        _.forEach(_newSelectors, function(_new_product) {
-           self.products[_new_product.id] = new ISnew.Product( _new_product , self.settings);
-        });
-
-      })
-      .fail(function (response) {
-        throw new ISnew.tools.Error('ErrorJson', 'ошибка при выполнени ajax запроса');
-      });
-}
-
-/**
  * OptionSelector
  */
 ISnew.OptionSelector = function (product, _owner) {
@@ -1764,8 +1615,76 @@ ISnew.OptionSelector.prototype._bindSelect = function () {
     }
   });
 };
+/**
+ * Создание новых продуктов
+ */
+ISnew.Products = function (settings) {
+  var self = this;
 
+  //получаем настройки
+  /*
+    Опции варантов:
+    options: {
+      'Цвет': 'option-image'
+    }
+   */
+  self.settings = settings || {};
 
+  // объект для создаваемых продуктов
+  self.products = {}
+
+  self._init(self);
+};
+
+ISnew.Products.prototype._init = function (owner){
+  var self = this;
+  self._owner = owner;
+
+  self.push()
+}
+
+/**
+ * Добавление новых продуктов
+ */
+ISnew.Products.prototype.push = function (){
+  var self = this;
+
+  $(function () {
+    var variantsName = 'product-variants'
+    var variantsSelector = $('[data-' + variantsName + ']');
+    var variantsCount = $('[data-product-variants]').length - 1;
+    var variantsId = [];
+
+    variantsSelector.each(function(index, el) {
+       var thisParents = $(el).parents('form:first');
+       var thatProductId = thisParents.data('product-id');
+       variantsId.push(thatProductId);
+
+       if (index === variantsCount) {
+        self._create(variantsId);
+       }
+    });
+  })
+}
+
+/**
+ * Инизиализация объекта Product
+ */
+ISnew.Products.prototype._create = function(variantsId){
+  var self = this;
+
+  ISnew.json.getProductsList(variantsId)
+      .done(function (_newSelectors) {
+
+        _.forEach(_newSelectors, function(_new_product) {
+           self.products[_new_product.id] = new ISnew.Product( _new_product , self.settings);
+        });
+
+      })
+      .fail(function (response) {
+        throw new ISnew.tools.Error('ErrorJson', 'ошибка при выполнени ajax запроса');
+      });
+}
 /**
  * Типы цен
  */
@@ -1938,7 +1857,6 @@ ISnew.Product.prototype._isVariants = function (_product) {
 
   return optionCount > 0;
 };
-
 /**
  * Variants tree
  */
@@ -1959,7 +1877,7 @@ ISnew.ProductVariants = function (product, _owner, settings) {
 
 
   //  id варианта из урла
-  self.urlVariant = ISnew.tools.URL.getKeyValue('variant_id');
+  self.urlVariant = Site.URL.getKeyValue('variant_id');
 
 
   self.tree = self._initTree(product.variants);
@@ -2281,177 +2199,256 @@ ISnew.ProductVariants.prototype._getImage = function (product) {
   return images;
 }
 /**
- * Обертка для шаблонизатора
+ * Сравнение товаров
  */
 
-ISnew.Template = function () {
-  var self = this;
+// TODO: сделать синглтон
+ISnew.Compare = function (options) {
+  options = options || {};
 
-  self._init(self);
+  var self = this;
+  self.products = [];
+  self.maxItems = options.maxItems || 4;
+
+  self.ui = new ISnew.CompareDOM(options);
+
+  // Обновляемся
+  self._update();
 };
 
 /**
- * Вытаскиваем нужный шаблон
+ * Добавляем товар
  */
-ISnew.Template.prototype.render = function (data, template_id) {
+ISnew.Compare.prototype.add = function (task) {
   var self = this;
 
-  var templateHtml = self._templateList[template_id];
-  var result;
+  task.item = parseInt(task.item);
+  task.method = 'add_item';
 
-  if (templateHtml !== undefined) {
-    result = self._templateList[template_id](data);
+  // если достигли максимального кол-ва товаров
+  // кидаем остановку
+  if (self.products.length >= self.maxItems) {
+    task.method = 'overload';
+    self._events(task);
+    self._always(task);
+
+    return;
+  } else if (_.findIndex(self.products, task.item) != -1) {
+    task.method = 'in_list';
+    self._events(task);
+    self._always(task);
+
+    return;
   } else {
-    result = false;
+    self._before(task);
+    ISnew.json.addCompareItem(task.item)
+      .done(function (response) {
+        self._update(task);
+      })
+      .fail(function (response) {
+        console.log('fail: ', response);
+        // Завернуто сюда, потому что в done идет ещё один
+        // ajax запрос. Нужно сделать удобные ответы на эти запросы
+        self._always(task);
+      });
   }
-
-  return result;
 };
 
 /**
- * Складываем шаблоны по местам, подготавливаем для работы
+ * Удаляем товар
  */
-ISnew.Template.prototype.load = function (template_body, template_id) {
+ISnew.Compare.prototype.remove = function (task) {
   var self = this;
 
-  self._templateList[template_id] = _.template(template_body);
+  task.item = parseInt(task.item);
+  task.method = 'remove_item';
 
-  return;
-};
-
-/**
- * Автоматический сбор шаблонов в верстке
- */
-ISnew.Template.prototype._init = function (_owner) {
-  var self = this;
-  self._owner = _owner;
-
-  //  устанавливаем lock пока не собирем все шаблоны
-  self._lock = true;
-  self._templateList = {};
-
-  $(function () {
-    var templateCount = $('script[data-template-id]').length - 1;
-
-    $('[data-template-id]').each(function (index, el) {
-
-      self.load($(el).html(), $(el).data('templateId'));
-      if (templateCount === index) {
-        self._lock = false;
-      }
-
+  self._before(task);
+  ISnew.json.removeCompareItem(task.item)
+    .done(function (response) {
+      self._update(task);
+    })
+    .fail(function (response) {
+      console.log('fail: ', response);
+      // Завернуто сюда, потому что в done идет ещё один
+      // ajax запрос. Нужно сделать удобные ответы на эти запросы
+      self._always(task);
     });
+};
 
+/**
+ * Обновляем состояние сравнения
+ */
+ISnew.Compare.prototype.update = function () {
+  var self = this;
+
+  self._update({
+    method: 'update_items'
   });
 };
 
 /**
- * Тул для вывода ошибок.
+ *
  */
-ISnew.tools.Error = function (name, message) {
+ISnew.Compare.prototype.getCompare = function () {
   var self = this;
-  var errorObject = new Error(message);
 
-  errorObject.name = name || 'Ошибка';
+  return self;
+};
 
-  self.name = errorObject.name;
-  self.message = errorObject.message;
+/**
+ * Получение актуальной инфы с сервера
+ */
+ISnew.Compare.prototype._update = function (task) {
+  var self = this;
 
-  if (errorObject.stack) {
-    self.stack = errorObject.stack;
+  task = task || {};
+  task.method = task.method || 'init';
+
+  if (task.method == 'init' || task.method == 'update_items') {
+    self._before(task);
   }
 
-  //Вывод в консоль
-  self.toString = function() {
-   return self.name + ': ' + self.message;
-  };
-};
-/**
- * Класс для работы с валютой.
- */
-ISnew.Money = function () {
-  var self = this;
-};
-
-/**
- * Разбиралка настроек
- */
-ISnew.Money.prototype._init = function (params) {
-  var self = this;
-  self.options = $.parseJSON(params);
-  return;
-};
-
-ISnew.Money.prototype.set = function (params) {
-  var self = this;
-  self._init(params);
-};
-
-ISnew.Money.prototype.format = function (amount) {
-  var self = this;
-  var value = amount;
-  var patern = /(\d)(?=(\d\d\d)+(?!\d))/g;
-
-  if (amount === null || amount === undefined) {
-    return '';
-  }
-
-  value = value.toString().replace(',', '.');
-  value = parseFloat(value).toFixed(2) || 0;
-  value = value.toString().split('.');
-  value[0] = value[0].replace(patern, '$1'+ self.options.delimiter);
-
-  if (self.options.show_price_without_cents) {
-    value = value[0];
-  } else {
-    value = value.join(self.options.separator);
-  }
-
-  return self.options.format.replace('%n', value).replace('%n', self.options.unit);
-};
-/**
- * Тул для разбора url.
- */
-ISnew.tools.URL = function () {
-  var self = this;
-
-  //self.init();
-};
-
-/**
- * Разбор урла
- */
-ISnew.tools.URL.init = function () {
-  var self = this;
-  self.keys = {};
-
-  var windowLocation = window.location;
-  var temp;
-
-  //self.search = self.search;
-
-  _.chain(windowLocation.search.replace('?', ''))
-    .split('&')
-    .forEach(function (part) {
-      if (part !== '') {
-        part = part.split('=');
-        self.keys[part[0]] = part[1];
-      }
+  ISnew.json.getCompareItems()
+    .done(function (response) {
+      self.products = response.products;
+      self._events(task);
     })
-    .value();
+    .fail(function (response) {
+      console.log('fail: ', response);
+    })
+    .always(function () {
+      self._always(task);
+    });
+};
 
-  return;
+/**
+ * Вызов событий
+ */
+ISnew.Compare.prototype._events = function (task) {
+  var self = this;
+  var data = self;
+  data.action = task;
+  EventBus.publish(task.method +':insales:compares', data);
+
+  if (data.action.method != 'update_items' && data.action.method != 'overload') {
+    EventBus.publish('update_items:insales:compares', data);
+  }
+};
+
+/**
+ * Событие ПЕРЕД действием
+ */
+ISnew.Compare.prototype._before = function (task) {
+  EventBus.publish('before:insales:compares', task);
+};
+
+/**
+ * Мы закончили что-то делать в сравнении
+ */
+ISnew.Compare.prototype._always = function (task) {
+  EventBus.publish('always:insales:compares', task);
 };
 /**
- * Вытаскиваем значение ключа
+ * DOM + ISnew.Compare
  */
-ISnew.tools.URL.getKeyValue = function (key) {
+
+ISnew.CompareDOM = function (options) {
   var self = this;
 
-  return self.keys[key];
+  self._init(options);
+}
+
+ISnew.CompareDOM.prototype._init = function (options) {
+  var self = this;
+
+  self.options = {
+    add: 'compare-item-add',
+    delete: 'compare-item-delete',
+
+    disabled: 'disabled',
+    inProcess: 'inProcess'
+  };
+
+  self._bindAddItem();
+  self._bindDelteItem();
 };
 
 /**
- * Запуск тулзы
+ * Обработчик добавления
  */
-ISnew.tools.URL.init();
+ISnew.CompareDOM.prototype._bindAddItem = function () {
+  var self = this;
+
+  $(document).on('click', '['+ self.options.add +']', function (event) {
+    event.preventDefault();
+    var $button = $(this);
+
+    if (!$button.prop(self.options.inProcess)) {
+      $button.prop(self.options.inProcess, true);
+      self._addItem($button);
+    }
+  });
+
+  EventBus.subscribe('always:insales:compares', function (data) {
+    var try_added = (data.method == 'add_item' || data.method == 'overload');
+    if (data.button && try_added) {
+      data.button.prop(self.options.inProcess, false);
+    }
+  });
+};
+
+/**
+ * Основаня логика добавления товара в сравнение по кнопке
+ */
+ISnew.CompareDOM.prototype._addItem = function ($button) {
+  var self = this;
+  var task = {
+    button: $button,
+    item: parseInt($button.attr(self.options.add))
+  };
+
+  Compare.add(task);
+  return;
+};
+
+/**
+ * Обработчик удаления
+ */
+ISnew.CompareDOM.prototype._bindDelteItem = function () {
+  var self = this;
+
+  $(document).on('click', '['+ self.options.delete +']', function (event) {
+    event.preventDefault();
+    var $button = $(this);
+
+    if (!$button.prop(self.options.inProcess)) {
+      $button.prop(self.options.inProcess, true);
+      self._deleteItem($button);
+    }
+  });
+
+  EventBus.subscribe('always:insales:compares', function (data) {
+    if (data.button && data.method == 'remove_item') {
+      data.button.prop(self.options.inProcess, false);
+    }
+  });
+};
+
+/**
+ * Основаня логика удаления товара из сравнения по кнопке
+ */
+ISnew.CompareDOM.prototype._deleteItem = function ($button) {
+  var self = this;
+  var task = {
+    button: $button,
+    item: parseInt($button.attr(self.options.delete))
+  };
+
+  Compare.remove(task);
+};
+
+/*
+ * Инициализация объектов
+ */
+Site.URL = new ISnew.tools.URL();

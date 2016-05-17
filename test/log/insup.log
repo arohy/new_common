@@ -3238,3 +3238,71 @@
 2016-05-16 17:34:30 +0300 - INFO	: --> 200 OK 425 (224.0ms) 
 2016-05-16 17:34:32 +0300 - INFO	: PUT http://shop-48497.myinsales.ru:80/admin/themes/626874/assets/58083363.xml 
 2016-05-16 17:34:32 +0300 - INFO	: --> 200 OK 425 (253.0ms) 
+2016-05-17 10:01:02 +0300 - INFO	: GET http://shop-48497.myinsales.ru:80/admin/themes.xml 
+2016-05-17 10:01:02 +0300 - INFO	: --> 200 OK 2140 (135.0ms) 
+2016-05-17 10:01:02 +0300 - INFO	: GET http://shop-48497.myinsales.ru:80/admin/themes/626874/assets.xml 
+2016-05-17 10:01:02 +0300 - INFO	: --> 200 OK 7183 (242.0ms) 
+2016-05-17 10:01:05 +0300 - INFO	: PUT http://shop-48497.myinsales.ru:80/admin/themes/626874/assets/58083363.xml 
+2016-05-17 10:01:05 +0300 - INFO	: --> 200 OK 425 (484.0ms) 
+2016-05-17 10:01:54 +0300 - INFO	: PUT http://shop-48497.myinsales.ru:80/admin/themes/626874/assets/58083363.xml 
+2016-05-17 10:01:54 +0300 - INFO	: --> 200 OK 425 (280.0ms) 
+2016-05-17 10:01:55 +0300 - INFO	: PUT http://shop-48497.myinsales.ru:80/admin/themes/626874/assets/58083363.xml 
+2016-05-17 10:01:55 +0300 - INFO	: --> 200 OK 425 (214.0ms) 
+2016-05-17 10:02:16 +0300 - INFO	: PUT http://shop-48497.myinsales.ru:80/admin/themes/626874/assets/58083363.xml 
+2016-05-17 10:02:16 +0300 - INFO	: --> 200 OK 425 (394.0ms) 
+2016-05-17 10:02:16 +0300 - INFO	: PUT http://shop-48497.myinsales.ru:80/admin/themes/626874/assets/58083363.xml 
+2016-05-17 10:02:16 +0300 - INFO	: --> 200 OK 425 (303.0ms) 
+2016-05-17 10:02:49 +0300 - INFO	: PUT http://shop-48497.myinsales.ru:80/admin/themes/626874/assets/58083361.xml 
+2016-05-17 10:02:49 +0300 - INFO	: --> 200 OK 409 (1128.1ms) 
+2016-05-17 10:04:47 +0300 - INFO	: PUT http://shop-48497.myinsales.ru:80/admin/themes/626874/assets/58083361.xml 
+2016-05-17 10:04:47 +0300 - INFO	: --> 200 OK 409 (248.0ms) 
+2016-05-17 10:04:47 +0300 - INFO	: PUT http://shop-48497.myinsales.ru:80/admin/themes/626874/assets/58083361.xml 
+2016-05-17 10:04:47 +0300 - INFO	: --> 200 OK 409 (143.0ms) 
+2016-05-17 10:05:41 +0300 - INFO	: PUT http://shop-48497.myinsales.ru:80/admin/themes/626874/assets/58083363.xml 
+2016-05-17 10:05:41 +0300 - INFO	: --> 200 OK 425 (438.0ms) 
+2016-05-17 10:05:41 +0300 - INFO	: PUT http://shop-48497.myinsales.ru:80/admin/themes/626874/assets/58083363.xml 
+2016-05-17 10:05:41 +0300 - INFO	: --> 200 OK 425 (134.0ms) 
+2016-05-17 10:05:50 +0300 - INFO	: PUT http://shop-48497.myinsales.ru:80/admin/themes/626874/assets/58083363.xml 
+2016-05-17 10:05:50 +0300 - INFO	: --> 200 OK 425 (235.0ms) 
+2016-05-17 10:06:26 +0300 - INFO	: PUT http://shop-48497.myinsales.ru:80/admin/themes/626874/assets/58083363.xml 
+2016-05-17 10:06:26 +0300 - INFO	: --> 200 OK 425 (147.0ms) 
+2016-05-17 10:07:59 +0300 - INFO	: PUT http://shop-48497.myinsales.ru:80/admin/themes/626874/assets/58083363.xml 
+2016-05-17 10:07:59 +0300 - INFO	: --> 200 OK 425 (368.0ms) 
+2016-05-17 10:24:27 +0300 - INFO	: PUT http://shop-48497.myinsales.ru:80/admin/themes/626874/assets/58083363.xml 
+2016-05-17 10:24:27 +0300 - INFO	: --> 200 OK 425 (218.0ms) 
+2016-05-17 10:25:43 +0300 - INFO	: PUT http://shop-48497.myinsales.ru:80/admin/themes/626874/assets/58083363.xml 
+2016-05-17 10:25:43 +0300 - INFO	: --> 200 OK 425 (1173.1ms) 
+2016-05-17 10:25:43 +0300 - INFO	: PUT http://shop-48497.myinsales.ru:80/admin/themes/626874/assets/58083363.xml 
+2016-05-17 10:25:43 +0300 - INFO	: --> 200 OK 425 (163.0ms) 
+2016-05-17 10:26:39 +0300 - INFO	: PUT http://shop-48497.myinsales.ru:80/admin/themes/626874/assets/58083363.xml 
+2016-05-17 10:26:39 +0300 - INFO	: --> 200 OK 425 (356.0ms) 
+2016-05-17 10:27:24 +0300 - INFO	: PUT http://shop-48497.myinsales.ru:80/admin/themes/626874/assets/58083363.xml 
+2016-05-17 10:27:24 +0300 - INFO	: --> 200 OK 425 (244.0ms) 
+2016-05-17 10:27:49 +0300 - INFO	: PUT http://shop-48497.myinsales.ru:80/admin/themes/626874/assets/58083363.xml 
+2016-05-17 10:27:49 +0300 - INFO	: --> 200 OK 425 (183.0ms) 
+2016-05-17 10:28:00 +0300 - INFO	: PUT http://shop-48497.myinsales.ru:80/admin/themes/626874/assets/58083363.xml 
+2016-05-17 10:28:00 +0300 - INFO	: --> 200 OK 425 (254.0ms) 
+2016-05-17 10:28:17 +0300 - INFO	: PUT http://shop-48497.myinsales.ru:80/admin/themes/626874/assets/58083363.xml 
+2016-05-17 10:28:17 +0300 - INFO	: --> 200 OK 425 (444.0ms) 
+2016-05-17 10:28:40 +0300 - INFO	: PUT http://shop-48497.myinsales.ru:80/admin/themes/626874/assets/58083363.xml 
+2016-05-17 10:28:40 +0300 - INFO	: --> 200 OK 425 (574.0ms) 
+2016-05-17 10:28:42 +0300 - INFO	: PUT http://shop-48497.myinsales.ru:80/admin/themes/626874/assets/58083363.xml 
+2016-05-17 10:28:42 +0300 - INFO	: --> 200 OK 425 (304.0ms) 
+2016-05-17 10:28:43 +0300 - INFO	: PUT http://shop-48497.myinsales.ru:80/admin/themes/626874/assets/58083363.xml 
+2016-05-17 10:28:43 +0300 - INFO	: --> 200 OK 425 (264.0ms) 
+2016-05-17 10:28:44 +0300 - INFO	: PUT http://shop-48497.myinsales.ru:80/admin/themes/626874/assets/58083363.xml 
+2016-05-17 10:28:44 +0300 - INFO	: --> 200 OK 425 (173.0ms) 
+2016-05-17 10:29:14 +0300 - INFO	: PUT http://shop-48497.myinsales.ru:80/admin/themes/626874/assets/58083363.xml 
+2016-05-17 10:29:14 +0300 - INFO	: --> 200 OK 425 (363.0ms) 
+2016-05-17 10:30:05 +0300 - INFO	: PUT http://shop-48497.myinsales.ru:80/admin/themes/626874/assets/58083363.xml 
+2016-05-17 10:30:05 +0300 - INFO	: --> 200 OK 425 (756.0ms) 
+2016-05-17 10:30:11 +0300 - INFO	: PUT http://shop-48497.myinsales.ru:80/admin/themes/626874/assets/58083363.xml 
+2016-05-17 10:30:11 +0300 - INFO	: --> 200 OK 425 (243.0ms) 
+2016-05-17 10:30:12 +0300 - INFO	: PUT http://shop-48497.myinsales.ru:80/admin/themes/626874/assets/58083363.xml 
+2016-05-17 10:30:12 +0300 - INFO	: --> 200 OK 425 (152.0ms) 
+2016-05-17 10:30:40 +0300 - INFO	: PUT http://shop-48497.myinsales.ru:80/admin/themes/626874/assets/58083363.xml 
+2016-05-17 10:30:40 +0300 - INFO	: --> 200 OK 425 (1381.1ms) 
+2016-05-17 10:30:46 +0300 - INFO	: PUT http://shop-48497.myinsales.ru:80/admin/themes/626874/assets/58083363.xml 
+2016-05-17 10:30:46 +0300 - INFO	: --> 200 OK 425 (456.0ms) 
+2016-05-17 10:30:47 +0300 - INFO	: PUT http://shop-48497.myinsales.ru:80/admin/themes/626874/assets/58083363.xml 
+2016-05-17 10:30:47 +0300 - INFO	: --> 200 OK 425 (262.0ms) 

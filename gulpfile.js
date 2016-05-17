@@ -4,7 +4,7 @@ var concat = require('gulp-concat');
 var plumber = require('gulp-plumber');
 var combine = require('stream-combiner');
 var shell = require('gulp-shell');
-var browserify = require('gulp-browserify');
+var rigger = require('gulp-rigger');
 
 // ==============================
 gulp.task('default', ['common-watch', 'test-watch'], function() {
@@ -26,17 +26,16 @@ gulp.task('test-watch', function() {
 })
 
 gulp.task('build-common', function() {
-  return gulp.src(['source/**/*.js'])
+  return gulp.src(['source/*.js'])
     .pipe(combine(
       plumber(),
-      concat('new_common.js'),
+      rigger(),
       gulp.dest('./test/media')
     ))
 });
 
 gulp.task('build-tests', function() {
   return gulp.src(['test/js_tests/**/*.js'])
-    .pipe(browserify())
     .pipe(combine(
       plumber(),
       concat('tests.js'),

@@ -1,13 +1,4 @@
 var Cart = new ISnew.Cart();
-var collectionConfig = {
-  product_id: 'data-product-id',
-  options: {
-      'Цвет': 'option-image',
-      'Размер': 'option-span',
-      'Жесткий диск': 'option-span'
-    }
-}
-var Collection = new ISnew.Collection(collectionConfig);
 
 EventBus.subscribe('update_items:insales:cart', function (data) {
   var cart_widget_html = Template.render(data, 'cart_widget')
@@ -17,7 +8,7 @@ EventBus.subscribe('update_items:insales:cart', function (data) {
 var Compare = new ISnew.Compare({
   //maxItems: 2
 });
-EventBus.logger.add('product');
+EventBus.logger.add('cart');
 /*
  * Тест для addCartItems()
  */
@@ -189,4 +180,12 @@ testUpdateCartItems = function (items, comments) {
       console.log('fail', response);
     })
 }
-//var product;
+var ProductsConfig = {
+  product_id: 'data-product-id',
+  options: {
+      'Цвет': 'option-image',
+      'Размер': 'option-span',
+      'Жесткий диск': 'option-span'
+    }
+}
+var Products = new ISnew.Products(ProductsConfig);

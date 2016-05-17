@@ -8,17 +8,16 @@ if (!ISnew) {
   var ISnew = {};
 }
 
+// Место для всяких утилиток
+if (!ISnew.tools) {
+  ISnew.tools = {};
+}
+
 // Глобальная информация о сайте.
 if (!Site) {
   var Site = {};
 }
 
-// Место для всяких утилиток
-if (!ISnew.tools) {
-  ISnew.tools = {};
-  ISnew.tools.URL = {};
-  ISnew.tools.Error = {};
-}
 
 // Место для всех оберток json
 if (!ISnew.json) {
@@ -29,3 +28,16 @@ if (!ISnew.json) {
 if (!EventBus) {
   var EventBus;
 }
+
+//= ./events/
+//= ./tools/
+//= ./json/
+//= ./template/
+//= ./cart/
+//= ./product/
+//= ./compare/
+
+/*
+ * Инициализация объектов
+ */
+Site.URL = new ISnew.tools.URL();

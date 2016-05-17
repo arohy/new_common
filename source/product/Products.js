@@ -1,7 +1,7 @@
 /**
  * Создание новых продуктов
  */
-ISnew.Collection = function (settings) {
+ISnew.Products = function (settings) {
   var self = this;
 
   //получаем настройки
@@ -19,7 +19,7 @@ ISnew.Collection = function (settings) {
   self._init(self);
 };
 
-ISnew.Collection.prototype._init = function (owner){
+ISnew.Products.prototype._init = function (owner){
   var self = this;
   self._owner = owner;
 
@@ -29,7 +29,7 @@ ISnew.Collection.prototype._init = function (owner){
 /**
  * Добавление новых продуктов
  */
-ISnew.Collection.prototype.push = function (){
+ISnew.Products.prototype.push = function (){
   var self = this;
 
   $(function () {
@@ -53,7 +53,7 @@ ISnew.Collection.prototype.push = function (){
 /**
  * Инизиализация объекта Product
  */
-ISnew.Collection.prototype._create = function(variantsId){
+ISnew.Products.prototype._create = function(variantsId){
   var self = this;
 
   ISnew.json.getProductsList(variantsId)

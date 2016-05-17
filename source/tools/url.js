@@ -4,13 +4,15 @@
 ISnew.tools.URL = function () {
   var self = this;
 
-  //self.init();
+  self.init();
+
+  return self;
 };
 
 /**
  * Разбор урла
  */
-ISnew.tools.URL.init = function () {
+ISnew.tools.URL.prototype.init = function () {
   var self = this;
   self.keys = {};
 
@@ -34,13 +36,8 @@ ISnew.tools.URL.init = function () {
 /**
  * Вытаскиваем значение ключа
  */
-ISnew.tools.URL.getKeyValue = function (key) {
+ISnew.tools.URL.prototype.getKeyValue = function (key) {
   var self = this;
 
   return self.keys[key];
 };
-
-/**
- * Запуск тулзы
- */
-ISnew.tools.URL.init();
