@@ -171,7 +171,9 @@ ISnew.CartTasks.prototype._before = function () {
 
   _.forEach(self._taskInWork, function (task) {
     data.action = task || {};
-    EventBus.publish('before:insales:cart', data);
-  })
+    if (task.method != 'init') {
+      EventBus.publish('before:insales:cart', data);
+    }
+  });
   return;
 };
