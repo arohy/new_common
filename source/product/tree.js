@@ -12,8 +12,11 @@ ISnew.ProductVariants = function (product, _owner, settings) {
   //  инизиализация параметров
   self.settings = {};
 
-  console.log(settings)
-  self.settings = settings || {};
+  if (typeof settings.validate === 'undefined') {
+    self.settings = Site.Setting.validate(settings)
+  }else{
+    self.settings = settings;
+  }
   self.settings.options['default'] = 'option-select';
 
 
@@ -21,12 +24,55 @@ ISnew.ProductVariants = function (product, _owner, settings) {
   self.urlVariant = Site.URL.getKeyValue('variant_id');
 
 
+
   self.tree = self._initTree(product.variants);
   self.options = self._initOptions(product.option_names);
 
-  self._update();
+  self.listOption = self._initListOption(product.variants, product.option_names);
+
+  if (self.settings.init_option) {
+    self._update();
+  }
 };
 
+ISnew.ProductVariants.prototype._initListOption = function (variants, option_names) {
+  var self = this;
+  var _variants = variants;
+  var _option_names = option_names;
+  var listOption = {};
+  var _temp = {};
+
+  _.forEach(_variants, function (variant) {
+    var variant_id = variant.id;
+    listOption[variant_id] = {};
+     _.forEach(variant.option_values, function(option, index) {
+      if ( typeof _temp[option.option_name_id] === 'undefined') {
+
+        _temp[option.option_name_id] = {};
+
+        if ( typeof _temp[option.option_name_id][option.id] === 'undefined') {
+          _temp[option.option_name_id][option.id] = {option};
+          _temp[option.option_name_id][option.id] = option;
+        }else{
+          _temp[option.option_name_id][option.id] = option;
+        }
+
+      }else{
+
+        if ( typeof _temp[option.option_name_id][option.id] === 'undefined') {
+          _temp[option.option_name_id][option.id] = {};
+          _temp[option.option_name_id][option.id] = option;
+        }else{
+          _temp[option.option_name_id][option.id] = option;
+        }
+
+      }
+
+     })
+  })
+  listOption = _temp;
+  return listOption;
+}
 /**
  * Строим дерево вариантов
  */
@@ -86,6 +132,7 @@ ISnew.ProductVariants.prototype._initTree = function (variants) {
 ISnew.ProductVariants.prototype._nodeAvailable = function (leaf) {
   var self = this;
 
+
   if (leaf.variant_id === undefined) {
     var isAvailable = false;
 
@@ -117,6 +164,7 @@ ISnew.ProductVariants.prototype._update = function () {
     self._setOptionByVariant(self.urlVariant);
     self.urlVariant = false;
   }
+
   return;
 };
 
@@ -185,6 +233,10 @@ ISnew.ProductVariants.prototype.getVariant = function () {
 ISnew.ProductVariants.prototype.setVariant = function (variant_id) {
   var self = this;
 
+  if (! self.settings.init_option) {
+    self.settings.init_option = true;
+  }
+
   self._setOptionByVariant(variant_id);
 
   self._update();
@@ -214,7 +266,9 @@ ISnew.ProductVariants.prototype._initOptions = function (options) {
       options[index].render_type = paramOptions['default']
     }
 
+
     options[index].selected = first.position;
+
     leaf = first.tree;
   });
 
@@ -228,12 +282,13 @@ ISnew.ProductVariants.prototype._initOptions = function (options) {
 ISnew.ProductVariants.prototype.setOption = function (option) {
   var self = this;
 
+
   var index = _.findKey(self.options, function (_option) {
     return _option.id == option.option_name_id;
   });
 
   // Если не опцию не меняли - на выход
-  if (self.options[index].selected == option.position) {
+  if (self.options[index].selected == option.position & self.settings.init_option) {
     return;
   }
 
@@ -255,6 +310,10 @@ ISnew.ProductVariants.prototype.setOption = function (option) {
       _option.selected = first.position;
     }
   });
+
+  if (! self.settings.init_option) {
+    self.settings.init_option = true;
+  }
 
   self._update();
   return;
@@ -278,7 +337,6 @@ ISnew.ProductVariants.prototype._setOptionByVariant = function (variant_id) {
   var index = _.findKey(self.variants, function (variant) {
     return variant.id == variant_id;
   });
-
 
   if (self.variants[index]) {
     _.forEach(self.variants[index].option_values, function(option, option_index) {

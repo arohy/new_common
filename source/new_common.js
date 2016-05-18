@@ -41,3 +41,4 @@ if (!EventBus) {
  * Инициализация объектов
  */
 Site.URL = new ISnew.tools.URL();
+Site.Setting = new ISnew.tools.Setting();

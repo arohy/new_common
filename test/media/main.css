@@ -940,3 +940,6 @@ hr {
   vertical-align: top;
   padding: 5px;
 }
+.option-image.disabled {
+  opacity: 0.7;
+}

@@ -5,8 +5,6 @@ ISnew.tools.URL = function () {
   var self = this;
 
   self.init();
-
-  return self;
 };
 
 /**

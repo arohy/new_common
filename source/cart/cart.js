@@ -116,7 +116,6 @@ ISnew.Cart.prototype._set_items = function (task, current_items) {
 ISnew.Cart.prototype.delete = function (task) {
   var self = this;
   task = task || {};
-
   task.method = 'delete_items';
 
   self.tasks.send(task);

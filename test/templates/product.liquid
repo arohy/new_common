@@ -1,16 +1,28 @@
-<form action="{{ cart_url }}" method="post" data-product-id="{{ product.id }}">
-  <select name="variant_id"  data-product-variants>
-    {% for variant in product.variants %}
-      <option value="{{ variant.id }}">{{ variant.title | escape }}</option>
-    {% endfor %}
-  </select>
+<a href="/" >< на главную</a>
+    <a class="super-title" href="{{ product.url }}">====== {{ product.title }} ========</a>
+    <form action="{{ cart_url }}" method="post" data-collection-variant data-product-id="{{ product.id }}">
+    {% if product.show_variants? %}
 
-  <input type="text" name="quantity" value="1" />
+    <select name="variant_id" data-product-variants>
+      {% for variant in product.variants %}
+        <option value="{{ variant.id }}">{{ variant.title | escape }}</option>
+      {% endfor %}
+    </select>
+  {% else %}
+  <input type="hidden" name="variant_id" value="{{product.variants.first.id}}" >
+    {% endif %}
+    <input class="input-field" type="number" name="quantity" value="1" />
 
-  <button type="" cart-item-add>
+
+  <div class="variant-info">
+
+  </div>
+
+  <button type="" cart-item-add class="btn">
     Добавь одну
   </button>
 </form>
+
 <br />
 <br />
 <br />

@@ -1,7 +1,7 @@
 <div class="row-flex">
 
 <div class="flex-xl-6">
-
+{% comment %}
   <h2>products</h2>
   {% for product in collections.all.products limit: 10 %}
     <div class="">
@@ -15,14 +15,32 @@
     </div>
   {% endfor %}
 
+{% endcomment %}
   ==================<br />
-  {% for product in collections.all.products limit: 10 %}
+
+<p>var ProductsConfig = {<br />
+&nbsp; product_id: &#39;data-product-id&#39;,<br />
+&nbsp; options: {<br />
+&nbsp; &nbsp; &nbsp; &#39;Цвет&#39;: &#39;option-image&#39;,<br />
+&nbsp; &nbsp; &nbsp; &#39;Размер&#39;: &#39;option-span&#39;,<br />
+&nbsp; &nbsp; &nbsp; &#39;Жесткий диск&#39;: &#39;option-span&#39;<br />
+&nbsp; &nbsp; }<br />
+}</p>
+<p>
+  var Products = new ISnew.Products(ProductsConfig);
+</p>
+
+
+  {% for product in collections.all.products limit: 2 %}
     <a class="super-title" href="{{ product.url }}">====== {{ product.title }} ========</a>
     <form action="{{ cart_url }}" method="post" data-collection-variant data-product-id="{{ product.id }}">
     {% if product.show_variants? %}
 
     <select name="variant_id" data-product-variants>
       {% for variant in product.variants %}
+        {% if forloop.first %}
+          <option value="false" selected="selected">Clear</option>
+        {% endif %}
         <option value="{{ variant.id }}">{{ variant.title | escape }}</option>
       {% endfor %}
     </select>
@@ -32,11 +50,19 @@
     <input class="input-field" type="number" name="quantity" value="1" />
 
 
+  <div class="variant-info">
+
+  </div>
+
   <button type="" cart-item-add class="btn">
     Добавь одну
   </button>
 </form>
   {% endfor %}
+
+
+<br>
+<br>
 <br>
   <button class="btn" data-cart-remove>Очистить корзину</button>
 
@@ -73,3 +99,6 @@ $(function(){
   });
 });
 </script>
+
+
+

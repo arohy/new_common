@@ -63,7 +63,7 @@
       <select
         class="select-field"
         data-option-selector=""
-        data-option-select
+        data-option-change
         data-option_name_id="<%= option.id %>"
       >
         <% _.forEach(values, function (value){ %>
@@ -109,6 +109,34 @@
     </div>
   </script>
 
+  <script type="text/template" data-template-id="option-images">
+    <div class="option-item">
+      <label><%= option.title %></label>
+      <div
+        class=""
+        data-option-selector=""
+        data-option-click
+        data-position-id=""
+        data-option_name_id="<%= option.id %>"
+      >
+        <% _.forEach(options, function (value){ %>
+          <span
+            data-selector-variant="<%= value.id %>"
+            data-value-position="<%= value.position %>"
+            class="option-image <% if (option.selected == value.position) { %>option-active<% } %>
+            <% if (value.disabled) { %>disabled<% } %>"
+          >
+            <% if (images[value.name]) { %>
+              <img src="<%= images[value.name].small_url %>" alt="<%= value.title %>">
+            <% }else{ %>
+              <span><%= value.title %></span>
+            <% } %>
+          </span>
+        <% }) %>
+      </div>
+    </div>
+  </script>
+
   <script type="text/template" data-template-id="option-span">
     <div class="option-item">
       <label><%= option.title %></label>
@@ -119,11 +147,12 @@
         data-position-id=""
         data-option_name_id="<%= option.id %>"
       >
-        <% _.forEach(values, function (value){ %>
+        <% _.forEach(options, function (value){ %>
           <span
             data-selector-variant="<%= value.id %>"
             data-value-position="<%= value.position %>"
-            class="btn <% if (option.selected == value.position) { %>active<% } %>"
+            class="btn <% if (option.selected == value.position & init_option) { %>active<% } %>
+            <% if (value.disabled) { %>disabled<% } %>"
           >
               <span><%= value.title %></span>
           </span>
@@ -131,5 +160,38 @@
       </div>
     </div>
   </script>
+
+
+  <script type="text/template" id="variant-info">
+
+    <div class="row-flex">
+      <div class="flex-xl-6">Цена:</div>
+      <div class="flex-xl-6 text-left"><%- price %></div>
+      <% if (old_price) { %>
+        <div class="flex-xl-6">Старая цена:</div>
+        <div class="flex-xl-6 text-left"><%- old_price %></div>
+      <% } %>
+      <% if (sku) { %>
+        <div class="flex-xl-6">Артикул:</div>
+        <div class="flex-xl-6 text-left"><%- sku %></div>
+      <% } %>
+      <% if (quantity >= 0) { %>
+        <div class="flex-xl-6">Доступно:</div>
+        <div class="flex-xl-6 text-left"><%- quantity %></div>
+      <% }else{ %>
+        <div class="flex-xl-6">Доступно:</div>
+        <div class="flex-xl-6 text-left">Много</div>
+      <% } %>
+      <% if (available) { %>
+        <div class="flex-xl-6">Наличие:</div>
+        <div class="flex-xl-6 text-left">В наличии</div>
+      <% }else{ %>
+        <div class="flex-xl-6">Наличие:</div>
+        <div class="flex-xl-6 text-left">отсутствует</div>
+      <% } %>
+
+    </div>
+</script>
+
 </body>
 </html>
