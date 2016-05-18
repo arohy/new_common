@@ -1,1 +1,4 @@
-new_common.js
+/node_modules
+/test/log
+*.zip
+*.insup
