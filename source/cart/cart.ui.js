@@ -169,10 +169,10 @@ ISnew.CartDOM.prototype.updateOrder = function ($button) {
  */
 ISnew.CartDOM.prototype._bindUpdateCart = function () {
   var self = this;
-  var $form = $('['+ self.options.form +']');
+  var form = '['+ self.options.form +']';
 
   // обработчик нажатия enter в форме корзины
-  $(document).on('keypress', $form, function (event) {
+  $(document).on('keypress', form, function (event) {
     if (event.keyCode == '13') {
       // блочим отправку формы и запускаем обработку
       event.preventDefault();
