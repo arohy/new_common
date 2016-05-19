@@ -1,0 +1,37 @@
+<script>
+
+{% comment %}
+  создание объекта с картинками из файлов
+{% endcomment %}
+var fileUrl = {}
+{% assign option_title  = 'Цвет' %}
+{% for option_name in collections.all.options %}
+  {% if option_name.title == option_title %}
+      {% for option_value in option_name.values %}
+      {% assign fileName = option_value.title | downcase | append: '.png' %}
+      {% assign fileURL = fileName | file_url %}
+        {% if fileURL %}
+          fileUrl['{{ option_value.title | downcase }}'] = '{{ fileURL }}';
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+  {% endfor %}
+
+  var Template = new ISnew.Template();
+  var cv_currency_format = '{{ money_with_currency_format }}';
+  var money = new ISnew.Money();
+  money.set(cv_currency_format);
+  var ProductsConfig = {
+  product_id: 'data-product-id',
+  show_variants: true,
+  init_option: true,
+  file_url: fileUrl,
+  options: {
+        'Цвет': 'option-image',
+        'Размер': 'option-span',
+        'Материал': 'option-span',
+        'Жесткий диск': 'option-span'
+      }
+  }
+  var Products = new ISnew.Products(ProductsConfig);
+</script>

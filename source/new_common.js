@@ -42,3 +42,4 @@ if (!EventBus) {
  */
 Site.URL = new ISnew.tools.URL();
 Site.Setting = new ISnew.tools.Setting();
+Site.Translit = new ISnew.tools.Translit();

@@ -3,15 +3,20 @@
  */
 ISnew.ProductVariants = function (product, _owner, settings) {
   var self = this;
+
+  self._init(product, _owner, settings)
+};
+
+ISnew.ProductVariants.prototype._init = function (product, _owner, settings) {
+  var self = this;
   self._owner = _owner;
 
   self.variants = product.variants;
+
   //  тут хранятся картики продукта
   self.images = self._getImage(product);
 
   //  инизиализация параметров
-  self.settings = {};
-
   if (typeof settings.validate === 'undefined') {
     self.settings = Site.Setting.validate(settings)
   }else{
@@ -33,8 +38,11 @@ ISnew.ProductVariants = function (product, _owner, settings) {
   if (self.settings.init_option) {
     self._update();
   }
-};
+}
 
+/**
+ * Инициируем список всех опций продукта
+ */
 ISnew.ProductVariants.prototype._initListOption = function (variants, option_names) {
   var self = this;
   var _variants = variants;
@@ -268,6 +276,9 @@ ISnew.ProductVariants.prototype._initOptions = function (options) {
 
 
     options[index].selected = first.position;
+
+    //  подмешиваем название опции транслитом
+    options[index].handle = Site.Translit.replace(optionTitle);
 
     leaf = first.tree;
   });

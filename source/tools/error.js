@@ -18,4 +18,6 @@ ISnew.tools.Error = function (name, message) {
   self.toString = function() {
    return self.name + ': ' + self.message;
   };
+
+  return self;
 };

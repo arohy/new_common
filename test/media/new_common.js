@@ -204,6 +204,8 @@ ISnew.tools.Error = function (name, message) {
   self.toString = function() {
    return self.name + ': ' + self.message;
   };
+
+  return self;
 };
 /**
  * Класс для работы с валютой.
@@ -272,11 +274,52 @@ ISnew.tools.Setting.prototype.validate = function (_settings) {
     thisSettings.init_option = true;
   }
 
+  if (typeof thisSettings.file_url === 'undefined') {
+    thisSettings.file_url = {};
+  }
+
   if (typeof thisSettings.validate === 'undefined') {
     thisSettings.validate = true;
   }
 
   return thisSettings;
+}
+/**
+ * производим транслитерацию строки
+ */
+ISnew.tools.Translit = function( string ){
+  var self = this;
+};
+
+ISnew.tools.Translit.prototype.replace = function (string) {
+  var
+    space     = '_',
+    $translit = {
+      'а': 'a', 'б': 'b', 'в': 'v', 'г': 'g', 'д': 'd', 'е': 'e', 'ё': 'e', 'ж': 'zh',
+      'з': 'z', 'и': 'i', 'й': 'j', 'к': 'k', 'л': 'l', 'м': 'm', 'н': 'n',
+      'о': 'o', 'п': 'p', 'р': 'r','с': 's', 'т': 't', 'у': 'u', 'ф': 'f', 'х': 'h',
+      'ц': 'c', 'ч': 'ch', 'ш': 'sh', 'щ': 'sh','ъ': space, 'ы': 'y', 'ь': space, 'э': 'e', 'ю': 'yu', 'я': 'ya',
+      ' ': space, '_': space, '`': space, '~': space, '!': space, '@': space,
+      '#': space, '$': space, '%': space, '^': space, '&': space, '*': space,
+      '(': space, ')': space,'-': space, '\=': space, '+': space, '[': space,
+      ']': space, '\\': space, '|': space, '/': space,'.': space, ',': space,
+      '{': space, '}': space, '\'': space, '"': space, ';': space, ':': space,
+      '?': space, '<': space, '>': space, '№':space
+    },
+    result  = '',
+    current = '';
+
+  string = string.toLowerCase();
+
+  for( i = 0; i < string.length; i++ ){
+    if( $translit[ string[ i ] ] !== undefined ){
+      result += $translit[ string[i] ];
+    }else{
+      result += string[ i ];
+    }
+  }
+
+  return result;
 }
 /**
  * Тул для разбора url.
@@ -1471,18 +1514,24 @@ ISnew.CartDOM.prototype._unlockButton = function (data, eventName) {
 ISnew.OptionSelector = function (product, _owner, settings) {
   var self = this;
 
-  self.settings = settings;
-
-  self._init(product, _owner);
+  self._init(product, _owner, settings);
 }
 
 /**
  * Настройки
  */
-ISnew.OptionSelector.prototype._init = function (_product, _owner) {
+ISnew.OptionSelector.prototype._init = function (_product, _owner, settings) {
   var self = this;
 
+  if (typeof settings.validate === 'undefined') {
+    self.settings = Site.Setting.validate(settings)
+  }else{
+    self.settings = settings;
+  }
+
   self.selector = {};
+
+  self._owner = _owner;
 
   //  селектор формы
   self.selector['product'] = self.settings.product_id || 'data-product-id';
@@ -1499,7 +1548,7 @@ ISnew.OptionSelector.prototype._init = function (_product, _owner) {
   // селектор нативного селекта
   self.selector['selector_native'] = '['+ self.selector.product +'="'+ _product.id +'"] ['+ self.selector.native_select +']';
 
-  self._owner = _owner;
+
 
   // находим опорный DOM-узел, который описывает товар
   self.$product = $('['+ self.selector.product +'="'+ _product.id +'"]');
@@ -1566,6 +1615,7 @@ ISnew.OptionSelector.prototype._renderSelector = function () {
       option: _tempOption_name,
       values: _tempValues,
       images: variants.images,
+      file_url: self.settings.file_url,
       init_option: self.settings.init_option,
       options: _tempFilter[_tempOption_name.id]
     });
@@ -1584,33 +1634,32 @@ ISnew.OptionSelector.prototype._filterOption = function (tempValues, tempOption)
   var _tempFilter = _.cloneDeep(tempOption);
 
   _.forEach(_tempValues, function(_values, count) {
-      var indexOption;
 
-      _.forEach(_tempFilter, function(option_name, index) {
+    _.forEach(_tempFilter, function(option_name, index) {
 
-          if (typeof option_name[_values.id] === "undefined") {
-            return
-          }
-          if (option_name[_values.id].id == _values.id) {
-            _tempFilter[index][_values.id].disabled = false;
-            return ;
-          }else{
-            return ;
-          }
-        });
-    });
-
-    _.forEach(_tempFilter, function(_values) {
-       _.forEach(_values, function(_option) {
-
-        _option['name'] = _option.title.toLowerCase();
-
-        if (typeof _option.disabled  === "undefined") {
-          _option.disabled = true;
+        if (typeof option_name[_values.id] === "undefined") {
+          return
         }
-       })
-    })
-    return _tempFilter;
+        if (option_name[_values.id].id == _values.id) {
+          _tempFilter[index][_values.id].disabled = false;
+          return ;
+        }else{
+          return ;
+        }
+      });
+  });
+
+  _.forEach(_tempFilter, function(_values) {
+     _.forEach(_values, function(_option) {
+
+      _option['name'] = _option.title.toLowerCase();
+
+      if (typeof _option.disabled  === "undefined") {
+        _option.disabled = true;
+      }
+     })
+  })
+  return _tempFilter;
 }
 /**
  * Рендер разметки
@@ -1710,29 +1759,16 @@ ISnew.OptionSelector.prototype._bindSelect = function () {
 ISnew.Products = function (settings) {
   var self = this;
 
-  //получаем настройки
-  /*
-    //  можно поменять data атрибут формы
-    product_id: 'data-product-id',
-
-    //  false отключает вывод optionSelector
-    show_variants: true,
-
-    //  Задаём шаблоны для вывода опций
-    options: {
-      'Цвет': 'option-image'
-    }
-   */
-  self.settings = Site.Setting.validate(settings);
-
-  // объект для создаваемых продуктов
-  self.products = {}
-
-  self._init();
+  self._init(settings);
 };
 
-ISnew.Products.prototype._init = function (owner){
+ISnew.Products.prototype._init = function (settings){
   var self = this;
+
+  // объект для создаваемых продуктов
+  self.collection = {}
+
+  self.settings = Site.Setting.validate(settings);
 
   self.push()
 }
@@ -1776,7 +1812,7 @@ ISnew.Products.prototype._create = function(variantsId){
       .done(function (_newSelectors) {
 
         _.forEach(_newSelectors, function(_new_product) {
-           self.products[_new_product.id] = new ISnew.Product( _new_product , self.settings);
+           self.collection[_new_product.id] = new ISnew.Product( _new_product , self.settings);
         });
 
       })
@@ -1790,8 +1826,12 @@ ISnew.Products.prototype._create = function(variantsId){
 ISnew.ProductPriceType = function (product, _owner) {
   var self = this;
   self._owner = _owner;
-  self.variant_id = product.variants[0].id;
 
+  if (typeof product.id === 'undefined') {
+    throw new ISnew.tools.Error('ErrorProduct', 'ошибка в передаче продукта');
+  }
+
+  self.variant_id = product.variants[0].id;
   self.price_kinds = self._initPrices(product);
 
   return self;
@@ -1889,24 +1929,25 @@ ISnew.ProductPriceType.prototype.setVariant = function (variant_id) {
 ISnew.Product = function (product, settings) {
   var self = this;
 
+
+  self._init(product, self, settings);
+};
+
+/**
+ * Настройки
+ */
+ISnew.Product.prototype._init = function (_product, _owner, settings){
+  var self = this;
+
   if (typeof settings.validate === 'undefined') {
     self.settings = Site.Setting.validate(settings)
   }else{
     self.settings = settings;
   }
 
-  if (!product) {
-    throw new ISnew.tools.Error('ErrorProduct', 'ошибка в передаче аргумента');
+  if (typeof _product.id === 'undefined') {
+    throw new ISnew.tools.Error('ErrorProduct', 'ошибка в передаче продукта');
   }
-
-  self._init(product, self);
-};
-
-/**
- * Настройки
- */
-ISnew.Product.prototype._init = function (_product, _owner){
-  var self = this;
 
   self.product = _product;
   self._owner = _owner;
@@ -1965,15 +2006,20 @@ ISnew.Product.prototype._isVariants = function (_product) {
  */
 ISnew.ProductVariants = function (product, _owner, settings) {
   var self = this;
+
+  self._init(product, _owner, settings)
+};
+
+ISnew.ProductVariants.prototype._init = function (product, _owner, settings) {
+  var self = this;
   self._owner = _owner;
 
   self.variants = product.variants;
+
   //  тут хранятся картики продукта
   self.images = self._getImage(product);
 
   //  инизиализация параметров
-  self.settings = {};
-
   if (typeof settings.validate === 'undefined') {
     self.settings = Site.Setting.validate(settings)
   }else{
@@ -1995,8 +2041,11 @@ ISnew.ProductVariants = function (product, _owner, settings) {
   if (self.settings.init_option) {
     self._update();
   }
-};
+}
 
+/**
+ * Инициируем список всех опций продукта
+ */
 ISnew.ProductVariants.prototype._initListOption = function (variants, option_names) {
   var self = this;
   var _variants = variants;
@@ -2230,6 +2279,9 @@ ISnew.ProductVariants.prototype._initOptions = function (options) {
 
 
     options[index].selected = first.position;
+
+    //  подмешиваем название опции транслитом
+    options[index].handle = Site.Translit.replace(optionTitle);
 
     leaf = first.tree;
   });
@@ -2614,3 +2666,4 @@ ISnew.CompareDOM.prototype._deleteItem = function ($button) {
  */
 Site.URL = new ISnew.tools.URL();
 Site.Setting = new ISnew.tools.Setting();
+Site.Translit = new ISnew.tools.Translit();

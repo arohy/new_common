@@ -4,18 +4,24 @@
 ISnew.OptionSelector = function (product, _owner, settings) {
   var self = this;
 
-  self.settings = settings;
-
-  self._init(product, _owner);
+  self._init(product, _owner, settings);
 }
 
 /**
  * Настройки
  */
-ISnew.OptionSelector.prototype._init = function (_product, _owner) {
+ISnew.OptionSelector.prototype._init = function (_product, _owner, settings) {
   var self = this;
 
+  if (typeof settings.validate === 'undefined') {
+    self.settings = Site.Setting.validate(settings)
+  }else{
+    self.settings = settings;
+  }
+
   self.selector = {};
+
+  self._owner = _owner;
 
   //  селектор формы
   self.selector['product'] = self.settings.product_id || 'data-product-id';
@@ -32,7 +38,7 @@ ISnew.OptionSelector.prototype._init = function (_product, _owner) {
   // селектор нативного селекта
   self.selector['selector_native'] = '['+ self.selector.product +'="'+ _product.id +'"] ['+ self.selector.native_select +']';
 
-  self._owner = _owner;
+
 
   // находим опорный DOM-узел, который описывает товар
   self.$product = $('['+ self.selector.product +'="'+ _product.id +'"]');
@@ -99,6 +105,7 @@ ISnew.OptionSelector.prototype._renderSelector = function () {
       option: _tempOption_name,
       values: _tempValues,
       images: variants.images,
+      file_url: self.settings.file_url,
       init_option: self.settings.init_option,
       options: _tempFilter[_tempOption_name.id]
     });
@@ -117,33 +124,32 @@ ISnew.OptionSelector.prototype._filterOption = function (tempValues, tempOption)
   var _tempFilter = _.cloneDeep(tempOption);
 
   _.forEach(_tempValues, function(_values, count) {
-      var indexOption;
 
-      _.forEach(_tempFilter, function(option_name, index) {
+    _.forEach(_tempFilter, function(option_name, index) {
 
-          if (typeof option_name[_values.id] === "undefined") {
-            return
-          }
-          if (option_name[_values.id].id == _values.id) {
-            _tempFilter[index][_values.id].disabled = false;
-            return ;
-          }else{
-            return ;
-          }
-        });
-    });
-
-    _.forEach(_tempFilter, function(_values) {
-       _.forEach(_values, function(_option) {
-
-        _option['name'] = _option.title.toLowerCase();
-
-        if (typeof _option.disabled  === "undefined") {
-          _option.disabled = true;
+        if (typeof option_name[_values.id] === "undefined") {
+          return
         }
-       })
-    })
-    return _tempFilter;
+        if (option_name[_values.id].id == _values.id) {
+          _tempFilter[index][_values.id].disabled = false;
+          return ;
+        }else{
+          return ;
+        }
+      });
+  });
+
+  _.forEach(_tempFilter, function(_values) {
+     _.forEach(_values, function(_option) {
+
+      _option['name'] = _option.title.toLowerCase();
+
+      if (typeof _option.disabled  === "undefined") {
+        _option.disabled = true;
+      }
+     })
+  })
+  return _tempFilter;
 }
 /**
  * Рендер разметки

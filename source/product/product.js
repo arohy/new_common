@@ -4,24 +4,25 @@
 ISnew.Product = function (product, settings) {
   var self = this;
 
+
+  self._init(product, self, settings);
+};
+
+/**
+ * Настройки
+ */
+ISnew.Product.prototype._init = function (_product, _owner, settings){
+  var self = this;
+
   if (typeof settings.validate === 'undefined') {
     self.settings = Site.Setting.validate(settings)
   }else{
     self.settings = settings;
   }
 
-  if (!product) {
-    throw new ISnew.tools.Error('ErrorProduct', 'ошибка в передаче аргумента');
+  if (typeof _product.id === 'undefined') {
+    throw new ISnew.tools.Error('ErrorProduct', 'ошибка в передаче продукта');
   }
-
-  self._init(product, self);
-};
-
-/**
- * Настройки
- */
-ISnew.Product.prototype._init = function (_product, _owner){
-  var self = this;
 
   self.product = _product;
   self._owner = _owner;

@@ -22,6 +22,10 @@ ISnew.tools.Setting.prototype.validate = function (_settings) {
     thisSettings.init_option = true;
   }
 
+  if (typeof thisSettings.file_url === 'undefined') {
+    thisSettings.file_url = {};
+  }
+
   if (typeof thisSettings.validate === 'undefined') {
     thisSettings.validate = true;
   }

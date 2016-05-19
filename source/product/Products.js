@@ -4,29 +4,16 @@
 ISnew.Products = function (settings) {
   var self = this;
 
-  //получаем настройки
-  /*
-    //  можно поменять data атрибут формы
-    product_id: 'data-product-id',
-
-    //  false отключает вывод optionSelector
-    show_variants: true,
-
-    //  Задаём шаблоны для вывода опций
-    options: {
-      'Цвет': 'option-image'
-    }
-   */
-  self.settings = Site.Setting.validate(settings);
-
-  // объект для создаваемых продуктов
-  self.products = {}
-
-  self._init();
+  self._init(settings);
 };
 
-ISnew.Products.prototype._init = function (owner){
+ISnew.Products.prototype._init = function (settings){
   var self = this;
+
+  // объект для создаваемых продуктов
+  self.collection = {}
+
+  self.settings = Site.Setting.validate(settings);
 
   self.push()
 }
@@ -70,7 +57,7 @@ ISnew.Products.prototype._create = function(variantsId){
       .done(function (_newSelectors) {
 
         _.forEach(_newSelectors, function(_new_product) {
-           self.products[_new_product.id] = new ISnew.Product( _new_product , self.settings);
+           self.collection[_new_product.id] = new ISnew.Product( _new_product , self.settings);
         });
 
       })

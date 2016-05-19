@@ -10,18 +10,20 @@
   <script type="text/javascript" src="{{ 'tests.js' | asset_url }}"></script>
   <link rel="stylesheet" href="{{ 'core.css' | asset_url }}">
   <link rel="stylesheet" href="{{ 'main.css' | asset_url }}">
+  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">
 </head>
 
 <body class="adaptive">
   <div class="container">
+    <div class="row-flex">
+      <div class="flex-4">
+        {% include 'search_widget' with 'header' %}
+      </div>
+    </div>
     {{ content_for_layout }}
   </div>
-  <script type="text/javascript">
-    var Template = new ISnew.Template();
-    var cv_currency_format = '{{ money_with_currency_format }}';
-    var money = new ISnew.Money();
-    money.set(cv_currency_format);
-  </script>
+
+  {% include 'insales_config' %}
 
   <script type="text/template" data-template-id="cart_widget">
     <% if (order_lines.length > 0) { %>
@@ -37,7 +39,7 @@
         =
         <%- item.total_price %>
         </div>
-      <div class="flex-xl-4"><%- item.comment %></div>
+      <div class="flex-xl-4"><div cart-item-delete="<%- item.variant_id %>" class="btn">Удалить</div></div>
     </div>
     <% }); %>
 
@@ -126,8 +128,8 @@
             class="option-image <% if (option.selected == value.position) { %>option-active<% } %>
             <% if (value.disabled) { %>disabled<% } %>"
           >
-            <% if (images[value.name]) { %>
-              <img src="<%= images[value.name].small_url %>" alt="<%= value.title %>">
+            <% if (file_url[value.name]) { %>
+              <img src="<%= file_url[value.name] %>" alt="<%= value.title %>">
             <% }else{ %>
               <span><%= value.title %></span>
             <% } %>
@@ -141,7 +143,7 @@
     <div class="option-item">
       <label><%= option.title %></label>
       <div
-        class=""
+        class="<%= option.handle %>"
         data-option-selector=""
         data-option-click
         data-position-id=""
@@ -189,6 +191,8 @@
         <div class="flex-xl-6">Наличие:</div>
         <div class="flex-xl-6 text-left">отсутствует</div>
       <% } %>
+        <div class="flex-xl-6">В корзине таких:</div>
+        <div class="flex-xl-6 text-left" data-item-cart="<%- variant_id %>"><%- order_item %></div>
 
     </div>
 </script>
