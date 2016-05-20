@@ -42,10 +42,15 @@ options: {
   'Цвет': 'option-image'
 }
 
+//  Объект с картинками из файлов
+file_url: {
+  "красный": "http//"
+}
+
 ====== Пример вызова ======
 var ProductsConfig = {
-  product_id: 'data-product-id',
   show_variants: true,
+  file_url: fileUrl,
   init_option: true,
   options: {
       'Цвет': 'option-images',

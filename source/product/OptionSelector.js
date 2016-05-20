@@ -18,7 +18,7 @@ ISnew.OptionSelector.prototype._init = function (_product, _owner) {
   self._owner = _owner;
 
   //  селектор формы
-  self.selector['product'] = self._owner.settings.product_id || 'data-product-id';
+  self.selector['product'] = 'data-product-id';
   // data атрибут нативного селекта
   self.selector['native_select'] = 'data-product-variants';
   // data атрибут блока в который происходит рендер модификаций
@@ -80,11 +80,11 @@ ISnew.OptionSelector.prototype._renderSelector = function () {
   var self = this;
 
   var variants = self._owner.variants;
-  var deep = variants.options.length;
+  var variants_options = variants.options;
   var optionsHTML = '';
 
   //  собираем данные которые пойдут в шаблон
-  for(var i = 0; i < deep; i++) {
+  _.forEach(variants_options, function(value, i) {
     var _option = {}
     var _tempListOption = variants.listOption;
 
@@ -100,7 +100,7 @@ ISnew.OptionSelector.prototype._renderSelector = function () {
     _option.options = _tempFilter[_option.option.id];
 
     optionsHTML += self._renderOption(_option);
-  }
+  })
 
   self.$option_selector.html(optionsHTML);
 };

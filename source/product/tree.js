@@ -250,19 +250,21 @@ ISnew.ProductVariants.prototype.setVariant = function (variant_id) {
 ISnew.ProductVariants.prototype._initOptions = function (options) {
   var self = this;
   var leaf = self.tree;
-  var paramOptions = self._owner.settings.options;
+
+  //  получаем параметры рендера опций
+  var settingsOptions = self._owner.settings.options;
 
   _.forEach(options, function(option, index) {
     var first = self.getFirst(leaf);
     var optionTitle = options[index].title;
 
-    var renderType = paramOptions[optionTitle];
+    var renderType = settingsOptions[optionTitle];
 
     //  если название шаблона для опции передано в параметрах
     if (renderType) {
       options[index].render_type = renderType;
     }else{
-      options[index].render_type = paramOptions['default'];
+      options[index].render_type = settingsOptions['default'];
     }
 
 

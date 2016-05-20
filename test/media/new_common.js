@@ -1526,7 +1526,7 @@ ISnew.OptionSelector.prototype._init = function (_product, _owner) {
   self._owner = _owner;
 
   //  селектор формы
-  self.selector['product'] = self._owner.settings.product_id || 'data-product-id';
+  self.selector['product'] = 'data-product-id';
   // data атрибут нативного селекта
   self.selector['native_select'] = 'data-product-variants';
   // data атрибут блока в который происходит рендер модификаций
@@ -1588,11 +1588,11 @@ ISnew.OptionSelector.prototype._renderSelector = function () {
   var self = this;
 
   var variants = self._owner.variants;
-  var deep = variants.options.length;
+  var variants_options = variants.options;
   var optionsHTML = '';
 
   //  собираем данные которые пойдут в шаблон
-  for(var i = 0; i < deep; i++) {
+  _.forEach(variants_options, function(value, i) {
     var _option = {}
     var _tempListOption = variants.listOption;
 
@@ -1608,7 +1608,7 @@ ISnew.OptionSelector.prototype._renderSelector = function () {
     _option.options = _tempFilter[_option.option.id];
 
     optionsHTML += self._renderOption(_option);
-  }
+  })
 
   self.$option_selector.html(optionsHTML);
 };
@@ -1763,30 +1763,23 @@ ISnew.Products.prototype._init = function (settings){
   // объект для создаваемых продуктов
   self.collection = {}
 
-  //  для того чтоб пробежаться по елементам нужен product_id
-  var _tempSetting = settings || {product_id: 'data-product-id'};
-
-  self.push(_tempSetting)
+  self._addProduct(settings)
 }
 
 
 /**
  * Добавление новых продуктов
  */
-ISnew.Products.prototype.push = function (settings){
+ISnew.Products.prototype._addProduct = function (settings){
   var self = this;
 
   $(function () {
-    var tempDataProductId = settings.product_id.split('data-') || [''];
-    var dataProductId = tempDataProductId[1] || 'product-id';
-    var variantsName = 'product-variants'
-    var variantsSelector = $('[data-' + variantsName + ']');
-    var variantsCount = $('[data-product-variants]').length - 1;
+    var variantsCount = $('[data-product-id]').length - 1;
     var variantsId = [];
 
-    variantsSelector.each(function(index, el) {
-       var thisParents = $(el).parents('form:first');
-       var thatProductId = thisParents.data( dataProductId );
+    //  Проходим по всем формам и собираем id для создания новых продуктов
+    $('[data-product-id]').each(function(index, el) {
+       var thatProductId = $(el).data( 'product-id' );
 
        if (thatProductId) {
         variantsId.push(thatProductId);
@@ -1941,6 +1934,7 @@ ISnew.Product = function (product, settings) {
 ISnew.Product.prototype._init = function (_product, settings){
   var self = this;
 
+  //  Валидация настроек
   self.validateSettings(settings);
 
   if (!_product) {
@@ -1949,6 +1943,7 @@ ISnew.Product.prototype._init = function (_product, settings){
 
   self.product = _product;
 
+  // статус рендера
   if (!self.is_render) {
     self.is_render = false;
   }
@@ -2017,16 +2012,11 @@ ISnew.Product.prototype.validateSettings = function (_settings) {
 
   self.settings = _settings || {};
 
-  console.log(self.settings.options)
   if (!self.settings.options) {
     self.settings.options = {};
     self.settings.options['default'] = 'option-default';
   }else{
     self.settings.options['default'] = 'option-default';
-  }
-
-  if (!self.settings.product_id) {
-    self.settings.product_id = 'data-product-id'
   }
 
   if (!self.settings.show_variants) {
@@ -2302,19 +2292,21 @@ ISnew.ProductVariants.prototype.setVariant = function (variant_id) {
 ISnew.ProductVariants.prototype._initOptions = function (options) {
   var self = this;
   var leaf = self.tree;
-  var paramOptions = self._owner.settings.options;
+
+  //  получаем параметры рендера опций
+  var settingsOptions = self._owner.settings.options;
 
   _.forEach(options, function(option, index) {
     var first = self.getFirst(leaf);
     var optionTitle = options[index].title;
 
-    var renderType = paramOptions[optionTitle];
+    var renderType = settingsOptions[optionTitle];
 
     //  если название шаблона для опции передано в параметрах
     if (renderType) {
       options[index].render_type = renderType;
     }else{
-      options[index].render_type = paramOptions['default'];
+      options[index].render_type = settingsOptions['default'];
     }
 
 

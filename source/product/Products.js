@@ -13,30 +13,23 @@ ISnew.Products.prototype._init = function (settings){
   // объект для создаваемых продуктов
   self.collection = {}
 
-  //  для того чтоб пробежаться по елементам нужен product_id
-  var _tempSetting = settings || {product_id: 'data-product-id'};
-
-  self.push(_tempSetting)
+  self._addProduct(settings)
 }
 
 
 /**
  * Добавление новых продуктов
  */
-ISnew.Products.prototype.push = function (settings){
+ISnew.Products.prototype._addProduct = function (settings){
   var self = this;
 
   $(function () {
-    var tempDataProductId = settings.product_id.split('data-') || [''];
-    var dataProductId = tempDataProductId[1] || 'product-id';
-    var variantsName = 'product-variants'
-    var variantsSelector = $('[data-' + variantsName + ']');
-    var variantsCount = $('[data-product-variants]').length - 1;
+    var variantsCount = $('[data-product-id]').length - 1;
     var variantsId = [];
 
-    variantsSelector.each(function(index, el) {
-       var thisParents = $(el).parents('form:first');
-       var thatProductId = thisParents.data( dataProductId );
+    //  Проходим по всем формам и собираем id для создания новых продуктов
+    $('[data-product-id]').each(function(index, el) {
+       var thatProductId = $(el).data( 'product-id' );
 
        if (thatProductId) {
         variantsId.push(thatProductId);

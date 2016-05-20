@@ -13,6 +13,7 @@ ISnew.Product = function (product, settings) {
 ISnew.Product.prototype._init = function (_product, settings){
   var self = this;
 
+  //  Валидация настроек
   self.validateSettings(settings);
 
   if (!_product) {
@@ -21,6 +22,7 @@ ISnew.Product.prototype._init = function (_product, settings){
 
   self.product = _product;
 
+  // статус рендера
   if (!self.is_render) {
     self.is_render = false;
   }
@@ -89,16 +91,11 @@ ISnew.Product.prototype.validateSettings = function (_settings) {
 
   self.settings = _settings || {};
 
-  console.log(self.settings.options)
   if (!self.settings.options) {
     self.settings.options = {};
     self.settings.options['default'] = 'option-default';
   }else{
     self.settings.options['default'] = 'option-default';
-  }
-
-  if (!self.settings.product_id) {
-    self.settings.product_id = 'data-product-id'
   }
 
   if (!self.settings.show_variants) {
