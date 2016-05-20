@@ -7,20 +7,24 @@ ISnew.ProductVariants = function (product, _owner, settings) {
   self._init(product, _owner, settings)
 };
 
+/**
+ * Инициализация объекта по работе с вариантами
+ *
+ * @property {object} variants массив модификаций продукта
+ * @property {object} images картики продукта в виде {'title': {smal_url: 'http//'}}
+ * @property {number} urlVariant id варианта из урла
+ * @property {object} options все опции продукта со всеми своими значениями
+ * @property {object} tree дерево вариантов
+ */
 ISnew.ProductVariants.prototype._init = function (product, _owner, settings) {
   var self = this;
   self._owner = _owner;
 
   self.variants = product.variants;
-
-  //  тут хранятся картики продукта
-  self.images = self._getImage(product);
-
-  //  id варианта из урла
+  self.images = self._getImage(product.images);
   self.urlVariant = Site.URL.getKeyValue('variant_id');
 
   self.options = {};
-
   self.options = self._initOptions(product.option_names);
 
   self.tree = self._initTree(product.variants);
@@ -32,6 +36,10 @@ ISnew.ProductVariants.prototype._init = function (product, _owner, settings) {
     self._update();
   }
 }
+
+// ====================================================================================
+//                          Методы по работе с деревом вариантов
+// ====================================================================================
 
 /**
  * Строим дерево вариантов
@@ -88,6 +96,10 @@ ISnew.ProductVariants.prototype._initTree = function (variants) {
   return tree;
 };
 
+// ====================================================================================
+//                          Методы по работе с вариантом
+// ====================================================================================
+
 /**
  * Установка доступности вариантов
  *
@@ -130,37 +142,6 @@ ISnew.ProductVariants.prototype._update = function () {
   }
 
   return;
-};
-
-/**
- * Получить значения с уровня
- */
-ISnew.ProductVariants.prototype.getLevel = function (level) {
-  var self = this;
-  var leaf = self.tree;
-
-  _.forEach(self.options, function(option, option_level) {
-    if (level == option_level) {
-      return false;
-    }
-    leaf = leaf[option.selected].tree;
-  });
-
-  return leaf;
-};
-
-/**
- * Получить первый элемент на уровне
- */
-ISnew.ProductVariants.prototype.getFirst = function (leaf) {
-  var self = this;
-
-  var first = _.chain(leaf)
-    .toArray()
-    .first()
-    .value();
-
-  return first;
 };
 
 /**
@@ -208,10 +189,15 @@ ISnew.ProductVariants.prototype.setVariant = function (variant_id) {
 };
 
 // ====================================================================================
-
+//                          Методы по работе с опциями
+// ====================================================================================
 
 /**
  * Подготовка опций
+ *
+ * @param  {object} options коллекция опций продукта (product.option_names)
+ *
+ * @return {object} options модифицированный объект опций, добавляется renderType из параметров продукта, добавляется handle как название опции транслитом.
  */
 ISnew.ProductVariants.prototype._initOptions = function (options) {
   var self = this;
@@ -242,7 +228,10 @@ ISnew.ProductVariants.prototype._initOptions = function (options) {
 }
 
 /**
- * Добавляем значение в опцию
+ * Собираем все значения опций варианта и привязываем их нужной опции
+ *
+ * @param {object} value значение опции, прилетает из перебора всех значений варианта. Из value собираются уникальные значения каждой опции в объект values. values является свойством объектов из self.options.
+ * @param {number} index порядковый номер опции к которой относится значение.
  */
 ISnew.ProductVariants.prototype._addValues = function (value, index) {
   var self = this;
@@ -256,7 +245,11 @@ ISnew.ProductVariants.prototype._addValues = function (value, index) {
 
 }
 /**
- * устанавливаем selected
+ * Устанавливаем selected
+ *
+ * @param  {object} options объект со всеми опциями (self.options)
+ *
+ * @return {object} options модифицированный self.options c новым свойством selected. option.selected содержит позицию выбранного значения.
  */
 ISnew.ProductVariants.prototype._selectedOptions = function (options) {
   var self = this;
@@ -327,7 +320,41 @@ ISnew.ProductVariants.prototype.getOption = function (index) {
 };
 
 /**
- * фильтрация опций
+ * Получить значения с уровня
+ */
+ISnew.ProductVariants.prototype.getLevel = function (level) {
+  var self = this;
+  var leaf = self.tree;
+
+  _.forEach(self.options, function(option, option_level) {
+    if (level == option_level) {
+      return false;
+    }
+    leaf = leaf[option.selected].tree;
+  });
+
+  return leaf;
+};
+
+/**
+ * Получить первый элемент на уровне
+ */
+ISnew.ProductVariants.prototype.getFirst = function (leaf) {
+  var self = this;
+
+  var first = _.chain(leaf)
+    .toArray()
+    .first()
+    .value();
+
+  return first;
+};
+
+/**
+ * Фильтрация опций
+ *
+ * @param  {number} level уровень опции в дереве (self.tree)
+ * @return {object} option опция готовая для рендера, в значениях опции проставлен value.disabled или удалены не относящиеся к варианту значения в зависимости от настроек продукта (self._owner.settings.filtered);
  */
 ISnew.ProductVariants.prototype.getFilterOption = function (level) {
   var self = this;
@@ -385,36 +412,36 @@ ISnew.ProductVariants.prototype._getSelectedVector = function (_length) {
   return vector;
 };
 
+// ====================================================================================
+//                          Методы по работе с изображениями продукта
+// ====================================================================================
+
 /**
- * Получаем картинки продукта
+ * Получаем объект с изображениями где ключом является название изображения
+ *
+ * @param  {array} images массив изображений продукта (product.images)
+ * @return {object} _images объект с изображениями, ключом является название картики, значением объект с url изображений по размерам.
  */
-ISnew.ProductVariants.prototype._getImage = function (product) {
+ISnew.ProductVariants.prototype._getImage = function (images) {
   var self = this;
 
-  var images = {};
-  var productImages = product.images;
+  var _images = {};
 
-  //  если у продукта есть картинки
-  if (productImages.length > 0) {
-
-  _.forEach(productImages, function(value, key) {
-
-    //  если у картинки есть title
-    if(value['title']){
-      var imageName = value['title'].toLowerCase();
-      images[imageName] = {};
-      images[imageName].thumb_url = value['thumb_url'];
-      images[imageName].small_url = value['small_url'];
-      images[imageName].medium_url = value['medium_url'];
-      images[imageName].large_url = value['large_url'];
-      images[imageName].original_url = value['original_url'];
-    }
-
-  });
-
-  }else{
-    images = false;
+  //  если у продукта есть изображения
+  if (_.size(images) > 0) {
+      _.forEach(images, function(image) {
+        //  если у изображения есть title
+        if(image['title']){
+          var imageName = image['title'].toLowerCase();
+          _images[imageName] = {};
+          _images[imageName].thumb_url = image['thumb_url'];
+          _images[imageName].small_url = image['small_url'];
+          _images[imageName].medium_url = image['medium_url'];
+          _images[imageName].large_url = image['large_url'];
+          _images[imageName].original_url = image['original_url'];
+        }
+      });
   }
 
-  return images;
+  return _images;
 }
