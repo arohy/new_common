@@ -13,6 +13,7 @@ ISnew.Products.prototype._init = function (settings){
   // объект для создаваемых продуктов
   self.collection = {}
 
+  //  для того чтоб пробежаться по елементам нужен product_id
   var _tempSetting = settings || {product_id: 'data-product-id'};
 
   self.push(_tempSetting)
@@ -70,7 +71,7 @@ ISnew.Products.prototype._create = function(variantsId, settings){
  */
 ISnew.Products.prototype.setConfig = function (settings){
   var self = this;
-  console.log(self.collection)
+
   $.each(self.collection, function(index, product) {
      product.setConfig(settings);
   });
