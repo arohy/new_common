@@ -1,6 +1,13 @@
 /**
- * ISnew.ProductVariants(product, _owner, settings) конструктор объета по работе с вариантами продукта
- *
+ * Конструктор объета по работе с вариантами продукта
+ * Объет по работе с вариантами продукта
+ * @class
+ * @name ISnew.ProductVariants
+ * 
+ * @param  {object} product продукт
+ * @param  {object} _owner родительский объект класса Product
+ * @param  {object} settings настройки продукта
+ * 
  * @property {array} variants массив модификаций продукта
  * @property {object} images картики продукта в виде {'title': {small_url: 'http//'}}
  * @property {number} urlVariant id варианта из урла
