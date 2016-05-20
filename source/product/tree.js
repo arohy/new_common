@@ -14,23 +14,6 @@
  * @property {object} options все опции продукта со всеми своими значениями
  * @property {object} tree дерево вариантов
  *
- * @property {function} _init(product, _owner, settings) инициализация объекта
- * @property {function} _initTree(variants) построение дерева вариантов
- * @property {function} _nodeAvailable(leaf) установка доступности вариантов
- * @property {function} _update() обновление состояния вариантов
- * @property {function} getVariant() получение выбранного варианта
- * @property {function} setVariant(variant_id) установка активного варианта
- * @property {function} _initOptions(options) подготовка опций (self.options)
- * @property {function} _addValues(value, index) добавление значений в self.options[index].values
- * @property {function} _selectedOptions(options) установка selected в значениях опции
- * @property {function} setOption(option) установка опции внешним обработчиком
- * @property {function} getOption(index) получение опции по индексу из self.options
- * @property {function} getLevel(level) получение значении с уровня
- * @property {function} getFirst(leaf) получение первого элемента на уровне
- * @property {function} getFilterOption(level) фильтрация опций по доступности в выбранном варианте
- * @property {function} _setOptionByVariant(variant_id) установка опций по варианту
- * @property {function} _getSelectedVector(_length) генерация пути по выбранным опциям
- * @property {function} _getImage(images) получение объекта с изображениями продукта
  */
 ISnew.ProductVariants = function (product, _owner, settings) {
   var self = this;
