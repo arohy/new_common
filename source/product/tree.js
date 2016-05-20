@@ -11,7 +11,7 @@ ISnew.ProductVariants = function (product, _owner, settings) {
  * Инициализация объекта по работе с вариантами
  *
  * @property {object} variants массив модификаций продукта
- * @property {object} images картики продукта в виде {'title': {smal_url: 'http//'}}
+ * @property {object} images картики продукта в виде {'title': {small_url: 'http//'}}
  * @property {number} urlVariant id варианта из урла
  * @property {object} options все опции продукта со всеми своими значениями
  * @property {object} tree дерево вариантов
@@ -228,10 +228,10 @@ ISnew.ProductVariants.prototype._initOptions = function (options) {
 }
 
 /**
- * Собираем все значения опций варианта и привязываем их нужной опции
+ * Собираем все значения опций варианта в опции по индексу (self.options[index].values)
  *
- * @param {object} value значение опции, прилетает из перебора всех значений варианта. Из value собираются уникальные значения каждой опции в объект values. values является свойством объектов из self.options.
- * @param {number} index порядковый номер опции к которой относится значение.
+ * @param {object} value значение опции, прилетает из перебора всех вариантов. value добавляется в объект self.options[index].values.
+ * @param {number} index порядковый номер опции.
  */
 ISnew.ProductVariants.prototype._addValues = function (value, index) {
   var self = this;
@@ -420,7 +420,8 @@ ISnew.ProductVariants.prototype._getSelectedVector = function (_length) {
  * Получаем объект с изображениями где ключом является название изображения
  *
  * @param  {array} images массив изображений продукта (product.images)
- * @return {object} _images объект с изображениями, ключом является название картики, значением объект с url изображений по размерам.
+ *
+ * @return {object} _images объект с изображениями в виде {'image.title': {small_url: 'http//'}}
  */
 ISnew.ProductVariants.prototype._getImage = function (images) {
   var self = this;
