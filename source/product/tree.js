@@ -1,7 +1,7 @@
 /**
  * ProductVariants объет по работе с вариантами продукта
  *
- * @property {object} variants массив модификаций продукта
+ * @property {array} variants массив модификаций продукта
  * @property {object} images картики продукта в виде {'title': {small_url: 'http//'}}
  * @property {number} urlVariant id варианта из урла
  * @property {object} options все опции продукта со всеми своими значениями
