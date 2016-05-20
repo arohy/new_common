@@ -7,10 +7,10 @@
 
   <script type="text/javascript" src="{{ 'lodash.js' | asset_url }}"></script>
   <script type="text/javascript" src="{{ 'new_common.js' | asset_url }}"></script>
-  <script type="text/javascript" src="{{ 'tests.js' | asset_url }}"></script>
   <link rel="stylesheet" href="{{ 'core.css' | asset_url }}">
   <link rel="stylesheet" href="{{ 'main.css' | asset_url }}">
   <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">
+  {% include 'insales_config' %}
 </head>
 
 <body class="adaptive">
@@ -23,7 +23,7 @@
     {{ content_for_layout }}
   </div>
 
-  {% include 'insales_config' %}
+
 
   <script type="text/template" data-template-id="cart_widget">
     <% if (order_lines.length > 0) { %>
@@ -61,6 +61,30 @@
 
   <script type="text/template" data-template-id="option-select">
     <div class="option-item">
+      <label><%= option.title %></label>
+      <select
+        class="select-field"
+        data-option-selector=""
+        data-option-change
+        data-option_name_id="<%= option.id %>"
+      >
+        <% _.forEach(values, function (value){ %>
+          <option
+            data-selector-variant="<%= value.id %>"
+            data-value-position="<%= value.position %>"
+            data-position-id=""
+            value="<%= value.position %>"
+            <% if (option.selected == value.position) { %>selected<% } %>
+          >
+            <%= value.title %>
+          </option>
+        <% }) %>
+      </select>
+    </div>
+  </script>
+
+  <script type="text/template" data-template-id="option-defaults">
+    <div>
       <label><%= option.title %></label>
       <select
         class="select-field"
@@ -196,6 +220,8 @@
 
     </div>
 </script>
+
+    <script type="text/javascript" src="{{ 'tests.js' | asset_url }}"></script>
 
 </body>
 </html>

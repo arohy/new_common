@@ -13,20 +13,20 @@ ISnew.Products.prototype._init = function (settings){
   // объект для создаваемых продуктов
   self.collection = {}
 
-  self.settings = Site.Setting.validate(settings);
+  var _tempSetting = settings || {product_id: 'data-product-id'};
 
-  self.push()
+  self.push(_tempSetting)
 }
 
 
 /**
  * Добавление новых продуктов
  */
-ISnew.Products.prototype.push = function (){
+ISnew.Products.prototype.push = function (settings){
   var self = this;
 
   $(function () {
-    var tempDataProductId = self.settings.product_id.split('data-');
+    var tempDataProductId = settings.product_id.split('data-') || [''];
     var dataProductId = tempDataProductId[1] || 'product-id';
     var variantsName = 'product-variants'
     var variantsSelector = $('[data-' + variantsName + ']');
@@ -41,7 +41,7 @@ ISnew.Products.prototype.push = function (){
         variantsId.push(thatProductId);
        }
        if (index === variantsCount) {
-        self._create(variantsId);
+        self._create(variantsId, settings);
        }
     });
   })
@@ -50,18 +50,28 @@ ISnew.Products.prototype.push = function (){
 /**
  * Инизиализация объекта Product
  */
-ISnew.Products.prototype._create = function(variantsId){
+ISnew.Products.prototype._create = function(variantsId, settings){
   var self = this;
 
   ISnew.json.getProductsList(variantsId)
       .done(function (_newSelectors) {
 
         _.forEach(_newSelectors, function(_new_product) {
-           self.collection[_new_product.id] = new ISnew.Product( _new_product , self.settings);
+           self.collection[_new_product.id] = new ISnew.Product( _new_product , settings);
         });
 
       })
       .fail(function (response) {
         throw new ISnew.tools.Error('ErrorJson', 'ошибка при выполнени ajax запроса');
       });
+}
+/**
+ * Обновление настроек
+ */
+ISnew.Products.prototype.setConfig = function (settings){
+  var self = this;
+  console.log(self.collection)
+  $.each(self.collection, function(index, product) {
+     product.setConfig(settings);
+  });
 }

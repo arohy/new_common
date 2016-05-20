@@ -25,7 +25,7 @@ ISnew.tools.Translit.prototype.replace = function (string) {
 
   string = string.toLowerCase();
 
-  for( i = 0; i < string.length; i++ ){
+  for(var i = 0; i < string.length; i++ ){
     if( $translit[ string[ i ] ] !== undefined ){
       result += $translit[ string[i] ];
     }else{

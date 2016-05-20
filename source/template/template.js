@@ -46,19 +46,51 @@ ISnew.Template.prototype._init = function (_owner) {
 
   //  устанавливаем lock пока не собирем все шаблоны
   self._lock = true;
+
+  //  устанавливаем статус пусто
+  self.empty = true;
+
   self._templateList = {};
 
+  //  вытаскиваем дефолтный шаблон
+  self._getDefault();
+
+
   $(function () {
-    var templateCount = $('script[data-template-id]').length - 1;
+    if ($('script[data-template-id]').length) {
 
-    $('[data-template-id]').each(function (index, el) {
+      var templateCount = $('script[data-template-id]').length - 1;
 
-      self.load($(el).html(), $(el).data('templateId'));
-      if (templateCount === index) {
-        self._lock = false;
-      }
+      $('[data-template-id]').each(function (index, el) {
 
-    });
+        self.load($(el).html(), $(el).data('templateId'));
 
+        if (templateCount === index) {
+          //  снимаем lock
+          self._lock = false;
+          //  обновляем статус
+          self.empty = false;
+        }
+
+      });
+
+    }else{
+      //  снимаем lock
+      self._lock = false;
+      //  обновляем статус
+      self.empty = true;
+    }
   });
 };
+
+
+/**
+ * прибиваем дефолтный селект для вывода опций
+ */
+ISnew.Template.prototype._getDefault = function () {
+  var self = this;
+
+  var option_default = '<div>\n<label><%= option.title %></label>\n<select\ndata-option-selector=""\ndata-option-change\ndata-option_name_id="<%= option.id %>"\n>\n<% _.forEach(values, function (value){ %><option\ndata-selector-variant="<%= value.id %>"\ndata-value-position="<%= value.position %>"\ndata-position-id=""\nvalue="<%= value.position %>"<% if (option.selected == value.position) { %>selected<% } %>\n>\n<%= value.title %></option>\n<% }) %>\n</select>\n</div>';
+
+  self._templateList['option-default'] = _.template(option_default);
+}

@@ -17,13 +17,7 @@ ISnew.ProductVariants.prototype._init = function (product, _owner, settings) {
   self.images = self._getImage(product);
 
   //  инизиализация параметров
-  if (typeof settings.validate === 'undefined') {
-    self.settings = Site.Setting.validate(settings)
-  }else{
-    self.settings = settings;
-  }
-  self.settings.options['default'] = 'option-select';
-
+  self._owner.validateSettings(settings);
 
   //  id варианта из урла
   self.urlVariant = Site.URL.getKeyValue('variant_id');
@@ -35,7 +29,7 @@ ISnew.ProductVariants.prototype._init = function (product, _owner, settings) {
 
   self.listOption = self._initListOption(product.variants, product.option_names);
 
-  if (self.settings.init_option) {
+  if (self._owner.settings.init_option) {
     self._update();
   }
 }
@@ -241,8 +235,8 @@ ISnew.ProductVariants.prototype.getVariant = function () {
 ISnew.ProductVariants.prototype.setVariant = function (variant_id) {
   var self = this;
 
-  if (! self.settings.init_option) {
-    self.settings.init_option = true;
+  if (! self._owner.settings.init_option) {
+    self._owner.settings.init_option = true;
   }
 
   self._setOptionByVariant(variant_id);
@@ -253,13 +247,14 @@ ISnew.ProductVariants.prototype.setVariant = function (variant_id) {
 
 // ====================================================================================
 
+
 /**
  * Подготовка опций
  */
 ISnew.ProductVariants.prototype._initOptions = function (options) {
   var self = this;
   var leaf = self.tree;
-  var paramOptions = self.settings.options;
+  var paramOptions = self._owner.settings.options;
 
   _.forEach(options, function(option, index) {
     var first = self.getFirst(leaf);
@@ -271,7 +266,7 @@ ISnew.ProductVariants.prototype._initOptions = function (options) {
     if (renderType) {
       options[index].render_type = renderType;
     }else{
-      options[index].render_type = paramOptions['default']
+      options[index].render_type = paramOptions['default'];
     }
 
 
@@ -299,7 +294,7 @@ ISnew.ProductVariants.prototype.setOption = function (option) {
   });
 
   // Если не опцию не меняли - на выход
-  if (self.options[index].selected == option.position & self.settings.init_option) {
+  if (self.options[index].selected == option.position & self._owner.settings.init_option) {
     return;
   }
 
@@ -322,8 +317,8 @@ ISnew.ProductVariants.prototype.setOption = function (option) {
     }
   });
 
-  if (! self.settings.init_option) {
-    self.settings.init_option = true;
+  if (! self._owner.settings.init_option) {
+    self._owner.settings.init_option = true;
   }
 
   self._update();

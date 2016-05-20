@@ -29,10 +29,10 @@ if (!EventBus) {
   var EventBus;
 }
 
+//= ./template/
 //= ./events/
 //= ./tools/
 //= ./json/
-//= ./template/
 //= ./cart/
 //= ./product/
 //= ./compare/
@@ -40,6 +40,9 @@ if (!EventBus) {
 /*
  * Инициализация объектов
  */
+var Cart = new ISnew.Cart();
+var Template = new ISnew.Template();
+var Compare = new ISnew.Compare();
+
 Site.URL = new ISnew.tools.URL();
-Site.Setting = new ISnew.tools.Setting();
 Site.Translit = new ISnew.tools.Translit();

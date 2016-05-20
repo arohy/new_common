@@ -1,30 +1,24 @@
 /**
  * OptionSelector
  */
-ISnew.OptionSelector = function (product, _owner, settings) {
+ISnew.OptionSelector = function (product, _owner) {
   var self = this;
 
-  self._init(product, _owner, settings);
+  self._init(product, _owner);
 }
 
 /**
  * Настройки
  */
-ISnew.OptionSelector.prototype._init = function (_product, _owner, settings) {
+ISnew.OptionSelector.prototype._init = function (_product, _owner) {
   var self = this;
-
-  if (typeof settings.validate === 'undefined') {
-    self.settings = Site.Setting.validate(settings)
-  }else{
-    self.settings = settings;
-  }
 
   self.selector = {};
 
   self._owner = _owner;
 
   //  селектор формы
-  self.selector['product'] = self.settings.product_id || 'data-product-id';
+  self.selector['product'] = self._owner.settings.product_id || 'data-product-id';
   // data атрибут нативного селекта
   self.selector['native_select'] = 'data-product-variants';
   // data атрибут блока в который происходит рендер модификаций
@@ -32,7 +26,7 @@ ISnew.OptionSelector.prototype._init = function (_product, _owner, settings) {
 
   //  Селекторы для _bindSelect
   //  селектор опции типа change
-  self.selector['selector_change'] = '['+ self.selector.product +'="'+ _product.id +'"] [data-option-select]';
+  self.selector['selector_change'] = '['+ self.selector.product +'="'+ _product.id +'"] [data-option-change]';
   //  селектор опции типа click
   self.selector['selector_click'] = '['+ self.selector.product +'="'+ _product.id +'"] [data-option-click] [data-selector-variant]';
   // селектор нативного селекта
@@ -56,8 +50,15 @@ ISnew.OptionSelector.prototype._init = function (_product, _owner, settings) {
     return;
   }
 
+  var option_selector_length = self.$native_select.next('[' + self.selector.option_selector + ']').length;
+
   // создаем контейнер и сохраняем линк на него
-  self.$native_select.after('<div class="option-selector" '+ self.selector.option_selector +'/>');
+  // проверка на рендер, если уже отрендерили то не добавляем новую обёртку
+  if (option_selector_length === 0) {
+    self.$native_select.after('<div class="option-selector" '+ self.selector.option_selector +'/>');
+    self._owner.is_render = true;
+  }
+
   self.$option_selector = self.$product.find('['+ self.selector.option_selector +']');
 
   // привязываем экземпляр Класса к товару
@@ -78,37 +79,27 @@ ISnew.OptionSelector.prototype._init = function (_product, _owner, settings) {
 ISnew.OptionSelector.prototype._renderSelector = function () {
   var self = this;
 
-  //  Пока не собрали инфу о шаблонах, лочим рендер и через таймаут перезапускаем метод
-  if (Template._lock) {
-    setTimeout(function(){
-      self._renderSelector();
-    }, 300)
-  }
-
   var variants = self._owner.variants;
   var deep = variants.options.length;
-
   var optionsHTML = '';
-
-
 
   //  собираем данные которые пойдут в шаблон
   for(var i = 0; i < deep; i++) {
-    var _tempValues = variants.getLevel(i);
-    var _tempOption_name = variants.getOption(i);
-    var _tempOption = variants.listOption;
+    var _option = {}
+    var _tempListOption = variants.listOption;
+
+    _option.option = variants.getOption(i);
+    _option.values = variants.getLevel(i);
+    _option.images = variants.images;
+    _option.file_url = self._owner.settings.file_url;
+    _option.init_option = self._owner.settings.init_option;
 
     //  Вывод всех опций с фильтрацией по доступности
-    var _tempFilter = self._filterOption(_tempValues, _tempOption)
+    var _tempFilter = self._filterOption(_option.values, _tempListOption)
 
-    optionsHTML += self._renderOption({
-      option: _tempOption_name,
-      values: _tempValues,
-      images: variants.images,
-      file_url: self.settings.file_url,
-      init_option: self.settings.init_option,
-      options: _tempFilter[_tempOption_name.id]
-    });
+    _option.options = _tempFilter[_option.option.id];
+
+    optionsHTML += self._renderOption(_option);
   }
 
   self.$option_selector.html(optionsHTML);
@@ -127,7 +118,7 @@ ISnew.OptionSelector.prototype._filterOption = function (tempValues, tempOption)
 
     _.forEach(_tempFilter, function(option_name, index) {
 
-        if (typeof option_name[_values.id] === "undefined") {
+        if (!option_name[_values.id]) {
           return
         }
         if (option_name[_values.id].id == _values.id) {
@@ -160,10 +151,16 @@ ISnew.OptionSelector.prototype._renderOption = function (option) {
   var optionHTML = '';
   var render_type = option.option.render_type;
 
-  optionHTML = Template.render(option, render_type);
+  //  Если шаблонов нет или переданный рендер render_type некорректный
+  if (Template.empty || !Template._templateList[render_type]) {
+    optionHTML = Template.render(option, self._owner.settings.options['default']);
+  }else{
+    optionHTML = Template.render(option, render_type);
+  }
+
 
   //  если не получили шаблон
-  if (optionHTML === false) {
+  if (!render_type) {
     throw new ISnew.tools.Error('ErrorOptionSelector', 'ошибка в получении шаблона');
   }
 

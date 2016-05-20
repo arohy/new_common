@@ -55,7 +55,7 @@ options: {<br />
 
   {% for product in collections.all.products limit: 2 %}
     <a class="super-title" href="{{ product.url }}">====== {{ product.title }} ========</a>
-    <form action="{{ cart_url }}" method="post" data-collection-variant data-product-id="{{ product.id }}">
+    <form action="{{ cart_url }}" method="post" data-product-id="{{ product.id }}">
     {% if product.show_variants? %}
 
     <select name="variant_id" data-product-variants>

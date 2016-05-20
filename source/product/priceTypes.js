@@ -5,10 +5,6 @@ ISnew.ProductPriceType = function (product, _owner) {
   var self = this;
   self._owner = _owner;
 
-  if (typeof product.id === 'undefined') {
-    throw new ISnew.tools.Error('ErrorProduct', 'ошибка в передаче продукта');
-  }
-
   self.variant_id = product.variants[0].id;
   self.price_kinds = self._initPrices(product);
 

@@ -4,37 +4,34 @@
 ISnew.Product = function (product, settings) {
   var self = this;
 
-
-  self._init(product, self, settings);
+  self._init(product, settings);
 };
 
 /**
  * Настройки
  */
-ISnew.Product.prototype._init = function (_product, _owner, settings){
+ISnew.Product.prototype._init = function (_product, settings){
   var self = this;
 
-  if (typeof settings.validate === 'undefined') {
-    self.settings = Site.Setting.validate(settings)
-  }else{
-    self.settings = settings;
-  }
+  self.validateSettings(settings);
 
-  if (typeof _product.id === 'undefined') {
+  if (!_product) {
     throw new ISnew.tools.Error('ErrorProduct', 'ошибка в передаче продукта');
   }
 
   self.product = _product;
-  self._owner = _owner;
 
+  if (!self.is_render) {
+    self.is_render = false;
+  }
 
   self.quantity = 0;
-  self.price_kinds = new ISnew.ProductPriceType(_product, _owner, self.settings);
+  self.price_kinds = new ISnew.ProductPriceType(_product, self);
 
   //  если есть модификации и в настройках true - запускаем создание OptionSelector
-  if (self._owner._isVariants(_product) & self.settings.show_variants) {
-    self.variants = new ISnew.ProductVariants(_product, _owner, self.settings);
-    self.OptionSelector = new ISnew.OptionSelector(_product, _owner, self.settings);
+  if (self._isVariants(_product) & self.settings.show_variants) {
+    self.variants = new ISnew.ProductVariants(_product, self);
+    self.OptionSelector = new ISnew.OptionSelector(_product, self);
   }
 }
 
@@ -76,3 +73,51 @@ ISnew.Product.prototype._isVariants = function (_product) {
 
   return optionCount > 0;
 };
+
+/**
+ * Обновление настроек
+ */
+ISnew.Product.prototype.setConfig = function (settings){
+  var self = this;
+
+  self._init(self.product, self, settings);
+}
+
+
+ISnew.Product.prototype.validateSettings = function (_settings) {
+  var self = this;
+
+  self.settings = _settings || {};
+
+  if (!self.settings.options) {
+    self.settings.options = {};
+    self.settings.options['default'] = 'option-default';
+  }else{
+    self.settings.options['default'] = 'option-default';
+  }
+
+  if (!self.settings.product_id) {
+    self.settings.product_id = 'data-product-id'
+  }
+
+  if (typeof self.settings.show_variants === 'undefined') {
+    self.settings.show_variants = true;
+  }
+
+  if (typeof self.settings.init_option === 'undefined') {
+    self.settings.init_option = true;
+  }
+
+  if (typeof self.settings.file_url === 'undefined') {
+    self.settings.file_url = {};
+  }
+
+  if (typeof self.settings.options === 'undefined') {
+    self.settings.options = {};
+  }
+
+  if (typeof self.settings.validate === 'undefined') {
+    self.settings.validate = true;
+  }
+
+}

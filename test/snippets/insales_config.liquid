@@ -17,13 +17,11 @@ var fileUrl = {}
     {% endif %}
   {% endfor %}
 
-  var Template = new ISnew.Template();
   var cv_currency_format = '{{ money_with_currency_format }}';
   var money = new ISnew.Money();
   money.set(cv_currency_format);
   var ProductsConfig = {
   product_id: 'data-product-id',
-  show_variants: true,
   init_option: true,
   file_url: fileUrl,
   options: {
@@ -33,5 +31,47 @@ var fileUrl = {}
         'Жесткий диск': 'option-span'
       }
   }
-  var Products = new ISnew.Products(ProductsConfig);
+  var ProductsConfig3 = {
+  product_id: 'data-product-id',
+  init_option: true,
+  file_url: fileUrl
+  }
+  var ProductsConfig2 = {
+  product_id: 'data-product-id',
+  init_option: true,
+  file_url: fileUrl,
+  options: {
+        'Размер': 'option-select',
+        'Материал': 'option-span',
+        'Жесткий диск': 'option-select'
+      }
+  }
+
+  var ProductsConfig4 = {
+  product_id: 'data-product-id',
+  init_option: true,
+  file_url: fileUrl,
+  options: {
+        'Цвет': 'option-image',
+        'Размер': 'option-select',
+        'Материал': 'option-select',
+        'Жесткий диск': 'option-select'
+      }
+  }
+
+  Products = new ISnew.Products(ProductsConfig);
+  jQuery(document).ready(function($) {
+    setTimeout(function () {
+      console.log('setConfig Products1')
+      Products.setConfig(ProductsConfig3);
+    }, 5000)
+    setTimeout(function () {
+      console.log('setConfig Products2')
+      Products.setConfig(ProductsConfig2);
+    }, 10000)
+    setTimeout(function () {
+      console.log('setConfig Products3')
+      Products.setConfig(ProductsConfig4);
+    }, 15000)
+  });
 </script>

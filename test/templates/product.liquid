@@ -2,7 +2,7 @@
 <div class="flex-xl-6">
 <a href="/" >< на главную</a>
     <a class="super-title" href="{{ product.url }}">====== {{ product.title }} ========</a>
-    <form action="{{ cart_url }}" method="post" data-collection-variant data-product-id="{{ product.id }}">
+    <form action="{{ cart_url }}" method="post" data-product-id="{{ product.id }}">
     <img src="{{ product.images.first.medium_url }}" alt="">
     {% if product.show_variants? %}
 
@@ -54,3 +54,26 @@
   <pre class="cart-widget js-cart"></pre>
 </div>
 </div>
+
+
+<script>
+  var ProductsConfigs = {
+  product_id: 'data-product-id',
+  show_variants: true,
+  init_option: true,
+  file_url: fileUrl,
+  options: {
+        //'Цвет': 'option-image',
+        'Размер': 'option-span',
+        'Материал': 'option-span',
+        'Жесткий диск': 'option-span'
+      }
+  }
+  var Product = new ISnew.Product({{product | json}});
+  jQuery(document).ready(function($) {
+    setTimeout(function () {
+      console.log('setConfig')
+      Product.setConfig(ProductsConfigs)
+    }, 4000)
+  });
+</script>
