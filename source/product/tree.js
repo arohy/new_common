@@ -1,5 +1,5 @@
 /**
- * ProductVariants объет по работе с вариантами продукта
+ * ISnew.ProductVariants(product, _owner, settings) конструктор объета по работе с вариантами продукта
  *
  * @property {array} variants массив модификаций продукта
  * @property {object} images картики продукта в виде {'title': {small_url: 'http//'}}
