@@ -91,30 +91,31 @@ ISnew.Product.prototype.validateSettings = function (_settings) {
 
   self.settings = _settings || {};
 
-  if (!self.settings.options) {
+  if (_.isNil(self.settings.options)) {
     self.settings.options = {};
     self.settings.options['default'] = 'option-default';
   }else{
     self.settings.options['default'] = 'option-default';
   }
 
-  if (!self.settings.show_variants) {
+  //
+  if (_.isNil(self.settings.show_variants)) {
     self.settings.show_variants = true;
   }
 
-  if (!self.settings.init_option) {
+  if (_.isNil(self.settings.init_option)) {
     self.settings.init_option = true;
   }
 
-  if (!self.settings.file_url) {
+  if (_.isNil(self.settings.file_url)) {
     self.settings.file_url = {};
   }
 
-  if (!self.settings.options) {
+  if (_.isNil(self.settings.options)) {
     self.settings.options = {};
   }
 
-  if (!self.settings.validate) {
+  if (_.isNil(self.settings.validate)) {
     self.settings.validate = true;
   }
 

@@ -1596,60 +1596,16 @@ ISnew.OptionSelector.prototype._renderSelector = function () {
     var _option = {}
     var _tempListOption = variants.listOption;
 
-    _option.option = variants.getOption(i);
-    _option.values = variants.getLevel(i);
+    _option.option = variants.getFilterOption(i);
     _option.images = variants.images;
     _option.file_url = self._owner.settings.file_url;
     _option.init_option = self._owner.settings.init_option;
-
-    //  Вывод всех опций с фильтрацией по доступности
-    var _tempFilter = self._filterOption(_option.values, _tempListOption)
-
-    _option.options = _tempFilter[_option.option.id];
 
     optionsHTML += self._renderOption(_option);
   })
 
   self.$option_selector.html(optionsHTML);
 };
-
-/**
- * Фильтр опций
- */
-ISnew.OptionSelector.prototype._filterOption = function (tempValues, tempOption) {
-  var self = this;
-
-  var _tempValues = _.cloneDeep(tempValues);
-  var _tempFilter = _.cloneDeep(tempOption);
-
-  _.forEach(_tempValues, function(_values, count) {
-
-    _.forEach(_tempFilter, function(option_name, index) {
-
-        if (!option_name[_values.id]) {
-          return
-        }
-        if (option_name[_values.id].id == _values.id) {
-          _tempFilter[index][_values.id].disabled = false;
-          return ;
-        }else{
-          return ;
-        }
-      });
-  });
-
-  _.forEach(_tempFilter, function(_values) {
-     _.forEach(_values, function(_option) {
-
-      _option['name'] = _option.title.toLowerCase();
-
-      if (typeof _option.disabled  === "undefined") {
-        _option.disabled = true;
-      }
-     })
-  })
-  return _tempFilter;
-}
 /**
  * Рендер разметки
  */
@@ -2012,30 +1968,31 @@ ISnew.Product.prototype.validateSettings = function (_settings) {
 
   self.settings = _settings || {};
 
-  if (!self.settings.options) {
+  if (_.isNil(self.settings.options)) {
     self.settings.options = {};
     self.settings.options['default'] = 'option-default';
   }else{
     self.settings.options['default'] = 'option-default';
   }
 
-  if (!self.settings.show_variants) {
+  //
+  if (_.isNil(self.settings.show_variants)) {
     self.settings.show_variants = true;
   }
 
-  if (!self.settings.init_option) {
+  if (_.isNil(self.settings.init_option)) {
     self.settings.init_option = true;
   }
 
-  if (!self.settings.file_url) {
+  if (_.isNil(self.settings.file_url)) {
     self.settings.file_url = {};
   }
 
-  if (!self.settings.options) {
+  if (_.isNil(self.settings.options)) {
     self.settings.options = {};
   }
 
-  if (!self.settings.validate) {
+  if (_.isNil(self.settings.validate)) {
     self.settings.validate = true;
   }
 
@@ -2061,58 +2018,20 @@ ISnew.ProductVariants.prototype._init = function (product, _owner, settings) {
   //  id варианта из урла
   self.urlVariant = Site.URL.getKeyValue('variant_id');
 
+  self.options = {};
 
-  self.tree = self._initTree(product.variants);
   self.options = self._initOptions(product.option_names);
 
-  self.listOption = self._initListOption(product.variants, product.option_names);
+  self.tree = self._initTree(product.variants);
+
+  self.options = self._selectedOptions(self.options);
+
 
   if (self._owner.settings.init_option) {
     self._update();
   }
 }
 
-/**
- * Инициируем список всех опций продукта
- */
-ISnew.ProductVariants.prototype._initListOption = function (variants, option_names) {
-  var self = this;
-  var _variants = variants;
-  var _option_names = option_names;
-  var listOption = {};
-  var _temp = {};
-
-  _.forEach(_variants, function (variant) {
-    var variant_id = variant.id;
-    listOption[variant_id] = {};
-     _.forEach(variant.option_values, function(option, index) {
-      if ( typeof _temp[option.option_name_id] === 'undefined') {
-
-        _temp[option.option_name_id] = {};
-
-        if ( typeof _temp[option.option_name_id][option.id] === 'undefined') {
-          _temp[option.option_name_id][option.id] = {option};
-          _temp[option.option_name_id][option.id] = option;
-        }else{
-          _temp[option.option_name_id][option.id] = option;
-        }
-
-      }else{
-
-        if ( typeof _temp[option.option_name_id][option.id] === 'undefined') {
-          _temp[option.option_name_id][option.id] = {};
-          _temp[option.option_name_id][option.id] = option;
-        }else{
-          _temp[option.option_name_id][option.id] = option;
-        }
-
-      }
-
-     })
-  })
-  listOption = _temp;
-  return listOption;
-}
 /**
  * Строим дерево вариантов
  */
@@ -2129,6 +2048,9 @@ ISnew.ProductVariants.prototype._initTree = function (variants) {
     _.forEach(variant.option_values, function(option, index) {
       var id;
       var isAvailable;
+
+      // Добавляем новое значение в опцию
+      self._addValues(option, index);
 
       // Если дошли до последней опции - выставляем вариант и доступность
       if (index == (variant.option_values.length - 1)) {
@@ -2152,6 +2074,7 @@ ISnew.ProductVariants.prototype._initTree = function (variants) {
           leaf[option.position].available = isAvailable;
         };
       }
+
 
       leaf = leaf[option.position].tree;
     });
@@ -2291,13 +2214,11 @@ ISnew.ProductVariants.prototype.setVariant = function (variant_id) {
  */
 ISnew.ProductVariants.prototype._initOptions = function (options) {
   var self = this;
-  var leaf = self.tree;
 
   //  получаем параметры рендера опций
   var settingsOptions = self._owner.settings.options;
 
   _.forEach(options, function(option, index) {
-    var first = self.getFirst(leaf);
     var optionTitle = options[index].title;
 
     var renderType = settingsOptions[optionTitle];
@@ -2309,11 +2230,41 @@ ISnew.ProductVariants.prototype._initOptions = function (options) {
       options[index].render_type = settingsOptions['default'];
     }
 
+    //  название опции транслитом
+    options[index].handle = Site.Translit.replace(optionTitle);
+
+    //  массив значений опции
+    options[index].values = {};
+  });
+
+  return options;
+}
+
+/**
+ * Добавляем значение в опцию
+ */
+ISnew.ProductVariants.prototype._addValues = function (value, index) {
+  var self = this;
+
+  var optionValues = self.options[index].values;
+
+  if (!optionValues[value.position]) {
+    optionValues[value.position] = value;
+    optionValues[value.position].name = optionValues[value.position].title.toLowerCase();
+  }
+
+}
+/**
+ * устанавливаем selected
+ */
+ISnew.ProductVariants.prototype._selectedOptions = function (options) {
+  var self = this;
+  var leaf = self.tree;
+
+  _.forEach(options, function(option, index) {
+    var first = self.getFirst(leaf);
 
     options[index].selected = first.position;
-
-    //  подмешиваем название опции транслитом
-    options[index].handle = Site.Translit.replace(optionTitle);
 
     leaf = first.tree;
   });
@@ -2372,6 +2323,29 @@ ISnew.ProductVariants.prototype.getOption = function (index) {
   var self = this;
 
   return self.options[index];
+};
+
+/**
+ * фильтрация опций
+ */
+ISnew.ProductVariants.prototype.getFilterOption = function (level) {
+  var self = this;
+
+  var option = _.cloneDeep(self.getOption(level));
+  var values = self.getLevel(level);
+
+  _.forEach(option.values, function (value, index) {
+    if (!values[value.position]) {
+      //  если стоит фильтрация то ставим disabled, иначе удаляем ключ
+      if (self._owner.settings.filtered) {
+        value.disabled = true;
+      }else{
+        delete option.values[index];
+      }
+    }
+  })
+
+  return option;
 };
 
 /**

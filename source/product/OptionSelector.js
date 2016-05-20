@@ -88,60 +88,16 @@ ISnew.OptionSelector.prototype._renderSelector = function () {
     var _option = {}
     var _tempListOption = variants.listOption;
 
-    _option.option = variants.getOption(i);
-    _option.values = variants.getLevel(i);
+    _option.option = variants.getFilterOption(i);
     _option.images = variants.images;
     _option.file_url = self._owner.settings.file_url;
     _option.init_option = self._owner.settings.init_option;
-
-    //  Вывод всех опций с фильтрацией по доступности
-    var _tempFilter = self._filterOption(_option.values, _tempListOption)
-
-    _option.options = _tempFilter[_option.option.id];
 
     optionsHTML += self._renderOption(_option);
   })
 
   self.$option_selector.html(optionsHTML);
 };
-
-/**
- * Фильтр опций
- */
-ISnew.OptionSelector.prototype._filterOption = function (tempValues, tempOption) {
-  var self = this;
-
-  var _tempValues = _.cloneDeep(tempValues);
-  var _tempFilter = _.cloneDeep(tempOption);
-
-  _.forEach(_tempValues, function(_values, count) {
-
-    _.forEach(_tempFilter, function(option_name, index) {
-
-        if (!option_name[_values.id]) {
-          return
-        }
-        if (option_name[_values.id].id == _values.id) {
-          _tempFilter[index][_values.id].disabled = false;
-          return ;
-        }else{
-          return ;
-        }
-      });
-  });
-
-  _.forEach(_tempFilter, function(_values) {
-     _.forEach(_values, function(_option) {
-
-      _option['name'] = _option.title.toLowerCase();
-
-      if (typeof _option.disabled  === "undefined") {
-        _option.disabled = true;
-      }
-     })
-  })
-  return _tempFilter;
-}
 /**
  * Рендер разметки
  */

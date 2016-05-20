@@ -68,7 +68,7 @@
         data-option-change
         data-option_name_id="<%= option.id %>"
       >
-        <% _.forEach(values, function (value){ %>
+        <% _.forEach(option.values, function (value){ %>
           <option
             data-selector-variant="<%= value.id %>"
             data-value-position="<%= value.position %>"
@@ -92,7 +92,7 @@
         data-option-change
         data-option_name_id="<%= option.id %>"
       >
-        <% _.forEach(values, function (value){ %>
+        <% _.forEach(option.values, function (value){ %>
           <option
             data-selector-variant="<%= value.id %>"
             data-value-position="<%= value.position %>"
@@ -118,11 +118,12 @@
         data-position-id=""
         data-option_name_id="<%= option.id %>"
       >
-        <% _.forEach(values, function (value){ %>
+        <% _.forEach(option.values, function (value){ %>
           <span
             data-selector-variant="<%= value.id %>"
             data-value-position="<%= value.position %>"
-            class="option-image <% if (option.selected == value.position) { %>option-active<% } %>"
+            class="option-image <% if (option.selected == value.position) { %>option-active<% } %>
+            <% if (value.disabled) { %>disabled<% } %>"
           >
             <% if (images[value.name]) { %>
               <img src="<%= images[value.name].small_url %>" alt="<%= value.title %>">
@@ -173,7 +174,7 @@
         data-position-id=""
         data-option_name_id="<%= option.id %>"
       >
-        <% _.forEach(options, function (value){ %>
+        <% _.forEach(option.values, function (value){ %>
           <span
             data-selector-variant="<%= value.id %>"
             data-value-position="<%= value.position %>"
