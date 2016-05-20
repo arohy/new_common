@@ -3,9 +3,11 @@
  * @class
  * @name ISnew.ProductVariants
  * 
+ * @example
+ * self.variants = new ISnew.ProductVariants(_product, self);
+ *
  * @param  {object} product продукт
  * @param  {object} _owner родительский объект класса Product
- * @param  {object} settings настройки продукта
  * 
  * @property {array} variants массив модификаций продукта
  * @property {object} images картики продукта в виде {'title': {small_url: 'http//'}}
@@ -14,16 +16,16 @@
  * @property {object} tree дерево вариантов
  *
  */
-ISnew.ProductVariants = function (product, _owner, settings) {
+ISnew.ProductVariants = function (product, _owner) {
   var self = this;
 
-  self._init(product, _owner, settings)
+  self._init(product, _owner)
 };
 
 /**
  * Инициализация объекта по работе с вариантами
  */
-ISnew.ProductVariants.prototype._init = function (product, _owner, settings) {
+ISnew.ProductVariants.prototype._init = function (product, _owner) {
   var self = this;
   self._owner = _owner;
 
