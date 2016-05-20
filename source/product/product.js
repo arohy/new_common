@@ -80,7 +80,7 @@ ISnew.Product.prototype._isVariants = function (_product) {
 ISnew.Product.prototype.setConfig = function (settings){
   var self = this;
 
-  self._init(self.product, self, settings);
+  self._init(self.product, settings);
 }
 
 
@@ -89,6 +89,7 @@ ISnew.Product.prototype.validateSettings = function (_settings) {
 
   self.settings = _settings || {};
 
+  console.log(self.settings.options)
   if (!self.settings.options) {
     self.settings.options = {};
     self.settings.options['default'] = 'option-default';
@@ -100,23 +101,23 @@ ISnew.Product.prototype.validateSettings = function (_settings) {
     self.settings.product_id = 'data-product-id'
   }
 
-  if (typeof self.settings.show_variants === 'undefined') {
+  if (!self.settings.show_variants) {
     self.settings.show_variants = true;
   }
 
-  if (typeof self.settings.init_option === 'undefined') {
+  if (!self.settings.init_option) {
     self.settings.init_option = true;
   }
 
-  if (typeof self.settings.file_url === 'undefined') {
+  if (!self.settings.file_url) {
     self.settings.file_url = {};
   }
 
-  if (typeof self.settings.options === 'undefined') {
+  if (!self.settings.options) {
     self.settings.options = {};
   }
 
-  if (typeof self.settings.validate === 'undefined') {
+  if (!self.settings.validate) {
     self.settings.validate = true;
   }
 

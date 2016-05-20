@@ -16,12 +16,8 @@ ISnew.ProductVariants.prototype._init = function (product, _owner, settings) {
   //  тут хранятся картики продукта
   self.images = self._getImage(product);
 
-  //  инизиализация параметров
-  self._owner.validateSettings(settings);
-
   //  id варианта из урла
   self.urlVariant = Site.URL.getKeyValue('variant_id');
-
 
 
   self.tree = self._initTree(product.variants);

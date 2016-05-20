@@ -1763,6 +1763,7 @@ ISnew.Products.prototype._init = function (settings){
   // объект для создаваемых продуктов
   self.collection = {}
 
+  //  для того чтоб пробежаться по елементам нужен product_id
   var _tempSetting = settings || {product_id: 'data-product-id'};
 
   self.push(_tempSetting)
@@ -1815,12 +1816,13 @@ ISnew.Products.prototype._create = function(variantsId, settings){
         throw new ISnew.tools.Error('ErrorJson', 'ошибка при выполнени ajax запроса');
       });
 }
+
 /**
  * Обновление настроек
  */
 ISnew.Products.prototype.setConfig = function (settings){
   var self = this;
-  console.log(self.collection)
+
   $.each(self.collection, function(index, product) {
      product.setConfig(settings);
   });
@@ -2006,7 +2008,7 @@ ISnew.Product.prototype._isVariants = function (_product) {
 ISnew.Product.prototype.setConfig = function (settings){
   var self = this;
 
-  self._init(self.product, self, settings);
+  self._init(self.product, settings);
 }
 
 
@@ -2015,6 +2017,7 @@ ISnew.Product.prototype.validateSettings = function (_settings) {
 
   self.settings = _settings || {};
 
+  console.log(self.settings.options)
   if (!self.settings.options) {
     self.settings.options = {};
     self.settings.options['default'] = 'option-default';
@@ -2026,23 +2029,23 @@ ISnew.Product.prototype.validateSettings = function (_settings) {
     self.settings.product_id = 'data-product-id'
   }
 
-  if (typeof self.settings.show_variants === 'undefined') {
+  if (!self.settings.show_variants) {
     self.settings.show_variants = true;
   }
 
-  if (typeof self.settings.init_option === 'undefined') {
+  if (!self.settings.init_option) {
     self.settings.init_option = true;
   }
 
-  if (typeof self.settings.file_url === 'undefined') {
+  if (!self.settings.file_url) {
     self.settings.file_url = {};
   }
 
-  if (typeof self.settings.options === 'undefined') {
+  if (!self.settings.options) {
     self.settings.options = {};
   }
 
-  if (typeof self.settings.validate === 'undefined') {
+  if (!self.settings.validate) {
     self.settings.validate = true;
   }
 
@@ -2065,12 +2068,8 @@ ISnew.ProductVariants.prototype._init = function (product, _owner, settings) {
   //  тут хранятся картики продукта
   self.images = self._getImage(product);
 
-  //  инизиализация параметров
-  self._owner.validateSettings(settings);
-
   //  id варианта из урла
   self.urlVariant = Site.URL.getKeyValue('variant_id');
-
 
 
   self.tree = self._initTree(product.variants);

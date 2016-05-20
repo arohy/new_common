@@ -66,6 +66,7 @@ ISnew.Products.prototype._create = function(variantsId, settings){
         throw new ISnew.tools.Error('ErrorJson', 'ошибка при выполнени ajax запроса');
       });
 }
+
 /**
  * Обновление настроек
  */
