@@ -96,7 +96,7 @@ ISnew.Products.prototype._create = function(productsId, settings){
  *
  * @param {object} settings конфиг для рендера optionSelector
  *
- *  * @example
+ * @example
  * var Products = new ISnew.Products();
  * var settings = {
  *   init_option: true,
