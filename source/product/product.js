@@ -1,5 +1,12 @@
 /**
- * Product
+ * Главный объект продукта
+ *
+ * @class
+ * @name ISnew.Product
+ *
+ * @param {json} product json с информацией о товаре
+ * @param {object} settings конфиг для рендера optionSelector
+ *
  */
 ISnew.Product = function (product, settings) {
   var self = this;
@@ -85,7 +92,9 @@ ISnew.Product.prototype.setConfig = function (settings){
   self._init(self.product, settings);
 }
 
-
+/**
+ * Валидация настроек
+ */
 ISnew.Product.prototype.validateSettings = function (_settings) {
   var self = this;
 
