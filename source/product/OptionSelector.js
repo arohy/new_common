@@ -1,5 +1,18 @@
 /**
- * OptionSelector
+ * Объект отвечающий за работу опшн селектора
+ *
+ * @class
+ * @name ISnew.OptionSelector
+ *
+ * @param {json} product json с информацией о товаре
+ * @param {object} _owner ссылка на родительский класс ISnew.Products
+ *
+ *
+ * @property {object} selector в объекте хранятся названия селекторов
+ * @property {object} $product опорный DOM-узел, который описывает товар
+ * @property {object} $native_select нативный селект который выводим через liquid
+ * @property {object} $option_selector контейнер куда происходит рендер селекторов опций
+ *
  */
 ISnew.OptionSelector = function (product, _owner) {
   var self = this;
@@ -8,7 +21,11 @@ ISnew.OptionSelector = function (product, _owner) {
 }
 
 /**
- * Настройки
+ * Инициализация
+ *
+ * @param {json} product json с информацией о товаре
+ * @param {object} _owner ссылка на родительский класс ISnew.Products
+ *
  */
 ISnew.OptionSelector.prototype._init = function (_product, _owner) {
   var self = this;
@@ -42,7 +59,7 @@ ISnew.OptionSelector.prototype._init = function (_product, _owner) {
     return;
   }
 
-  // находим там нативный селектор/точку для рендера
+  // находим там нативный селект/точку для рендера
   self.$native_select = self.$product.find('['+ self.selector.native_select +']');
 
   // если нативного селектора нет, выходим
