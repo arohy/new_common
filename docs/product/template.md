@@ -14,3 +14,25 @@ option.values     | объект со значениями опции | `id` —
 images      | объект с картинками продукта | {'белый': {'large_url': 'https://static-eu.insales.ru/**.jpg'}...}
 file_url    | объект с картинками из файлов | {'белый': {'https://static-eu.insales.ru/**.jpg'}}
 init_option | включена ли в настройках утановка первого доступного варианта? | true/false
+
+```
+<script type="text/template" data-template-id="option-select">
+  <div class="option-item">
+    <label><%= option.title %></label>
+    <select
+      class="select-field"
+      data-option-bind="<%= option.id %>"
+    >
+      <% _.forEach(option.values, function (value){ %>
+        <option
+          data-value-position="<%= value.position %>"
+          value="<%= value.position %>"
+          <% if (option.selected == value.position) { %>selected<% } %>
+        >
+          <%= value.title %>
+        </option>
+      <% }) %>
+    </select>
+  </div>
+</script>
+```
