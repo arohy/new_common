@@ -18,16 +18,28 @@ init_option | включена ли в настройках утановка п�
 
 ## Примеры
 
+<<<<<<< b8c5b34509af8562a8e0a1e24bcadaec7f36ec78
 ```js
 <script type="text/template" data-template-id="option-select">
   <div class="option-item">
+=======
+### Нативный селект
+
+```js
+<script type="text/template" data-template-id="option-select">
+  <div class="option-<%= option.handle %>">
+>>>>>>> new md template
     <label><%= option.title %></label>
     <select data-option-bind="<%= option.id %>">
       <% _.forEach(option.values, function (value){ %>
         <option
           data-value-position="<%= value.position %>"
           value="<%= value.position %>"
+<<<<<<< b8c5b34509af8562a8e0a1e24bcadaec7f36ec78
           <% if (option.selected == value.position) { %>selected<% } %>
+=======
+          <% if (option.selected == value.position & init_option) { %>selected<% } %>
+>>>>>>> new md template
         >
           <%= value.title %>
         </option>
@@ -35,4 +47,83 @@ init_option | включена ли в настройках утановка п�
     </select>
   </div>
 </script>
+<<<<<<< b8c5b34509af8562a8e0a1e24bcadaec7f36ec78
+=======
+```
+
+### Опции картинками
+
+```js
+<script type="text/template" data-template-id="option-image">
+  <div class="option-<%= option.handle %>">
+    <label><%= option.title %></label>
+    <div>
+      <% _.forEach(option.values, function (value){ %>
+        <span
+          data-option-bind="<%= option.id %>"
+          data-value-position="<%= value.position %>"
+          class="option-image
+          <% if (option.selected == value.position & init_option) { %>active<% } %>
+          <% if (value.disabled) { %>disabled<% } %>"
+        >
+          <% if (images[value.name]) { %>
+            <img src="<%= images[value.name].small_url %>" alt="<%= value.title %>">
+          <% }else{ %>
+            <span><%= value.title %></span>
+          <% } %>
+        </span>
+      <% }) %>
+    </div>
+  </div>
+</script>
+```
+
+### Опции radio
+
+```js
+<script type="text/template" data-template-id="option-checkbox">
+  <div class="option-<%= option.handle %>">
+    <label><%= option.title %></label>
+    <div>
+      <% _.forEach(option.values, function (value){ %>
+        <input
+          type="checkbox"
+          name="<%= option.handle %>"
+          id="<%= option.handle %>-<%= value.id %>"
+          value="<%= value.position %>"
+          data-option-bind="<%= option.id %>"
+          data-value-position="<%= value.position %>"
+          <% if (option.selected == value.position & init_option) { %>checked="checked"<% } %>
+          <% if (value.disabled) { %>disabled="disabled"<% } %>"
+        >
+        <label for="<%= option.handle %>-<%= value.id %>">
+          <%= value.title %>
+        </label>
+      <% }) %>
+    </div>
+  </div>
+</script>
+```
+### Опции span
+
+```js
+<script type="text/template" data-template-id="option-span">
+  <div class="option-<%= option.handle %>">
+    <label><%= option.title %></label>
+    <div>
+      <% _.forEach(option.values, function (value){ %>
+        <span
+          data-option-bind="<%= option.id %>"
+          data-value-position="<%= value.position %>"
+          class="btn
+          <% if (option.selected == value.position & init_option) { %>active<% } %>
+          <% if (value.disabled) { %>disabled<% } %>"
+        >
+            <span><%= value.title %></span>
+        </span>
+      <% }) %>
+    </div>
+  </div>
+</script>
+>>>>>>> new md template
 ```

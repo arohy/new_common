@@ -107,16 +107,10 @@
   <script type="text/template" data-template-id="option-image">
     <div class="option-item">
       <label><%= option.title %></label>
-      <div
-        class=""
-        data-option-selector=""
-        data-option-click
-        data-position-id=""
-        data-option_name_id="<%= option.id %>"
-      >
+      <div>
         <% _.forEach(option.values, function (value){ %>
           <span
-            data-selector-variant="<%= value.id %>"
+            data-option-bind="<%= option.id %>"
             data-value-position="<%= value.position %>"
             class="option-image <% if (option.selected == value.position) { %>option-active<% } %>
             <% if (value.disabled) { %>disabled<% } %>"

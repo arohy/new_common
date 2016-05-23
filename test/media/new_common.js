@@ -121,7 +121,7 @@ ISnew.Template.prototype._init = function (_owner) {
 ISnew.Template.prototype._getDefault = function () {
   var self = this;
 
-  var option_default = '<div>\n<label><%= option.title %></label>\n<select\ndata-option-selector=""\ndata-option-change\ndata-option_name_id="<%= option.id %>"\n>\n<% _.forEach(values, function (value){ %><option\ndata-selector-variant="<%= value.id %>"\ndata-value-position="<%= value.position %>"\ndata-position-id=""\nvalue="<%= value.position %>"<% if (option.selected == value.position) { %>selected<% } %>\n>\n<%= value.title %></option>\n<% }) %>\n</select>\n</div>';
+  var option_default = '<div class="option-<%= option.handle %>">\n<label><%= option.title %></label>\n<select data-option-bind="<%= option.id %>">\n<% _.forEach(option.values, function (value){ %>\n<option\ndata-value-position="<%= value.position %>"\nvalue="<%= value.position %>"\n<% if (option.selected == value.position & init_option) { %>selected<% } %>\n>\n<%= value.title %>\n</option>\n<% }) %>\n</select>\n</div>';
 
   self._templateList['option-default'] = _.template(option_default);
 }
