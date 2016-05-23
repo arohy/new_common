@@ -21,13 +21,13 @@
 
 ## Event
 
-### EventName
+#### EventName
 `update_suggestions:insales:search` — срабатывает после ajax запроса и после клика по любому месту документа
 
-### update_suggestions:insales:search
+#### update_suggestions:insales:search
 В данный подписчик прилетает объект содержащий в себе:
 
-`action` - содержит свойство `method` и `input`
+`action` - содержит свойство `method` и `input`<br>
 `suggestions` — ответ сервера
 
 ## Пример шаблона
@@ -49,4 +49,15 @@
     </ul>
   <% } %>
 </script>
+```
+
+## Обновление настроек
+
+```js
+$(function() {
+  AjaxSearch.setConfig({
+    template: 'ajax-search',
+    letters: 3
+  })
+});
 ```
