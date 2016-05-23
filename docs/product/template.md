@@ -18,6 +18,7 @@ init_option | включена ли в настройках утановка п�
 
 ## Примеры
 
+<<<<<<< 239db69280a8426c84439b9c07abfd72fdffce53
 <<<<<<< b8c5b34509af8562a8e0a1e24bcadaec7f36ec78
 ```js
 <script type="text/template" data-template-id="option-select">
@@ -29,12 +30,20 @@ init_option | включена ли в настройках утановка п�
 <script type="text/template" data-template-id="option-select">
   <div class="option-<%= option.handle %>">
 >>>>>>> new md template
+=======
+### Нативный селект
+
+```js
+<script type="text/template" data-template-id="option-select">
+  <div class="option-<%= option.handle %>">
+>>>>>>> fix md
     <label><%= option.title %></label>
     <select data-option-bind="<%= option.id %>">
       <% _.forEach(option.values, function (value){ %>
         <option
           data-value-position="<%= value.position %>"
           value="<%= value.position %>"
+<<<<<<< 239db69280a8426c84439b9c07abfd72fdffce53
 <<<<<<< b8c5b34509af8562a8e0a1e24bcadaec7f36ec78
           <% if (option.selected == value.position) { %>selected<% } %>
 =======
@@ -125,5 +134,8 @@ init_option | включена ли в настройках утановка п�
     </div>
   </div>
 </script>
+<<<<<<< 239db69280a8426c84439b9c07abfd72fdffce53
 >>>>>>> new md template
+=======
+>>>>>>> fix md
 ```
