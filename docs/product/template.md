@@ -1,9 +1,10 @@
 # Шаблоны селекторов
 
-## Обязательные data атрибуты
+## Обязательные атрибуты
 
 `data-option-bind="<%= option.id %>"` — содержит id опции и на этот атрибут вешается EventListener.<br>
 `data-value-position="<%= value.position %>"` — содержит поизицию в дереве вариантов.
+`value="<%= value.position %>"` — необходим для select и input[type="radio"].
 
 ## Данные доступные в шаблоне
 
@@ -15,14 +16,13 @@ images      | объект с картинками продукта | {'белы
 file_url    | объект с картинками из файлов | {'белый': {'https://static-eu.insales.ru/**.jpg'}}
 init_option | включена ли в настройках утановка первого доступного варианта? | true/false
 
-```
+## Примеры
+
+```js
 <script type="text/template" data-template-id="option-select">
   <div class="option-item">
     <label><%= option.title %></label>
-    <select
-      class="select-field"
-      data-option-bind="<%= option.id %>"
-    >
+    <select data-option-bind="<%= option.id %>">
       <% _.forEach(option.values, function (value){ %>
         <option
           data-value-position="<%= value.position %>"
