@@ -2,7 +2,7 @@
 
 ## Обязательные data атрибуты
 
-`data-option-bind="<%= option.id %>"` — содержит id опции и на этот атрибут вешается EventListener.
+`data-option-bind="<%= option.id %>"` — содержит id опции и на этот атрибут вешается EventListener.<br>
 `data-value-position="<%= value.position %>"` — содержит поизицию в дереве вариантов.
 
 ## Данные доступные в шаблоне
