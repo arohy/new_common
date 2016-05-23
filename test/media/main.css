@@ -943,3 +943,6 @@ hr {
 .option-image.disabled {
   opacity: 0.7;
 }
+input:checked + label {
+  background: #ccc;
+}

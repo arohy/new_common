@@ -35,19 +35,22 @@ ISnew.OptionSelector.prototype._init = function (_product, _owner) {
   self._owner = _owner;
 
   //  селектор формы
-  self.selector['product'] = 'data-product-id';
+  self.selector.product = 'data-product-id';
   // data атрибут нативного селекта
-  self.selector['native_select'] = 'data-product-variants';
+  self.selector.native_select = 'data-product-variants';
   // data атрибут блока в который происходит рендер модификаций
-  self.selector['option_selector'] = 'data-option-selector';
+  self.selector.option_selector = 'data-option-selector';
 
   //  Селекторы для _bindSelect
   //  селектор опции типа change
   self.selector['selector_change'] = '['+ self.selector.product +'="'+ _product.id +'"] [data-option-change]';
   //  селектор опции типа click
   self.selector['selector_click'] = '['+ self.selector.product +'="'+ _product.id +'"] [data-option-click] [data-selector-variant]';
+
   // селектор нативного селекта
-  self.selector['selector_native'] = '['+ self.selector.product +'="'+ _product.id +'"] ['+ self.selector.native_select +']';
+  self.selector.selector_native = '['+ self.selector.product +'="'+ _product.id +'"] ['+ self.selector.native_select +']';
+  // data атрибут для bind
+  self.selector.selector_bind = 'option-bind';
 
 
 
@@ -81,10 +84,11 @@ ISnew.OptionSelector.prototype._init = function (_product, _owner) {
   // привязываем экземпляр Класса к товару
   self.$product[0]['OptionSelector'] = self;
 
+  self._bindSelect();
+
   //  вызов рендера и слушателя
   self._renderSelector();
 
-  self._bindSelect();
 
 
   return;
@@ -155,11 +159,12 @@ ISnew.OptionSelector.prototype._bindSelect = function () {
     if ($form[0]) {
       var OptionSelector = $form[0]['OptionSelector'];
     }else{
-      return
+      return;
     }
 
     OptionSelector._owner.variants.setVariant(variantId);
   });
+
 
   //  ! не путать с нативным селектом
   //  Слушаем изменения в селекторах модификаций типа select

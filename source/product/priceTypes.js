@@ -1,5 +1,12 @@
 /**
  * Типы цен
+ *
+ * @class
+ * @name ISnew.ProductPriceType
+ *
+ * @param {json} product json с информацией о товаре
+ * @param {object} _owner ссылка на родительский класс ISnew.Products
+ *
  */
 ISnew.ProductPriceType = function (product, _owner) {
   var self = this;

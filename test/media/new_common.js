@@ -1507,7 +1507,20 @@ ISnew.CartDOM.prototype._unlockButton = function (data, eventName) {
   return;
 };
 /**
- * OptionSelector
+ * Объект отвечающий за работу опшн селектора
+ *
+ * @class
+ * @name ISnew.OptionSelector
+ *
+ * @param {json} product json с информацией о товаре
+ * @param {object} _owner ссылка на родительский класс ISnew.Products
+ *
+ *
+ * @property {object} selector в объекте хранятся названия селекторов
+ * @property {object} $product опорный DOM-узел, который описывает товар
+ * @property {object} $native_select нативный селект который выводим через liquid
+ * @property {object} $option_selector контейнер куда происходит рендер селекторов опций
+ *
  */
 ISnew.OptionSelector = function (product, _owner) {
   var self = this;
@@ -1516,7 +1529,11 @@ ISnew.OptionSelector = function (product, _owner) {
 }
 
 /**
- * Настройки
+ * Инициализация
+ *
+ * @param {json} product json с информацией о товаре
+ * @param {object} _owner ссылка на родительский класс ISnew.Products
+ *
  */
 ISnew.OptionSelector.prototype._init = function (_product, _owner) {
   var self = this;
@@ -1526,19 +1543,22 @@ ISnew.OptionSelector.prototype._init = function (_product, _owner) {
   self._owner = _owner;
 
   //  селектор формы
-  self.selector['product'] = 'data-product-id';
+  self.selector.product = 'data-product-id';
   // data атрибут нативного селекта
-  self.selector['native_select'] = 'data-product-variants';
+  self.selector.native_select = 'data-product-variants';
   // data атрибут блока в который происходит рендер модификаций
-  self.selector['option_selector'] = 'data-option-selector';
+  self.selector.option_selector = 'data-option-selector';
 
   //  Селекторы для _bindSelect
   //  селектор опции типа change
   self.selector['selector_change'] = '['+ self.selector.product +'="'+ _product.id +'"] [data-option-change]';
   //  селектор опции типа click
   self.selector['selector_click'] = '['+ self.selector.product +'="'+ _product.id +'"] [data-option-click] [data-selector-variant]';
+
   // селектор нативного селекта
-  self.selector['selector_native'] = '['+ self.selector.product +'="'+ _product.id +'"] ['+ self.selector.native_select +']';
+  self.selector.selector_native = '['+ self.selector.product +'="'+ _product.id +'"] ['+ self.selector.native_select +']';
+  // data атрибут для bind
+  self.selector.selector_bind = 'option-bind';
 
 
 
@@ -1550,7 +1570,7 @@ ISnew.OptionSelector.prototype._init = function (_product, _owner) {
     return;
   }
 
-  // находим там нативный селектор/точку для рендера
+  // находим там нативный селект/точку для рендера
   self.$native_select = self.$product.find('['+ self.selector.native_select +']');
 
   // если нативного селектора нет, выходим
@@ -1572,10 +1592,11 @@ ISnew.OptionSelector.prototype._init = function (_product, _owner) {
   // привязываем экземпляр Класса к товару
   self.$product[0]['OptionSelector'] = self;
 
+  self._bindSelect();
+
   //  вызов рендера и слушателя
   self._renderSelector();
 
-  self._bindSelect();
 
 
   return;
@@ -1646,11 +1667,12 @@ ISnew.OptionSelector.prototype._bindSelect = function () {
     if ($form[0]) {
       var OptionSelector = $form[0]['OptionSelector'];
     }else{
-      return
+      return;
     }
 
     OptionSelector._owner.variants.setVariant(variantId);
   });
+
 
   //  ! не путать с нативным селектом
   //  Слушаем изменения в селекторах модификаций типа select
@@ -1705,7 +1727,27 @@ ISnew.OptionSelector.prototype._bindSelect = function () {
   });
 };
 /**
- * Создание новых продуктов
+ * Объект создаёт new ISnew.Product на основе ajax запроса к json продуктов
+ *
+ * @class
+ * @name ISnew.Products
+ *
+ * @example
+ * var settings = {
+ *   init_option: true,
+ *   filtered: true,
+ *   show_variants: true,
+ *   file_url: fileUrl,
+ *   options: {
+ *     'Цвет': 'option-image',
+ *     'Размер': 'option-span'
+ *     }
+ * }
+ * var Products = new ISnew.Products(settings);
+ *
+ * @param {object} settings конфиг для рендера optionSelector
+ *
+ * @property {object} collection коллекция созданных экземпляров продукта
  */
 ISnew.Products = function (settings) {
   var self = this;
@@ -1713,6 +1755,12 @@ ISnew.Products = function (settings) {
   self._init(settings);
 };
 
+/**
+ * Инициализация, запускает _addProduct(settings)
+ *
+ * @param {object} settings конфиг для рендера optionSelector
+ *
+ */
 ISnew.Products.prototype._init = function (settings){
   var self = this;
 
@@ -1724,36 +1772,41 @@ ISnew.Products.prototype._init = function (settings){
 
 
 /**
- * Добавление новых продуктов
+ * Добавление новых продуктов. Метод пробегает по формам и собирает их id в массив. После передает массив на _create(productsId, settings).
+ *
+ * @param {object} settings конфиг для рендера optionSelector
  */
 ISnew.Products.prototype._addProduct = function (settings){
   var self = this;
 
   $(function () {
     var variantsCount = $('[data-product-id]').length - 1;
-    var variantsId = [];
+    var productsId = [];
 
     //  Проходим по всем формам и собираем id для создания новых продуктов
     $('[data-product-id]').each(function(index, el) {
        var thatProductId = $(el).data( 'product-id' );
 
        if (thatProductId) {
-        variantsId.push(thatProductId);
+        productsId.push(thatProductId);
        }
        if (index === variantsCount) {
-        self._create(variantsId, settings);
+        self._create(productsId, settings);
        }
     });
   })
 }
 
 /**
- * Инизиализация объекта Product
+ * Создание экземпляров продукта
+ *
+ * @param  {array} productsId массив id продуктов для ajax запроса
+ * @param {object} settings конфиг для рендера optionSelector
  */
-ISnew.Products.prototype._create = function(variantsId, settings){
+ISnew.Products.prototype._create = function(productsId, settings){
   var self = this;
 
-  ISnew.json.getProductsList(variantsId)
+  ISnew.json.getProductsList(productsId)
       .done(function (_newSelectors) {
 
         _.forEach(_newSelectors, function(_new_product) {
@@ -1767,7 +1820,24 @@ ISnew.Products.prototype._create = function(variantsId, settings){
 }
 
 /**
- * Обновление настроек
+ * Обновление настроек продуктов созданных через new ISnew.Products();
+ *
+ * @param {object} settings конфиг для рендера optionSelector
+ *
+ * @example
+ * var Products = new ISnew.Products();
+ * var settings = {
+ *   init_option: true,
+ *   filtered: true,
+ *   show_variants: true,
+ *   file_url: fileUrl,
+ *   options: {
+ *     'Цвет': 'option-image',
+ *     'Размер': 'option-span'
+ *     }
+ * }
+ * Products.setConfig(settings);
+ *
  */
 ISnew.Products.prototype.setConfig = function (settings){
   var self = this;
@@ -1778,6 +1848,13 @@ ISnew.Products.prototype.setConfig = function (settings){
 }
 /**
  * Типы цен
+ *
+ * @class
+ * @name ISnew.ProductPriceType
+ *
+ * @param {json} product json с информацией о товаре
+ * @param {object} _owner ссылка на родительский класс ISnew.Products
+ *
  */
 ISnew.ProductPriceType = function (product, _owner) {
   var self = this;
@@ -1876,7 +1953,14 @@ ISnew.ProductPriceType.prototype.setVariant = function (variant_id) {
   return;
 };
 /**
- * Product
+ * Главный объект продукта
+ *
+ * @class
+ * @name ISnew.Product
+ *
+ * @param {json} product json с информацией о товаре
+ * @param {object} settings конфиг для рендера optionSelector
+ *
  */
 ISnew.Product = function (product, settings) {
   var self = this;
@@ -1962,7 +2046,9 @@ ISnew.Product.prototype.setConfig = function (settings){
   self._init(self.product, settings);
 }
 
-
+/**
+ * Валидация настроек
+ */
 ISnew.Product.prototype.validateSettings = function (_settings) {
   var self = this;
 
@@ -1998,28 +2084,41 @@ ISnew.Product.prototype.validateSettings = function (_settings) {
 
 }
 /**
- * Variants tree
+ * Конструктор объета по работе с вариантами продукта
+ * @class
+ * @name ISnew.ProductVariants
+ * 
+ * @example
+ * self.variants = new ISnew.ProductVariants(_product, self);
+ *
+ * @param  {object} product продукт
+ * @param  {object} _owner родительский объект класса Product
+ * 
+ * @property {array} variants массив модификаций продукта
+ * @property {object} images картики продукта в виде {'title': {small_url: 'http//'}}
+ * @property {number} urlVariant id варианта из урла
+ * @property {object} options все опции продукта со всеми своими значениями
+ * @property {object} tree дерево вариантов
+ *
  */
-ISnew.ProductVariants = function (product, _owner, settings) {
+ISnew.ProductVariants = function (product, _owner) {
   var self = this;
 
-  self._init(product, _owner, settings)
+  self._init(product, _owner)
 };
 
-ISnew.ProductVariants.prototype._init = function (product, _owner, settings) {
+/**
+ * Инициализация объекта по работе с вариантами
+ */
+ISnew.ProductVariants.prototype._init = function (product, _owner) {
   var self = this;
   self._owner = _owner;
 
   self.variants = product.variants;
-
-  //  тут хранятся картики продукта
-  self.images = self._getImage(product);
-
-  //  id варианта из урла
+  self.images = self._getImage(product.images);
   self.urlVariant = Site.URL.getKeyValue('variant_id');
 
   self.options = {};
-
   self.options = self._initOptions(product.option_names);
 
   self.tree = self._initTree(product.variants);
@@ -2031,6 +2130,10 @@ ISnew.ProductVariants.prototype._init = function (product, _owner, settings) {
     self._update();
   }
 }
+
+// ====================================================================================
+//                          Методы по работе с деревом вариантов
+// ====================================================================================
 
 /**
  * Строим дерево вариантов
@@ -2087,6 +2190,10 @@ ISnew.ProductVariants.prototype._initTree = function (variants) {
   return tree;
 };
 
+// ====================================================================================
+//                          Методы по работе с вариантом
+// ====================================================================================
+
 /**
  * Установка доступности вариантов
  *
@@ -2129,37 +2236,6 @@ ISnew.ProductVariants.prototype._update = function () {
   }
 
   return;
-};
-
-/**
- * Получить значения с уровня
- */
-ISnew.ProductVariants.prototype.getLevel = function (level) {
-  var self = this;
-  var leaf = self.tree;
-
-  _.forEach(self.options, function(option, option_level) {
-    if (level == option_level) {
-      return false;
-    }
-    leaf = leaf[option.selected].tree;
-  });
-
-  return leaf;
-};
-
-/**
- * Получить первый элемент на уровне
- */
-ISnew.ProductVariants.prototype.getFirst = function (leaf) {
-  var self = this;
-
-  var first = _.chain(leaf)
-    .toArray()
-    .first()
-    .value();
-
-  return first;
 };
 
 /**
@@ -2207,10 +2283,15 @@ ISnew.ProductVariants.prototype.setVariant = function (variant_id) {
 };
 
 // ====================================================================================
-
+//                          Методы по работе с опциями
+// ====================================================================================
 
 /**
  * Подготовка опций
+ *
+ * @param  {object} options коллекция опций продукта (product.option_names)
+ *
+ * @return {object} options модифицированный объект опций, добавляется renderType из параметров продукта, добавляется handle как название опции транслитом.
  */
 ISnew.ProductVariants.prototype._initOptions = function (options) {
   var self = this;
@@ -2241,7 +2322,10 @@ ISnew.ProductVariants.prototype._initOptions = function (options) {
 }
 
 /**
- * Добавляем значение в опцию
+ * Собираем все значения опций варианта в опции по индексу (self.options[index].values)
+ *
+ * @param {object} value значение опции, прилетает из перебора всех вариантов. value добавляется в объект self.options[index].values.
+ * @param {number} index порядковый номер опции.
  */
 ISnew.ProductVariants.prototype._addValues = function (value, index) {
   var self = this;
@@ -2255,7 +2339,11 @@ ISnew.ProductVariants.prototype._addValues = function (value, index) {
 
 }
 /**
- * устанавливаем selected
+ * Устанавливаем selected
+ *
+ * @param  {object} options объект со всеми опциями (self.options)
+ *
+ * @return {object} options модифицированный self.options c новым свойством selected. option.selected содержит позицию выбранного значения.
  */
 ISnew.ProductVariants.prototype._selectedOptions = function (options) {
   var self = this;
@@ -2326,7 +2414,41 @@ ISnew.ProductVariants.prototype.getOption = function (index) {
 };
 
 /**
- * фильтрация опций
+ * Получить значения с уровня
+ */
+ISnew.ProductVariants.prototype.getLevel = function (level) {
+  var self = this;
+  var leaf = self.tree;
+
+  _.forEach(self.options, function(option, option_level) {
+    if (level == option_level) {
+      return false;
+    }
+    leaf = leaf[option.selected].tree;
+  });
+
+  return leaf;
+};
+
+/**
+ * Получить первый элемент на уровне
+ */
+ISnew.ProductVariants.prototype.getFirst = function (leaf) {
+  var self = this;
+
+  var first = _.chain(leaf)
+    .toArray()
+    .first()
+    .value();
+
+  return first;
+};
+
+/**
+ * Фильтрация опций по доступности в выбанном варианте
+ *
+ * @param  {number} level уровень опции в дереве (self.tree)
+ * @return {object} option опция готовая для рендера, в значениях опции проставлен value.disabled или удалены не относящиеся к варианту значения в зависимости от настроек продукта (self._owner.settings.filtered);
  */
 ISnew.ProductVariants.prototype.getFilterOption = function (level) {
   var self = this;
@@ -2384,38 +2506,39 @@ ISnew.ProductVariants.prototype._getSelectedVector = function (_length) {
   return vector;
 };
 
+// ====================================================================================
+//                          Методы по работе с изображениями продукта
+// ====================================================================================
+
 /**
- * Получаем картинки продукта
+ * Получаем объект с изображениями где ключом является название изображения
+ *
+ * @param  {array} images массив изображений продукта (product.images)
+ *
+ * @return {object} _images объект с изображениями в виде {'image.title': {small_url: 'http//'}}
  */
-ISnew.ProductVariants.prototype._getImage = function (product) {
+ISnew.ProductVariants.prototype._getImage = function (images) {
   var self = this;
 
-  var images = {};
-  var productImages = product.images;
+  var _images = {};
 
-  //  если у продукта есть картинки
-  if (productImages.length > 0) {
-
-  _.forEach(productImages, function(value, key) {
-
-    //  если у картинки есть title
-    if(value['title']){
-      var imageName = value['title'].toLowerCase();
-      images[imageName] = {};
-      images[imageName].thumb_url = value['thumb_url'];
-      images[imageName].small_url = value['small_url'];
-      images[imageName].medium_url = value['medium_url'];
-      images[imageName].large_url = value['large_url'];
-      images[imageName].original_url = value['original_url'];
-    }
-
-  });
-
-  }else{
-    images = false;
+  //  если у продукта есть изображения
+  if (_.size(images) > 0) {
+      _.forEach(images, function(image) {
+        //  если у изображения есть title
+        if(image['title']){
+          var imageName = image['title'].toLowerCase();
+          _images[imageName] = {};
+          _images[imageName].thumb_url = image['thumb_url'];
+          _images[imageName].small_url = image['small_url'];
+          _images[imageName].medium_url = image['medium_url'];
+          _images[imageName].large_url = image['large_url'];
+          _images[imageName].original_url = image['original_url'];
+        }
+      });
   }
 
-  return images;
+  return _images;
 }
 /**
  * Сравнение товаров
@@ -2676,3 +2799,31 @@ var Compare = new ISnew.Compare();
 
 Site.URL = new ISnew.tools.URL();
 Site.Translit = new ISnew.tools.Translit();
+
+
+//  Слушаем изменения в селекторах модификаций
+$(document).on('change click', '[data-option-bind]', function (event) {
+  event.preventDefault();
+
+  var $select = $(this);
+
+  if ($select.is('select')) {
+    if (event.type === 'click') {
+      return false;
+    }
+  }
+
+  var $formProduct = $select.parents('form[data-product-id]:first');
+  var OptionSelector = $formProduct[0]['OptionSelector'];
+
+  var option = {
+    option_name_id: $select.data('option-bind'),
+    position: $select.data('value-position')
+  };
+
+  if ($select.is('select')) {
+    option.position = parseInt($select.val());
+  }
+
+  OptionSelector._owner.variants.setOption(option);
+});

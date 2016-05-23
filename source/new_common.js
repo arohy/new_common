@@ -1,33 +1,4 @@
-/*
- * Инициализация переменных
- */
-
-'use strict';
-
-if (!ISnew) {
-  var ISnew = {};
-}
-
-// Место для всяких утилиток
-if (!ISnew.tools) {
-  ISnew.tools = {};
-}
-
-// Глобальная информация о сайте.
-if (!Site) {
-  var Site = {};
-}
-
-
-// Место для всех оберток json
-if (!ISnew.json) {
-  ISnew.json = {};
-}
-
-
-if (!EventBus) {
-  var EventBus;
-}
+//= ./init/before.js
 
 //= ./template/
 //= ./events/
@@ -37,12 +8,5 @@ if (!EventBus) {
 //= ./product/
 //= ./compare/
 
-/*
- * Инициализация объектов
- */
-var Cart = new ISnew.Cart();
-var Template = new ISnew.Template();
-var Compare = new ISnew.Compare();
+//= ./init/after.js
 
-Site.URL = new ISnew.tools.URL();
-Site.Translit = new ISnew.tools.Translit();
