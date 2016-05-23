@@ -7,7 +7,71 @@
 
 ## Инициализация
 
-`product = new ISnew.Product(product_json)`
+### Liquid
+
+#### Обязательные атрибуты формы
+`data-product-id="{{ product.id }}"` — этот атрибут обязательно ставится в тег `form`. <br>
+`data-product-variants` — этот атрибут обязательно ставится в тег `select`.
+
+```liquid
+<form action="{{ cart_url }}" method="post" data-product-id="{{ product.id }}">
+  {% if product.show_variants? %}
+    <select name="variant_id" data-product-variants>
+      {% for variant in product.variants %}
+        <option value="{{ variant.id }}">{{ variant.title | escape }}</option>
+      {% endfor %}
+    </select>
+  {% else %}
+    <input type="hidden" name="variant_id" value="{{product.variants.first.id}}" >
+  {% endif %}
+
+  <input type="number" name="quantity" value="1" />
+
+  <button cart-item-add class="btn">
+    Добавить в корзину
+  </button>
+</form>
+```
+
+### ISnew.Products
+
+Данный класс инициализирует все продукты на сайте с атрибутом data-product-id <br>
+Скрипт автоматически проходится по всем формам, через ajax получает информацию о товаре и рисует optionSelector.
+
+```js
+var ProductsConfig = {
+  init_option: true,
+  filtered: true,
+  show_variants: true,
+  options: {
+        'Цвет': 'option-image',
+        'Размер': 'option-radio',
+        'Материал': 'option-select',
+        'Жесткий диск': 'option-span'
+      }
+  }
+var Products = new ISnew.Products(ProductsConfig);
+```
+
+### ISnew.Product
+
+Инициализация товара в ручную.
+
+```js
+var ProductsConfig = {
+  init_option: true,
+  filtered: true,
+  show_variants: true,
+  options: {
+        'Цвет': 'option-image',
+        'Размер': 'option-radio',
+        'Материал': 'option-select',
+        'Жесткий диск': 'option-span'
+      }
+  }
+var Product = new ISnew.Product({{ product | json }}, ProductsConfig);
+```
+
 
 ## Методы
 

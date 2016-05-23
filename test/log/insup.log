@@ -7542,3 +7542,5 @@
 2016-05-23 13:01:58 +0300 - INFO	: --> 200 OK 344 (250.0ms) 
 2016-05-23 13:10:55 +0300 - INFO	: PUT http://shop-48497.myinsales.ru:80/admin/themes/626874/assets/58083363.xml 
 2016-05-23 13:10:55 +0300 - INFO	: --> 200 OK 425 (454.0ms) 
+2016-05-23 13:17:50 +0300 - INFO	: PUT http://shop-48497.myinsales.ru:80/admin/themes/626874/assets/58083351.xml 
+2016-05-23 13:17:50 +0300 - INFO	: --> 200 OK 344 (1196.1ms) 
