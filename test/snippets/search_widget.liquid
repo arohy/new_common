@@ -15,9 +15,10 @@
           name="q"
           class="search_widget-field
                  input-field
-                {% if is_ajax %}js-ajax_search-input{% endif %}"
+                "
           value="{{ search.query | escape }}"
           placeholder="Поиск"
+          {% if is_ajax %}data-search-field{% endif %}
   />
 
   <button type="submit"
@@ -27,8 +28,8 @@
   </button>
 
   {% if is_ajax %}
-    <div class="ajax_search-wrapper
-                js-ajax_search-wrapper"
+    <div class="ajax_search-wrapper"
+         data-search-wrapper
     ></div>
   {% endif %}
 
@@ -36,3 +37,5 @@
     <input type="hidden" name="lang" value="{{ language.locale }}">
   {% endif %}
 </form>
+
+form>(input[data-search-field] + div[data-search-wrapper])

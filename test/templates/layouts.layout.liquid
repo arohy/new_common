@@ -213,6 +213,24 @@
   </script>
 
 
+<script type="text/template" data-template-id="ajax-search">
+  <% console.log(suggestions); if (suggestions.length > 0){ %>
+    <ul class="ajax_search-results">
+      <% _.forEach(suggestions, function (product){ %>
+        <li class="ajax_search-item">
+          <a href="<%- product.url %>" data-name="<%= product.marked_title %>" class="ajax_search-link">
+            <%= product.marked_title %>
+            <span class="ajax_search-prices">
+              <%= money.format( product.fields.price_min ) %>
+            </span>
+          </a>
+        </li>
+      <% }) %>
+    </ul>
+  <% } %>
+</script>
+
+
   <script type="text/template" id="variant-info">
 
     <div class="row-flex">

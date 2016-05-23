@@ -123,7 +123,10 @@ ISnew.Template.prototype._getDefault = function () {
 
   var option_default = '<div class="option-<%= option.handle %>">\n<label><%= option.title %></label>\n<select data-option-bind="<%= option.id %>">\n<% _.forEach(option.values, function (value){ %>\n<option\ndata-value-position="<%= value.position %>"\nvalue="<%= value.position %>"\n<% if (option.selected == value.position & init_option) { %>selected<% } %>\n>\n<%= value.title %>\n</option>\n<% }) %>\n</select>\n</div>';
 
+  var search_default = '<% if (suggestions.length > 0){ %>\n<ul class="ajax_search-results">\n<% _.forEach(suggestions, function (product){ %>\n<li class="ajax_search-item">\n<a href="<%- product.url %>" class="ajax_search-link"><%= product.marked_title %></a>\n</li><% }) %>\n</ul>\n<% } %>';
+
   self._templateList['option-default'] = _.template(option_default);
+  self._templateList['search-default'] = _.template(search_default);
 }
 /**
  * Event bus
@@ -344,7 +347,7 @@ ISnew.Money.prototype.format = function (amount) {
     value = value.join(self.options.separator);
   }
 
-  return self.options.format.replace('%n', value).replace('%n', self.options.unit);
+  return self.options.format.replace('%n', value).replace('%u', self.options.unit);
 };
 /**
  * производим транслитерацию строки
@@ -2735,6 +2738,148 @@ ISnew.CompareDOM.prototype._deleteItem = function ($button) {
 
   Compare.remove(task);
 };
+/**
+ * Live search
+ *
+ * @class
+ * @name ISnew.Search
+ */
+ISnew.Search = function( options ){
+  var self = this;
+
+  self._init(options);
+}
+/**
+ * Настройка
+ *
+ * @param  {object} options конфигурация поиска
+ */
+ISnew.Search.prototype._init = function(options) {
+  var self = this;
+
+  var options = options || {};
+
+  self.options = {};
+  self.options.searchSelector = options.searchSelector || '[data-search-field]';
+  self.options.searchWrapper  = options.searchWrapper  || $(self.searchSelector).parents('form:first');
+  self.options.markerClass    = options.markerClass    || 'ajax_search-marked';
+  self.options.letters     = options.letters           || 3;
+  self.options.template    = options.template          || 'search-default';
+
+  self.path = '/search_suggestions';
+
+  self.data = {
+    account_id: Site.account.id,
+    locale:     Site.language.locale,
+    fields:     [ 'price_min', 'price_min_available' ],
+    hide_items_out_of_stock: Site.account.hide_items,
+  };
+
+  self.binding();
+};
+/**
+ * Обработчик ввода символов
+ */
+ISnew.Search.prototype.binding = function(){
+  var self = this;
+
+  var
+    keyupTimeoutID = '',
+    $search = $( self.options.searchSelector );
+
+  $(document).on( 'keyup', self.options.searchSelector, function(){
+    var
+      $data = {};
+
+    var $input = $(this);
+
+    self.data.query = $input.val();
+
+    clearTimeout( self.keyupTimeoutID );
+
+    if( self.data.query !== '' && self.data.query.length >= self.options.letters ){
+      self.keyupTimeoutID = setTimeout( function(){
+        $.getJSON( self.path, self.data,
+          function( response ){
+            $data = self.makeData( response, $search.val() );
+
+            $data['action'] = {
+              method: 'update',
+              input: $input,
+              template: self.options.template
+            };
+
+            EventBus.publish('update_suggestions:insales:search', $data );
+          });
+      }, 300 );
+
+      $( document ).on( 'click', 'body', self.outClick );
+    }else{
+      // возвращаем пустой объект, чтобы спрятать результат поиска
+      $data['suggestions'] = [];
+      $data['action'] = {
+              method: 'update',
+              template: self.options.template,
+              input: $input
+            };
+      EventBus.publish('update_suggestions:insales:search', $data);
+
+      $( document ).off( 'click', 'body', self.outClick );
+    }
+  });
+};
+
+ISnew.Search.prototype.outClick = function(){
+  var $search = $( AjaxSearch.options.searchWrapper );
+
+  var $data = {};
+      $data['suggestions'] = [];
+      $data['action'] = {
+        method: 'close',
+        input: false,
+        template: AjaxSearch.options.template
+      }
+
+  if( $( event.target ).closest( $search ).length ) return;
+    EventBus.publish('update_suggestions:insales:search', $data );
+  event.stopPropagation();
+  $( document ).off( 'click', 'body', self.outClick );
+};
+
+/**
+ * приводим в общий порядок список поиска
+ */
+ISnew.Search.prototype.makeData = function( $data, keyword ){
+  var self = this;
+  var replacment = '<span class="'+ self.options.markerClass +'">$1</span>';
+  $.each( $data.suggestions, function( index, product ){
+    product.id    = product.data;
+    product.url   = '/product_by_id/'+ product.id;
+    product.title = product.value;
+    product.marked_title = product.value.replace( new RegExp( '('+ keyword +')', 'gi' ), replacment );
+  });
+
+  return $data;
+};
+
+/**
+ * Обновляем настройки
+ */
+ISnew.Search.prototype.setConfig = function(options) {
+  var self = this;
+
+  if (!options) {
+    return;
+  }
+
+  if (options.template) {
+    self.options.template = options.template;
+  }
+
+  if (options.letters) {
+    self.options.letters = options.letters;
+  }
+}
 
 /*
  * Инициализация объектов
@@ -2746,6 +2891,9 @@ var Compare = new ISnew.Compare();
 Site.URL = new ISnew.tools.URL();
 Site.Translit = new ISnew.tools.Translit();
 
+// =======================================================================================
+//                                      OptionSelector
+// =======================================================================================
 
 //  Слушаем изменения в селекторах модификаций
 $(document).on('change click', '[data-option-bind]', function (event) {
@@ -2772,4 +2920,29 @@ $(document).on('change click', '[data-option-bind]', function (event) {
   }
 
   OptionSelector._owner.variants.setOption(option);
+});
+
+// =======================================================================================
+//                                      AJAX SEARCH
+// =======================================================================================
+if (!AjaxSearch) {
+  var AjaxSearch = {};
+}
+
+$(function() {
+  AjaxSearch = new ISnew.Search();
+  EventBus.subscribe('update_suggestions:insales:search', function( data ){
+    //  срабатывает на события внутри формы
+    if (data.action.input) {
+      var $input = $(data.action.input);
+      var $form_suggestions = $input.parents('form:first')
+
+      $form_suggestions.find( '[data-search-wrapper]' )
+          .html( Template.render(data, AjaxSearch.options.template) );
+    }else{
+      //  срабатывает на события вне формы
+      $( '[data-search-wrapper]' )
+          .html( Template.render(data, AjaxSearch.options.template) );
+    }
+  });
 });

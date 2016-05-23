@@ -21,9 +21,36 @@ var fileUrl = {}
   var money = new ISnew.Money();
   money.set(cv_currency_format);
 
+  Site.client_group = {
+    id:                   '{{ client_group.id }}',
+    title:                '{{ client_group.title }}',
+    discount:             '{{ client_group.discount }}',
+    discount_description: '{{ client_group.discount_description }}',
+  };
+  Site.template = '{{ template }}';
+  Site.locale   = '{{ language.locale }}';
+
+  Site.language = {
+    locale: '{{ language.locale }}',
+    not_default: {{ language.not_default? }},
+  };
+
+  Site.account = {
+    id: '{{ account.id }}',
+    hide_items: '{{ account.hide_items_out_of_stock }}',
+    email: '{{ account.email }}',
+  };
+
+  $(function() {
+    AjaxSearch.setConfig({
+      template: 'ajax-search',
+      letters: 10
+    })
+  });
+
   var ProductsConfig = {
   init_option: true,
-  filtered: true,
+  filtered: false,
   show_variants: true,
   file_url: fileUrl,
   options: {

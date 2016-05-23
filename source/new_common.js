@@ -7,6 +7,7 @@
 //= ./cart/
 //= ./product/
 //= ./compare/
+//= ./search/
 
 //= ./init/after.js
 

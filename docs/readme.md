@@ -9,3 +9,4 @@
 * [Корзина](cart/cart.md)
 * [Сравнение](compare/compare.md)
 * [Товар](product/product.md)
+* [Поиск](search/search.md)
