@@ -39,5 +39,5 @@ ISnew.Money.prototype.format = function (amount) {
     value = value.join(self.options.separator);
   }
 
-  return self.options.format.replace('%n', value).replace('%n', self.options.unit);
+  return self.options.format.replace('%n', value).replace('%u', self.options.unit);
 };
