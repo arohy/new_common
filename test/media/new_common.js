@@ -1549,19 +1549,6 @@ ISnew.OptionSelector.prototype._init = function (_product, _owner) {
   // data атрибут блока в который происходит рендер модификаций
   self.selector.option_selector = 'data-option-selector';
 
-  //  Селекторы для _bindSelect
-  //  селектор опции типа change
-  self.selector['selector_change'] = '['+ self.selector.product +'="'+ _product.id +'"] [data-option-change]';
-  //  селектор опции типа click
-  self.selector['selector_click'] = '['+ self.selector.product +'="'+ _product.id +'"] [data-option-click] [data-selector-variant]';
-
-  // селектор нативного селекта
-  self.selector.selector_native = '['+ self.selector.product +'="'+ _product.id +'"] ['+ self.selector.native_select +']';
-  // data атрибут для bind
-  self.selector.selector_bind = 'option-bind';
-
-
-
   // находим опорный DOM-узел, который описывает товар
   self.$product = $('['+ self.selector.product +'="'+ _product.id +'"]');
 
@@ -1622,7 +1609,6 @@ ISnew.OptionSelector.prototype._renderSelector = function () {
     _option.file_url = self._owner.settings.file_url;
     _option.init_option = self._owner.settings.init_option;
 
-    console.log(_option)
     optionsHTML += self._renderOption(_option);
   })
 
@@ -1659,63 +1645,6 @@ ISnew.OptionSelector.prototype._renderOption = function (option) {
 ISnew.OptionSelector.prototype._bindSelect = function () {
   var self = this;
 
-  //  Слушаем изменения в нативном селекте
-  $(document).on('change', self.selector.selector_native, function (event) {
-
-    var $select = $(this);
-    var variantId = parseInt($(this).val());
-    var $form = $select.parents('form:first');
-    if ($form[0]) {
-      var OptionSelector = $form[0]['OptionSelector'];
-    }else{
-      return;
-    }
-
-    OptionSelector._owner.variants.setVariant(variantId);
-  });
-
-
-  //  ! не путать с нативным селектом
-  //  Слушаем изменения в селекторах модификаций типа select
-  $(document).on('change', self.selector.selector_change, function (event) {
-    event.preventDefault();
-
-    var $select = $(this);
-    var OptionSelector = self.$product[0]['OptionSelector'];
-
-
-    var option = {
-      option_name_id: $select.data('option_name_id'),
-      position: $select.data('position-id')
-    };
-
-    if ($select.is('select')) {
-      option.position = parseInt($select.val());
-    }
-
-    OptionSelector._owner.variants.setOption(option);
-  });
-
-
-  //  Слушаем изменения в селекторах модификаций типа span
-  $(document).on('click', self.selector.selector_click, function (event) {
-    event.preventDefault();
-
-    var $span = $(this);
-    var $spanParent = $(this).parents('[data-option-click]:first');
-    var positionId = $span.data('value-position');
-    var optionNameId = $spanParent.data('option_name_id');
-    var OptionSelector = self.$product[0]['OptionSelector'];
-
-
-    var option = {
-      option_name_id: optionNameId,
-      position: parseInt(positionId)
-    };
-
-    OptionSelector._owner.variants.setOption(option);
-  });
-
   //  подписываемся на обновление вариантов
   EventBus.subscribe('update_variant:insales:product', function (data) {
     var $product = $('['+ self.selector.product +'='+ data.product_id +']');
@@ -1727,6 +1656,22 @@ ISnew.OptionSelector.prototype._bindSelect = function () {
     }
   });
 };
+
+//  Слушаем изменения в нативном селекте
+$(document).on('change', '[data-product-variants]', function (event) {
+  event.preventDefault();
+  var $select = $(this);
+
+  var variantId = parseInt($(this).val());
+  var $formProduct = $select.parents('form:first');
+  if ($formProduct[0]) {
+    var OptionSelector = $formProduct[0]['OptionSelector'];
+  }else{
+    return;
+  }
+
+  OptionSelector._owner.variants.setVariant(variantId);
+});
 /**
  * Объект создаёт new ISnew.Product на основе ajax запроса к json продуктов
  *
