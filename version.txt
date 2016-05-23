@@ -25,9 +25,6 @@ _.forEach(options, function (value)
 
 === Настройки продукта ===
 
-//  можно поменять data атрибут формы
-product_id: 'data-product-id'
-
 //  false отключает вывод optionSelector
 show_variants: true
 

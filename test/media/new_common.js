@@ -1622,6 +1622,7 @@ ISnew.OptionSelector.prototype._renderSelector = function () {
     _option.file_url = self._owner.settings.file_url;
     _option.init_option = self._owner.settings.init_option;
 
+    console.log(_option)
     optionsHTML += self._renderOption(_option);
   })
 
