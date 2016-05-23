@@ -8068,3 +8068,5 @@
 2016-05-23 17:50:21 +0300 - INFO	: --> 200 OK 344 (387.0ms) 
 2016-05-23 17:50:21 +0300 - INFO	: PUT http://shop-48497.myinsales.ru:80/admin/themes/626874/assets/58083363.xml 
 2016-05-23 17:50:21 +0300 - INFO	: --> 200 OK 425 (264.0ms) 
+2016-05-23 17:54:03 +0300 - INFO	: PUT http://shop-48497.myinsales.ru:80/admin/themes/626874/assets/58374880.xml 
+2016-05-23 17:54:03 +0300 - INFO	: --> 200 OK 353 (445.0ms) 

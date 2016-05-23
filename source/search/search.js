@@ -88,7 +88,9 @@ ISnew.Search.prototype.binding = function(){
     }
   });
 };
-
+/**
+ * Удаление данных из выдачи
+ */
 ISnew.Search.prototype.outClick = function(){
   var $search = $( AjaxSearch.options.searchWrapper );
 
