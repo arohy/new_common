@@ -87,7 +87,9 @@ ISnew.OptionSelector.prototype._init = function (_product, _owner) {
 ISnew.OptionSelector.prototype._renderSelector = function () {
   var self = this;
 
+  // Если в настройках не отключили отображение селекторов
   if (self._owner.settings.show_variants) {
+
   var variants = self._owner.variants;
   var variants_options = variants.options;
   var optionsHTML = '';
@@ -106,6 +108,7 @@ ISnew.OptionSelector.prototype._renderSelector = function () {
   })
 
   self.$option_selector.html(optionsHTML);
+
   }
 };
 /**

@@ -37,7 +37,7 @@ ISnew.Product.prototype._init = function (_product, settings){
   self.quantity = 0;
   self.price_kinds = new ISnew.ProductPriceType(_product, self);
 
-  //  если есть модификации и в настройках true - запускаем создание OptionSelector
+  //  если есть модификации - запускаем создание OptionSelector
   if (self._isVariants(_product)) {
     self.variants = new ISnew.ProductVariants(_product, self);
     self.OptionSelector = new ISnew.OptionSelector(_product, self);
