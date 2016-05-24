@@ -4,8 +4,9 @@
 
 ISnew.Template = function () {
   var self = this;
+  self._templateList = {};
 
-  self._init(self);
+  self._init();
 };
 
 /**
@@ -13,11 +14,10 @@ ISnew.Template = function () {
  */
 ISnew.Template.prototype.render = function (data, template_id) {
   var self = this;
-
-  var templateHtml = self._templateList[template_id];
+  var template = self._templateList[template_id];
   var result;
 
-  if (templateHtml !== undefined) {
+  if (template !== undefined) {
     result = self._templateList[template_id](data);
   } else {
     result = false;
@@ -40,9 +40,8 @@ ISnew.Template.prototype.load = function (template_body, template_id) {
 /**
  * Автоматический сбор шаблонов в верстке
  */
-ISnew.Template.prototype._init = function (_owner) {
+ISnew.Template.prototype._init = function () {
   var self = this;
-  self._owner = _owner;
 
   //  устанавливаем lock пока не собирем все шаблоны
   self._lock = true;
@@ -50,31 +49,24 @@ ISnew.Template.prototype._init = function (_owner) {
   //  устанавливаем статус пусто
   self.empty = true;
 
-  self._templateList = {};
-
   //  вытаскиваем дефолтный шаблон
-  self._getDefault();
-
+  self._setDefault();
 
   $(function () {
-    if ($('script[data-template-id]').length) {
+    var $templates = $('[data-template-id]');
 
-      var templateCount = $('script[data-template-id]').length - 1;
-
-      $('[data-template-id]').each(function (index, el) {
-
+    if ($templates.length) {
+      $templates.each(function (index, el) {
         self.load($(el).html(), $(el).data('templateId'));
 
-        if (templateCount === index) {
+        if ($(el).is(':last')) {
           //  снимаем lock
           self._lock = false;
           //  обновляем статус
           self.empty = false;
         }
-
       });
-
-    }else{
+    } else {
       //  снимаем lock
       self._lock = false;
       //  обновляем статус
@@ -82,19 +74,3 @@ ISnew.Template.prototype._init = function (_owner) {
     }
   });
 };
-
-
-/**
- * прибиваем дефолтный селект для вывода опций
- */
-ISnew.Template.prototype._getDefault = function () {
-  var self = this;
-
-  var option_default = '<div class="option-<%= option.handle %>">\n<label><%= option.title %></label>\n<select data-option-bind="<%= option.id %>">\n<% _.forEach(option.values, function (value){ %>\n<option\ndata-value-position="<%= value.position %>"\nvalue="<%= value.position %>"\n<% if (option.selected == value.position & init_option) { %>selected<% } %>\n>\n<%= value.title %>\n</option>\n<% }) %>\n</select>\n</div>';
-
-  var search_default = '<% if (suggestions.length > 0){ %>\n<ul class="ajax_search-results">\n<% _.forEach(suggestions, function (product){ %>\n<li class="ajax_search-item">\n<a href="<%- product.url %>" class="ajax_search-link"><%= product.marked_title %></a>\n</li><% }) %>\n</ul>\n<% } %>';
-
-  self._templateList['option-default'] = _.template(option_default);
-  self._templateList['search-default'] = _.template(search_default);
-}
-
