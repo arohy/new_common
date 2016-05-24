@@ -17511,6 +17511,7 @@ ISnew.OptionSelector.prototype._init = function (_product, _owner) {
 ISnew.OptionSelector.prototype._renderSelector = function () {
   var self = this;
 
+  if (self._owner.settings.show_variants) {
   var variants = self._owner.variants;
   var variants_options = variants.options;
   var optionsHTML = '';
@@ -17529,6 +17530,7 @@ ISnew.OptionSelector.prototype._renderSelector = function () {
   })
 
   self.$option_selector.html(optionsHTML);
+  }
 };
 /**
  * Рендер разметки
@@ -17854,7 +17856,7 @@ ISnew.Product.prototype._init = function (_product, settings){
   self.price_kinds = new ISnew.ProductPriceType(_product, self);
 
   //  если есть модификации и в настройках true - запускаем создание OptionSelector
-  if (self._isVariants(_product) & self.settings.show_variants) {
+  if (self._isVariants(_product)) {
     self.variants = new ISnew.ProductVariants(_product, self);
     self.OptionSelector = new ISnew.OptionSelector(_product, self);
   }
