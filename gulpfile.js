@@ -7,9 +7,13 @@ var shell = require('gulp-shell');
 var rigger = require('gulp-rigger');
 
 // ==============================
+// таска дял Win
 gulp.task('default', ['common-watch', 'test-watch'], function() {
   // пустая таска, главное - просто работает )
 });
+
+// таска для linux, mac os
+gulp.task('linux', ['insup-load', 'common-watch', 'test-watch'], function() {});
 
 gulp.task('common-watch', function() {
   return gulp.watch(['source/**/*.js'],
