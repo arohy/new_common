@@ -4,22 +4,18 @@
 ISnew.tools.URL = function () {
   var self = this;
 
-  self.init();
+  self._init();
 };
 
 /**
  * Разбор урла
  */
-ISnew.tools.URL.prototype.init = function () {
+ISnew.tools.URL.prototype._init = function () {
   var self = this;
   self.keys = {};
+  self.location = window.location;
 
-  var windowLocation = window.location;
-  var temp;
-
-  //self.search = self.search;
-
-  _.chain(windowLocation.search.replace('?', ''))
+  _.chain(self.location.search.replace('?', ''))
     .split('&')
     .forEach(function (part) {
       if (part !== '') {
@@ -31,6 +27,7 @@ ISnew.tools.URL.prototype.init = function () {
 
   return;
 };
+
 /**
  * Вытаскиваем значение ключа
  */
