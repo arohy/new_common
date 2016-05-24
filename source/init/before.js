@@ -18,12 +18,10 @@ if (!Site) {
   var Site = {};
 }
 
-
 // Место для всех оберток json
 if (!ISnew.json) {
   ISnew.json = {};
 }
-
 
 if (!EventBus) {
   var EventBus;
