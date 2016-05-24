@@ -1,3 +1,4 @@
+//= ./lib/lodash.js
 //= ./init/before.js
 
 //= ./template/

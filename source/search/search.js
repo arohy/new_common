@@ -21,17 +21,17 @@ ISnew.Search.prototype._init = function(options) {
 
   self.options = {};
   self.options.searchSelector = options.searchSelector || '[data-search-field]';
-  self.options.searchWrapper  = options.searchWrapper  || $(self.searchSelector).parents('form:first');
-  self.options.markerClass    = options.markerClass    || 'ajax_search-marked';
-  self.options.letters     = options.letters           || 3;
-  self.options.template    = options.template          || 'search-default';
+  self.options.searchWrapper = options.searchWrapper || $(self.searchSelector).parents('form:first');
+  self.options.markerClass = options.markerClass || 'ajax_search-marked';
+  self.options.letters = options.letters || 3;
+  self.options.template = options.template || 'search-default';
 
   self.path = '/search_suggestions';
 
   self.data = {
     account_id: Site.account.id,
-    locale:     Site.language.locale,
-    fields:     [ 'price_min', 'price_min_available' ],
+    locale: Site.language.locale,
+    fields: [ 'price_min', 'price_min_available' ],
     hide_items_out_of_stock: Site.account.hide_items,
   };
 
@@ -65,8 +65,7 @@ ISnew.Search.prototype.binding = function(){
 
             $data['action'] = {
               method: 'update',
-              input: $input,
-              template: self.options.template
+              input: $input
             };
 
             EventBus.publish('update_suggestions:insales:search', $data );
@@ -79,7 +78,6 @@ ISnew.Search.prototype.binding = function(){
       $data['suggestions'] = [];
       $data['action'] = {
               method: 'update',
-              template: self.options.template,
               input: $input
             };
       EventBus.publish('update_suggestions:insales:search', $data);
@@ -94,13 +92,13 @@ ISnew.Search.prototype.binding = function(){
 ISnew.Search.prototype.outClick = function(){
   var $search = $( AjaxSearch.options.searchWrapper );
 
-  var $data = {};
-      $data['suggestions'] = [];
-      $data['action'] = {
-        method: 'close',
-        input: false,
-        template: AjaxSearch.options.template
-      }
+  var $data = {
+    suggestions: [],
+    action: {
+      method: 'close',
+      input: false
+    }
+  };
 
   if( $( event.target ).closest( $search ).length ) return;
     EventBus.publish('update_suggestions:insales:search', $data );

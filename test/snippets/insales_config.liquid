@@ -1,3 +1,4 @@
+<script type="text/javascript" src="{{ 'new_common.js' | asset_url }}"></script>
 <script>
 
 {% comment %}
@@ -41,12 +42,12 @@ var fileUrl = {}
     email: '{{ account.email }}',
   };
 
-  /*$(function() {
+  $(function() {
     AjaxSearch.setConfig({
       template: 'ajax-search',
       letters: 3
     })
-  });*/
+  });
 
   var ProductsConfig = {
   init_option: true,

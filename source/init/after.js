@@ -54,11 +54,11 @@ $(function() {
       var $input = $(data.action.input);
       var $form_suggestions = $input.parents('form:first')
 
-      $form_suggestions.find( '[data-search-wrapper]' )
+      $form_suggestions.find( '[data-search-result]' )
           .html( Template.render(data, AjaxSearch.options.template) );
     }else{
       //  срабатывает на события вне формы
-      $( '[data-search-wrapper]' )
+      $( '[data-search-result]' )
           .html( Template.render(data, AjaxSearch.options.template) );
     }
   });
