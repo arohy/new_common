@@ -118,3 +118,9 @@ ISnew.Products.prototype.setConfig = function (settings){
      product.setConfig(settings);
   });
 }
+
+ISnew.Products.prototype.getProduct = function (id) {
+  var self = this;
+
+  return self.collection[parseInt(id)];
+}
