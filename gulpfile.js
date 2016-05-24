@@ -15,6 +15,15 @@ gulp.task('default', ['common-watch', 'test-watch'], function() {
 // таска для linux, mac os
 gulp.task('linux', ['insup-load', 'common-watch', 'test-watch'], function() {});
 
+gulp.task('dist', function () {
+  return gulp.src(['source/*.js'])
+    .pipe(combine(
+      plumber(),
+      rigger(),
+      gulp.dest('./dist')
+    ))
+});
+
 gulp.task('common-watch', function() {
   return gulp.watch(['source/**/*.js'],
     { cwd: './' },
