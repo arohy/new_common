@@ -22,6 +22,7 @@ ISnew.Product.prototype._init = function (_product, settings){
 
   //  Валидация настроек
   self.validateSettings(settings);
+  self.settings = new ISnew.ProductSettings(settings);
 
   if (!_product) {
     throw new ISnew.tools.Error('ErrorProduct', 'ошибка в передаче продукта');
