@@ -4,10 +4,10 @@
 
 ### Атрибуты
 `data-search-field` — атрибут для поля ввода <br>
-`data-search-wrapper` — атрибут для контейнера куда будет происходить рендер результата <br>
+`data-search-result` — атрибут для контейнера куда будет происходить рендер результата <br>
 
 ### Теги
-`form>(input[data-search-field]+div[data-search-wrapper])` — теги `form`, `input[data-search-field]`, `div[data-search-wrapper]`
+`form>(input[data-search-field]+div[data-search-result])` — теги `form`, `input[data-search-field]`, `div[data-search-result]`
 
 ## liquid
 
@@ -15,7 +15,7 @@
 <form action="/search" method="get">
   <input type="text" name="q" value="{{ search.query | escape }}" placeholder="Поиск" data-search-field/>
   <button type="submit">Поиск</button>
-  <div data-search-wrapper></div>
+  <div data-search-result></div>
 </form>
 ```
 
