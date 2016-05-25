@@ -6,10 +6,10 @@
  *
  * @example
  * var settings = {
- *   init_option: true,
+ *   initOption: true,
  *   filtered: true,
- *   show_variants: true,
- *   file_url: fileUrl,
+ *   showVariants: true,
+ *   fileUrl: fileUrl,
  *   options: {
  *     'Цвет': 'option-image',
  *     'Размер': 'option-span'
@@ -99,10 +99,10 @@ ISnew.Products.prototype._create = function(productsId, settings){
  * @example
  * var Products = new ISnew.Products();
  * var settings = {
- *   init_option: true,
+ *   initOption: true,
  *   filtered: true,
- *   show_variants: true,
- *   file_url: fileUrl,
+ *   showVariants: true,
+ *   fileUrl: fileUrl,
  *   options: {
  *     'Цвет': 'option-image',
  *     'Размер': 'option-span'

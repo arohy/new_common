@@ -13,8 +13,8 @@ name      | description | property
 option  | информация о опции  | `handle` — название опции на транслите \. <br> `id` — id опции <br> `position` — позиция в дереве вариантов.<br> `render_type` — id шаблона. <br> `selected` — выбранная в варианте позиция в данной опции <br> `title` — название опции <br> `values` — объект со значениями опции
 option.values     | объект со значениями опции | `id` — id значения опции <br> `position` — позиция значения в опции <br> `name` — название значения в lowerCase <br> `option_name_id` — id опции родителя <br> `title` — имя значения опции
 images      | объект с картинками продукта | {'белый': {'large_url': 'https://static-eu.insales.ru/**.jpg'}...}
-file_url    | объект с картинками из файлов | {'белый': {'https://static-eu.insales.ru/**.jpg'}}
-init_option | включена ли в настройках утановка первого доступного варианта? | true/false
+fileUrl    | объект с картинками из файлов | {'белый': {'https://static-eu.insales.ru/**.jpg'}}
+initOption | включена ли в настройках утановка первого доступного варианта? | true/false
 
 ## Примеры
 
@@ -43,12 +43,16 @@ init_option | включена ли в настройках утановка п�
         <option
           data-value-position="<%= value.position %>"
           value="<%= value.position %>"
+<<<<<<< 9fd6a4fd0fa92cfa029ece1f4b96ebcff60e6251
 <<<<<<< 239db69280a8426c84439b9c07abfd72fdffce53
 <<<<<<< b8c5b34509af8562a8e0a1e24bcadaec7f36ec78
           <% if (option.selected == value.position) { %>selected<% } %>
 =======
           <% if (option.selected == value.position & init_option) { %>selected<% } %>
 >>>>>>> new md template
+=======
+          <% if (option.selected == value.position & initOption) { %>selected<% } %>
+>>>>>>> фиксация кода и стиля
         >
           <%= value.title %>
         </option>
@@ -72,7 +76,7 @@ init_option | включена ли в настройках утановка п�
           data-option-bind="<%= option.id %>"
           data-value-position="<%= value.position %>"
           class="option-image
-          <% if (option.selected == value.position & init_option) { %>active<% } %>
+          <% if (option.selected == value.position & initOption) { %>active<% } %>
           <% if (value.disabled) { %>disabled<% } %>"
         >
           <% if (images[value.name]) { %>
@@ -102,7 +106,7 @@ init_option | включена ли в настройках утановка п�
           value="<%= value.position %>"
           data-option-bind="<%= option.id %>"
           data-value-position="<%= value.position %>"
-          <% if (option.selected == value.position & init_option) { %>checked="checked"<% } %>
+          <% if (option.selected == value.position & initOption) { %>checked="checked"<% } %>
           <% if (value.disabled) { %>disabled="disabled"<% } %>"
         >
         <label for="<%= option.handle %>-<%= value.id %>">
@@ -125,7 +129,7 @@ init_option | включена ли в настройках утановка п�
           data-option-bind="<%= option.id %>"
           data-value-position="<%= value.position %>"
           class="btn
-          <% if (option.selected == value.position & init_option) { %>active<% } %>
+          <% if (option.selected == value.position & initOption) { %>active<% } %>
           <% if (value.disabled) { %>disabled<% } %>"
         >
             <span><%= value.title %></span>

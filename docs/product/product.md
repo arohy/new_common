@@ -15,7 +15,7 @@
 
 ```liquid
 <form action="{{ cart_url }}" method="post" data-product-id="{{ product.id }}">
-  {% if product.show_variants? %}
+  {% if product.showVariants? %}
     <select name="variant_id" data-product-variants>
       {% for variant in product.variants %}
         <option value="{{ variant.id }}">{{ variant.title | escape }}</option>
@@ -40,9 +40,9 @@
 
 ```js
 var ProductsConfig = {
-  init_option: true,
+  initOption: true,
   filtered: true,
-  show_variants: true,
+  showVariants: true,
   options: {
         'Цвет': 'option-image',
         'Размер': 'option-radio',
@@ -59,9 +59,9 @@ var Products = new ISnew.Products(ProductsConfig);
 
 ```js
 var ProductsConfig = {
-  init_option: true,
+  initOption: true,
   filtered: true,
-  show_variants: true,
+  showVariants: true,
   options: {
         'Цвет': 'option-image',
         'Размер': 'option-radio',

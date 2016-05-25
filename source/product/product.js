@@ -11,37 +11,41 @@
 ISnew.Product = function (product, settings) {
   var self = this;
 
-  self._init(product, settings);
+  // Банхамер должен быть на входе
+  if (!product) {
+    throw new ISnew.tools.Error('ErrorProduct', 'ошибка в передаче продукта');
+  }
+
+  //  Валидация настроек
+  self.settings = new ISnew.ProductSettings(settings);
+
+  self.product = product;
+
+  // статус рендера
+  if (!self.isRender) {
+    self.isRender = false;
+  }
+
+  self.images = self._getImage(product.images);
+
+  self.quantity = 0;
+  self.price_kinds = new ISnew.ProductPriceType(self);
+
+  self._init(settings);
 };
 
 /**
  * Настройки
  */
-ISnew.Product.prototype._init = function (_product, settings){
+ISnew.Product.prototype._init = function (settings){
   var self = this;
 
-  //  Валидация настроек
-  self.validateSettings(settings);
-  self.settings = new ISnew.ProductSettings(settings);
-
-  if (!_product) {
-    throw new ISnew.tools.Error('ErrorProduct', 'ошибка в передаче продукта');
-  }
-
-  self.product = _product;
-
-  // статус рендера
-  if (!self.is_render) {
-    self.is_render = false;
-  }
-
-  self.quantity = 0;
-  self.price_kinds = new ISnew.ProductPriceType(_product, self);
-
-  //  если есть модификации - запускаем создание OptionSelector
-  if (self._isVariants(_product)) {
-    self.variants = new ISnew.ProductVariants(_product, self);
-    self.OptionSelector = new ISnew.OptionSelector(_product, self);
+  // Важно!!
+  // В товаре МОЖЕТ не быть ни одной опции, мы в таком варианте валимся
+  // TODO: залатать эту дыру в .variants - это поле ДОЛЖНО быть всегда
+  if (self._isVariants(self.product)) {
+    self.variants = new ISnew.ProductVariants(self);
+    self.OptionSelector = new ISnew.OptionSelector(self);
   }
 }
 
@@ -84,49 +88,38 @@ ISnew.Product.prototype._isVariants = function (_product) {
   return optionCount > 0;
 };
 
-/**
- * Обновление настроек
- */
-ISnew.Product.prototype.setConfig = function (settings){
-  var self = this;
-
-  self._init(self.product, settings);
-}
+// ====================================================================================
+//                          Методы по работе с изображениями продукта
+// ====================================================================================
 
 /**
- * Валидация настроек
+ * Получаем объект с изображениями где ключом является название изображения
+ *
+ * @param  {array} images массив изображений продукта (product.images)
+ *
+ * @return {object} _images объект с изображениями в виде {'image.title': {small_url: 'http//'}}
  */
-ISnew.Product.prototype.validateSettings = function (_settings) {
+ISnew.Product.prototype._getImage = function (images) {
   var self = this;
 
-  self.settings = _settings || {};
+  var _images = {};
 
-  if (_.isNil(self.settings.options)) {
-    self.settings.options = {};
-    self.settings.options['default'] = 'option-default';
-  }else{
-    self.settings.options['default'] = 'option-default';
+  //  если у продукта есть изображения
+  if (_.size(images) > 0) {
+    _.forEach(images, function (image) {
+      //  если у изображения есть title
+      if (image['title']) {
+        var imageName = image['title'].toLowerCase();
+        _images[imageName] = {
+          thumb_url: image['thumb_url'],
+          small_url: image['small_url'],
+          medium_url: image['medium_url'],
+          large_url: image['large_url'],
+          original_url: image['original_url']
+        };
+      }
+    });
   }
 
-  //
-  if (_.isNil(self.settings.show_variants)) {
-    self.settings.show_variants = true;
-  }
-
-  if (_.isNil(self.settings.init_option)) {
-    self.settings.init_option = true;
-  }
-
-  if (_.isNil(self.settings.file_url)) {
-    self.settings.file_url = {};
-  }
-
-  if (_.isNil(self.settings.options)) {
-    self.settings.options = {};
-  }
-
-  if (_.isNil(self.settings.validate)) {
-    self.settings.validate = true;
-  }
-
+  return _images;
 }

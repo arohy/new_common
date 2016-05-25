@@ -10,14 +10,14 @@
  *
  * @property {object} selector в объекте хранятся названия селекторов
  * @property {object} $product опорный DOM-узел, который описывает товар
- * @property {object} $native_select нативный селект который выводим через liquid
- * @property {object} $option_selector контейнер куда происходит рендер селекторов опций
+ * @property {object} $nativeSelect нативный селект который выводим через liquid
+ * @property {object} $optionSelector контейнер куда происходит рендер селекторов опций
  *
  */
-ISnew.OptionSelector = function (product, _owner) {
+ISnew.OptionSelector = function (_owner) {
   var self = this;
 
-  self._init(product, _owner);
+  self._init(_owner);
 }
 
 /**
@@ -27,22 +27,22 @@ ISnew.OptionSelector = function (product, _owner) {
  * @param {object} _owner ссылка на родительский класс ISnew.Products
  *
  */
-ISnew.OptionSelector.prototype._init = function (_product, _owner) {
+ISnew.OptionSelector.prototype._init = function (_owner) {
   var self = this;
 
-  self.selector = {};
+  self.selector = {
+    //  селектор формы
+    product: 'data-product-id',
+    // data атрибут нативного селекта
+    nativeSelect: 'data-product-variants',
+    // data атрибут блока в который происходит рендер модификаций
+    optionSelector: 'data-option-selector'
+  };
 
   self._owner = _owner;
 
-  //  селектор формы
-  self.selector.product = 'data-product-id';
-  // data атрибут нативного селекта
-  self.selector.native_select = 'data-product-variants';
-  // data атрибут блока в который происходит рендер модификаций
-  self.selector.option_selector = 'data-option-selector';
-
   // находим опорный DOM-узел, который описывает товар
-  self.$product = $('['+ self.selector.product +'="'+ _product.id +'"]');
+  self.$product = $('['+ self.selector.product +'="'+ self._owner.product.id +'"]');
 
   // если DOM-узла нет, выходим
   if (self.$product.length == 0) {
@@ -50,23 +50,23 @@ ISnew.OptionSelector.prototype._init = function (_product, _owner) {
   }
 
   // находим там нативный селект/точку для рендера
-  self.$native_select = self.$product.find('['+ self.selector.native_select +']');
+  self.$nativeSelect = self.$product.find('['+ self.selector.nativeSelect +']');
 
   // если нативного селектора нет, выходим
-  if (self.$native_select.length == 0) {
+  if (self.$nativeSelect.length == 0) {
     return;
   }
 
-  var option_selector_length = self.$native_select.next('[' + self.selector.option_selector + ']').length;
+  var optionSelector_length = self.$nativeSelect.next('[' + self.selector.optionSelector + ']').length;
 
   // создаем контейнер и сохраняем линк на него
   // проверка на рендер, если уже отрендерили то не добавляем новую обёртку
-  if (option_selector_length === 0) {
-    self.$native_select.after('<div class="option-selector" '+ self.selector.option_selector +'/>');
-    self._owner.is_render = true;
+  if (optionSelector_length === 0) {
+    self.$nativeSelect.after('<div class="option-selector" '+ self.selector.optionSelector +'/>');
+    self._owner.isRender = true;
   }
 
-  self.$option_selector = self.$product.find('['+ self.selector.option_selector +']');
+  self.$optionSelector = self.$product.find('['+ self.selector.optionSelector +']');
 
   // привязываем экземпляр Класса к товару
   self.$product[0]['OptionSelector'] = self;
@@ -75,8 +75,6 @@ ISnew.OptionSelector.prototype._init = function (_product, _owner) {
 
   //  вызов рендера и слушателя
   self._renderSelector();
-
-
 
   return;
 };
@@ -87,53 +85,39 @@ ISnew.OptionSelector.prototype._init = function (_product, _owner) {
 ISnew.OptionSelector.prototype._renderSelector = function () {
   var self = this;
 
-  // Если в настройках не отключили отображение селекторов
-  if (self._owner.settings.show_variants) {
-
   var variants = self._owner.variants;
-  var variants_options = variants.options;
-  var optionsHTML = '';
+  var images = self._owner.images;
 
-  //  собираем данные которые пойдут в шаблон
-  _.forEach(variants_options, function(value, i) {
-    var _option = {}
-    var _tempListOption = variants.listOption;
+  // Если в настройках не отключили отображение селекторов
+  if (self._owner.settings.showVariants) {
+    //  собираем отрендеренные селекторы
+    var optionsHTML = _.reduce(variants.options, function (html, value, index) {
+      return html += self._renderOption({
+        option: variants.getFilterOption(index),
+        images: images,
+        fileUrl: self._owner.settings.fileUrl,
+        initOption: self._owner.settings.initOption
+      });
+    }, '');
 
-    _option.option = variants.getFilterOption(i);
-    _option.images = variants.images;
-    _option.file_url = self._owner.settings.file_url;
-    _option.init_option = self._owner.settings.init_option;
-
-    optionsHTML += self._renderOption(_option);
-  })
-
-  self.$option_selector.html(optionsHTML);
-
+    self.$optionSelector.html(optionsHTML);
   }
 };
+
 /**
  * Рендер разметки
  */
 ISnew.OptionSelector.prototype._renderOption = function (option) {
   var self = this;
 
-  var optionHTML = '';
-  var render_type = option.option.render_type;
-
-  //  Если шаблонов нет или переданный рендер render_type некорректный
-  if (Template.empty || !Template._templateList[render_type]) {
-    optionHTML = Template.render(option, self._owner.settings.options['default']);
-  }else{
-    optionHTML = Template.render(option, render_type);
-  }
-
+  var renderType = option.option.renderType;
 
   //  если не получили шаблон
-  if (!render_type) {
+  if (!renderType) {
     throw new ISnew.tools.Error('ErrorOptionSelector', 'ошибка в получении шаблона');
   }
 
-  return optionHTML;
+  return Template.render(option, renderType);
 };
 
 /**
@@ -148,7 +132,7 @@ ISnew.OptionSelector.prototype._bindSelect = function () {
     var OptionSelector = $product[0]['OptionSelector'];
 
     if ( OptionSelector ) {
-      OptionSelector.$native_select.val(data.id);
+      OptionSelector.$nativeSelect.val(data.id);
       OptionSelector._renderSelector();
     }
   });
