@@ -44,7 +44,7 @@ ISnew.Template.prototype._init = function () {
   var self = this;
 
   //  устанавливаем lock пока не собирем все шаблоны
-  self._lock = true;
+  self.lock = true;
 
   //  устанавливаем статус пусто
   self.empty = true;
@@ -61,16 +61,28 @@ ISnew.Template.prototype._init = function () {
 
         if ($(el).is(':last')) {
           //  снимаем lock
-          self._lock = false;
+          self.lock = false;
           //  обновляем статус
           self.empty = false;
         }
       });
     } else {
       //  снимаем lock
-      self._lock = false;
+      self.lock = false;
       //  обновляем статус
       self.empty = true;
     }
   });
+};
+
+ISnew.Template.prototype.has = function (template_id) {
+  var self = this;
+
+  var _has = false;
+
+  if (!Template.empty || self._templateList[template_id]) {
+    _has = true;
+  }
+
+  return _has;
 };
