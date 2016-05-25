@@ -18,41 +18,18 @@ initOption | включена ли в настройках утановка пе
 
 ## Примеры
 
-<<<<<<< 239db69280a8426c84439b9c07abfd72fdffce53
-<<<<<<< b8c5b34509af8562a8e0a1e24bcadaec7f36ec78
-```js
-<script type="text/template" data-template-id="option-select">
-  <div class="option-item">
-=======
 ### Нативный селект
 
 ```js
 <script type="text/template" data-template-id="option-select">
   <div class="option-<%= option.handle %>">
->>>>>>> new md template
-=======
-### Нативный селект
-
-```js
-<script type="text/template" data-template-id="option-select">
-  <div class="option-<%= option.handle %>">
->>>>>>> fix md
     <label><%= option.title %></label>
     <select data-option-bind="<%= option.id %>">
       <% _.forEach(option.values, function (value){ %>
         <option
           data-value-position="<%= value.position %>"
           value="<%= value.position %>"
-<<<<<<< 9fd6a4fd0fa92cfa029ece1f4b96ebcff60e6251
-<<<<<<< 239db69280a8426c84439b9c07abfd72fdffce53
-<<<<<<< b8c5b34509af8562a8e0a1e24bcadaec7f36ec78
-          <% if (option.selected == value.position) { %>selected<% } %>
-=======
-          <% if (option.selected == value.position & init_option) { %>selected<% } %>
->>>>>>> new md template
-=======
           <% if (option.selected == value.position & initOption) { %>selected<% } %>
->>>>>>> фиксация кода и стиля
         >
           <%= value.title %>
         </option>
@@ -60,8 +37,6 @@ initOption | включена ли в настройках утановка пе
     </select>
   </div>
 </script>
-<<<<<<< b8c5b34509af8562a8e0a1e24bcadaec7f36ec78
-=======
 ```
 
 ### Опции картинками
@@ -138,8 +113,4 @@ initOption | включена ли в настройках утановка пе
     </div>
   </div>
 </script>
-<<<<<<< 239db69280a8426c84439b9c07abfd72fdffce53
->>>>>>> new md template
-=======
->>>>>>> fix md
 ```
