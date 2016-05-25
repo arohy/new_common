@@ -39,7 +39,7 @@
       <% _.forEach(suggestions, function (product){ %>
         <li class="ajax_search-item">
           <a href="<%- product.url %>" class="ajax_search-link">
-            <%= product.marked_title %>
+            <%= product.markedTitle %>
             <span class="ajax_search-prices">
               <%= money.format( product.fields.price_min ) %>
             </span>

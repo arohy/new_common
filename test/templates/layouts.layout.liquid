@@ -140,8 +140,8 @@
             class="option-image <% if (option.selected == value.position) { %>option-active<% } %>
             <% if (value.disabled) { %>disabled<% } %>"
           >
-            <% if (file_url[value.name]) { %>
-              <img src="<%= file_url[value.name] %>" alt="<%= value.title %>">
+            <% if (fileUrl[value.name]) { %>
+              <img src="<%= fileUrl[value.name] %>" alt="<%= value.title %>">
             <% }else{ %>
               <span><%= value.title %></span>
             <% } %>
@@ -161,7 +161,7 @@
           <span
             data-option-bind="<%= option.id %>"
             data-value-position="<%= value.position %>"
-            class="btn <% if (option.selected == value.position & init_option) { %>active<% } %>
+            class="btn <% if (option.selected == value.position & initOption) { %>active<% } %>
             <% if (value.disabled) { %>disabled<% } %>"
           >
               <span><%= value.title %></span>
@@ -181,8 +181,8 @@
           <input
             data-option-bind="<%= option.id %>"
             data-value-position="<%= value.position %>"
-            <% if (option.selected == value.position & init_option) { %>checked="checked"<% } %>
-            class="btn <% if (option.selected == value.position & init_option) { %>active<% } %>
+            <% if (option.selected == value.position & initOption) { %>checked="checked"<% } %>
+            class="btn <% if (option.selected == value.position & initOption) { %>active<% } %>
             <% if (value.disabled) { %>disabled<% } %>"
                 type="radio" name="<%= option.handle %>" id="<%= option.handle %>-<%= value.id %>" value="<%= value.position %>"><label for="<%= option.handle %>-<%= value.id %>"><%= value.title %></label><Br>
         <% }) %>
@@ -200,8 +200,8 @@
           <input
             data-option-bind="<%= option.id %>"
             data-value-position="<%= value.position %>"
-            <% if (option.selected == value.position & init_option) { %>checked="checked"<% } %>
-            class="btn <% if (option.selected == value.position & init_option) { %>active<% } %>
+            <% if (option.selected == value.position & initOption) { %>checked="checked"<% } %>
+            class="btn <% if (option.selected == value.position & initOption) { %>active<% } %>
             <% if (value.disabled) { %>disabled<% } %>"
                 type="checkbox" name="<%= option.handle %>" id="<%= option.handle %>-<%= value.id %>" value="<%= value.position %>"><label for="<%= option.handle %>-<%= value.id %>"><%= value.title %></label><Br>
         <% }) %>
@@ -216,7 +216,7 @@
       <% _.forEach(suggestions, function (product){ %>
         <li class="ajax_search-item">
           <a href="<%- product.url %>" class="ajax_search-link">
-            <%= product.marked_title %>
+            <%= product.markedTitle %>
             <span class="ajax_search-prices">
               <%= money.format( product.fields.price_min ) %>
             </span>

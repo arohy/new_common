@@ -4,6 +4,7 @@
 var Cart = new ISnew.Cart();
 var Template = new ISnew.Template();
 var Compare = new ISnew.Compare();
+var AjaxSearch = new ISnew.Search();
 
 Site.URL = new ISnew.tools.URL();
 Site.Translit = new ISnew.tools.Translit();
@@ -40,24 +41,30 @@ $(document).on('change click', '[data-option-bind]', function (event) {
 // =======================================================================================
 //                                      AJAX SEARCH
 // =======================================================================================
-if (!AjaxSearch) {
-  var AjaxSearch = {};
-}
 
 $(function() {
-  AjaxSearch = new ISnew.Search();
+  AjaxSearch.setConfig({
+    data: {
+      account_id: Site.account.id,
+      locale: Site.language.locale,
+      fields: [ 'price_min', 'price_min_available' ],
+      hide_items_out_of_stock: Site.account.hide_items
+    }
+  });
+
   EventBus.subscribe('update_suggestions:insales:search', function( data ){
     //  срабатывает на события внутри формы
     if (data.action.input) {
       var $input = $(data.action.input);
       var $form_suggestions = $input.parents('form:first')
 
-      $form_suggestions.find( '[data-search-result]' )
-          .html( Template.render(data, AjaxSearch.options.template) );
-    }else{
+      $form_suggestions
+        .find('[data-search-result]')
+          .html(Template.render(data, AjaxSearch.options.template));
+    } else {
       //  срабатывает на события вне формы
-      $( '[data-search-result]' )
-          .html( Template.render(data, AjaxSearch.options.template) );
+      $('[data-search-result]')
+        .html(Template.render(data, AjaxSearch.options.template));
     }
   });
 });

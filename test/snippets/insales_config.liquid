@@ -1,16 +1,16 @@
 <script type="text/javascript" src="{{ 'new_common.js' | asset_url }}"></script>
 <script>
 
-{% comment %}
-  создание объекта с картинками из файлов
-{% endcomment %}
-var fileUrl = {}
-{% assign option_title  = 'Цвет' %}
-{% for option_name in collections.all.options %}
-  {% if option_name.title == option_title %}
+  {% comment %}
+    создание объекта с картинками из файлов
+  {% endcomment %}
+  var fileUrl = {}
+  {% assign option_title  = 'Цвет' %}
+  {% for option_name in collections.all.options %}
+    {% if option_name.title == option_title %}
       {% for option_value in option_name.values %}
-      {% assign fileName = option_value.title | downcase | append: '.png' %}
-      {% assign fileURL = fileName | file_url %}
+        {% assign fileName = option_value.title | downcase | append: '.png' %}
+        {% assign fileURL = fileName | fileUrl %}
         {% if fileURL %}
           fileUrl['{{ option_value.title | downcase }}'] = '{{ fileURL }}';
         {% endif %}
@@ -18,18 +18,16 @@ var fileUrl = {}
     {% endif %}
   {% endfor %}
 
-  var cv_currency_format = '{{ money_with_currency_format }}';
-  var money = new ISnew.Money();
-  money.set(cv_currency_format);
+  var money = new ISnew.Money('{{ money_with_currency_format }}');
 
   Site.client_group = {
-    id:                   '{{ client_group.id }}',
-    title:                '{{ client_group.title }}',
-    discount:             '{{ client_group.discount }}',
+    id: '{{ client_group.id }}',
+    title: '{{ client_group.title }}',
+    discount: '{{ client_group.discount }}',
     discount_description: '{{ client_group.discount_description }}',
   };
   Site.template = '{{ template }}';
-  Site.locale   = '{{ language.locale }}';
+  Site.locale = '{{ language.locale }}';
 
   Site.language = {
     locale: '{{ language.locale }}',
@@ -50,16 +48,16 @@ var fileUrl = {}
   });
 
   var ProductsConfig = {
-  init_option: true,
+  initOption: true,
   filtered: false,
-  show_variants: true,
-  file_url: fileUrl,
+  showVariants: true,
+  fileUrl: fileUrl,
   options: {
-        'Цвет': 'option-image',
-        'Размер': 'option-radio',
-        'Материал': 'option-select',
-        'Жесткий диск': 'option-span'
-      }
+      'Цвет': 'option-image',
+      'Размер': 'option-radio',
+      'Материал': 'option-select',
+      'Жесткий диск': 'option-span'
+    }
   }
 
   Products = new ISnew.Products(ProductsConfig);

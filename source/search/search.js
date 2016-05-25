@@ -4,8 +4,18 @@
  * @class
  * @name ISnew.Search
  */
-ISnew.Search = function( options ){
+ISnew.Search = function ( options ) {
   var self = this;
+
+  self._default = {
+    options: {
+      searchSelector: '[data-search-field]',
+      markerClass: 'ajax_search-marked',
+      letters: 3,
+      template: 'search-default',
+    },
+    path: '/search_suggestions'
+  };
 
   self._init(options);
 }
@@ -14,85 +24,80 @@ ISnew.Search = function( options ){
  *
  * @param  {object} options конфигурация поиска
  */
-ISnew.Search.prototype._init = function(options) {
+ISnew.Search.prototype._init = function (options) {
   var self = this;
 
-  var options = options || {};
+  self.setConfig(options);
 
-  self.options = {};
-  self.options.searchSelector = options.searchSelector || '[data-search-field]';
-  self.options.searchWrapper = options.searchWrapper || $(self.searchSelector).parents('form:first');
-  self.options.markerClass = options.markerClass || 'ajax_search-marked';
-  self.options.letters = options.letters || 3;
-  self.options.template = options.template || 'search-default';
+  self.$searchField = $(self.options.earchSelector);
+  self.$searchForm = self.$searchField.parents('form:first');
 
-  self.path = '/search_suggestions';
-
+  /*
   self.data = {
     account_id: Site.account.id,
     locale: Site.language.locale,
     fields: [ 'price_min', 'price_min_available' ],
     hide_items_out_of_stock: Site.account.hide_items,
   };
+  */
 
-  self.binding();
+  self._binding();
 };
+
 /**
  * Обработчик ввода символов
  */
-ISnew.Search.prototype.binding = function(){
+ISnew.Search.prototype._binding = function () {
   var self = this;
 
-  var
-    keyupTimeoutID = '',
-    $search = $( self.options.searchSelector );
+  self.keyupTimeoutID = '';
 
-  $(document).on( 'keyup', self.options.searchSelector, function(){
-    var
-      $data = {};
-
+  $(document).on( 'keyup', self.options.searchSelector, function (){
+    var data = {};
     var $input = $(this);
 
     self.data.query = $input.val();
 
-    clearTimeout( self.keyupTimeoutID );
+    clearTimeout(self.keyupTimeoutID);
 
-    if( self.data.query !== '' && self.data.query.length >= self.options.letters ){
-      self.keyupTimeoutID = setTimeout( function(){
-        $.getJSON( self.path, self.data,
-          function( response ){
-            $data = self.makeData( response, $search.val() );
+    if (self.data.query !== '' && self.data.query.length >= self.options.letters) {
+      self.keyupTimeoutID = setTimeout( function () {
+        $.getJSON(self.path, self.data,
+          function (response) {
+            data = self._patch (response, self.$searchField.val());
 
-            $data['action'] = {
+            data.action = {
               method: 'update',
               input: $input
             };
 
-            EventBus.publish('update_suggestions:insales:search', $data );
+            EventBus.publish('update_suggestions:insales:search', data);
           });
       }, 300 );
 
-      $( document ).on( 'click', 'body', self.outClick );
-    }else{
+      $(document).on('click', 'body', self._outClick);
+    } else {
       // возвращаем пустой объект, чтобы спрятать результат поиска
-      $data['suggestions'] = [];
-      $data['action'] = {
-              method: 'update',
-              input: $input
-            };
-      EventBus.publish('update_suggestions:insales:search', $data);
+      data = {
+        suggestions: [],
+        action: {
+          method: 'update',
+          input: $input
+        }
+      }
+      EventBus.publish('update_suggestions:insales:search', data);
 
-      $( document ).off( 'click', 'body', self.outClick );
+      $(document).off('click', 'body', self._outClick);
     }
   });
 };
+
 /**
  * Удаление данных из выдачи
  */
-ISnew.Search.prototype.outClick = function(){
-  var $search = $( AjaxSearch.options.searchWrapper );
-
-  var $data = {
+ISnew.Search.prototype._outClick = function () {
+  var self = this;
+  var data = {
     suggestions: [],
     action: {
       method: 'close',
@@ -100,26 +105,31 @@ ISnew.Search.prototype.outClick = function(){
     }
   };
 
-  if( $( event.target ).closest( $search ).length ) return;
-    EventBus.publish('update_suggestions:insales:search', $data );
+  if ($(event.target).closest(self.$searchForm).length) {
+    return
+  };
+  EventBus.publish('update_suggestions:insales:search', data);
   event.stopPropagation();
-  $( document ).off( 'click', 'body', self.outClick );
+  $(document).off('click', 'body', self._outClick);
 };
 
 /**
  * приводим в общий порядок список поиска
  */
-ISnew.Search.prototype.makeData = function( $data, keyword ){
+ISnew.Search.prototype._patch = function (data, keyword) {
   var self = this;
   var replacment = '<span class="'+ self.options.markerClass +'">$1</span>';
-  $.each( $data.suggestions, function( index, product ){
-    product.id    = product.data;
-    product.url   = '/product_by_id/'+ product.id;
+
+  console.log(data);
+
+  _.forEach(data.suggestions, function (product) {
+    product.id = product.data;
+    product.url = '/product_by_id/'+ product.id;
     product.title = product.value;
-    product.marked_title = product.value.replace( new RegExp( '('+ keyword +')', 'gi' ), replacment );
+    product.markedTitle = product.value.replace(new RegExp('('+ keyword +')', 'gi'), replacment);
   });
 
-  return $data;
+  return data;
 };
 
 /**
@@ -128,15 +138,5 @@ ISnew.Search.prototype.makeData = function( $data, keyword ){
 ISnew.Search.prototype.setConfig = function(options) {
   var self = this;
 
-  if (!options) {
-    return;
-  }
-
-  if (options.template) {
-    self.options.template = options.template;
-  }
-
-  if (options.letters) {
-    self.options.letters = options.letters;
-  }
+  _.merge(self, self._default, options);
 }

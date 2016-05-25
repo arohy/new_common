@@ -15931,12 +15931,10 @@ if (!Site) {
   var Site = {};
 }
 
-
 // Место для всех оберток json
 if (!ISnew.json) {
   ISnew.json = {};
 }
-
 
 if (!EventBus) {
   var EventBus;
@@ -15948,8 +15946,9 @@ if (!EventBus) {
 
 ISnew.Template = function () {
   var self = this;
+  self._templateList = {};
 
-  self._init(self);
+  self._init();
 };
 
 /**
@@ -15957,11 +15956,10 @@ ISnew.Template = function () {
  */
 ISnew.Template.prototype.render = function (data, template_id) {
   var self = this;
-
-  var templateHtml = self._templateList[template_id];
+  var template = self._templateList[template_id];
   var result;
 
-  if (templateHtml !== undefined) {
+  if (template !== undefined) {
     result = self._templateList[template_id](data);
   } else {
     result = false;
@@ -15984,62 +15982,64 @@ ISnew.Template.prototype.load = function (template_body, template_id) {
 /**
  * Автоматический сбор шаблонов в верстке
  */
-ISnew.Template.prototype._init = function (_owner) {
+ISnew.Template.prototype._init = function () {
   var self = this;
-  self._owner = _owner;
 
   //  устанавливаем lock пока не собирем все шаблоны
-  self._lock = true;
+  self.lock = true;
 
   //  устанавливаем статус пусто
   self.empty = true;
 
-  self._templateList = {};
-
   //  вытаскиваем дефолтный шаблон
-  self._getDefault();
-
+  self._setDefault();
 
   $(function () {
-    if ($('script[data-template-id]').length) {
+    var $templates = $('[data-template-id]');
 
-      var templateCount = $('script[data-template-id]').length - 1;
-
-      $('[data-template-id]').each(function (index, el) {
-
+    if ($templates.length) {
+      $templates.each(function (index, el) {
         self.load($(el).html(), $(el).data('templateId'));
 
-        if (templateCount === index) {
+        if ($(el).is(':last')) {
           //  снимаем lock
-          self._lock = false;
+          self.lock = false;
           //  обновляем статус
           self.empty = false;
         }
-
       });
-
-    }else{
+    } else {
       //  снимаем lock
-      self._lock = false;
+      self.lock = false;
       //  обновляем статус
       self.empty = true;
     }
   });
 };
 
+ISnew.Template.prototype.has = function (template_id) {
+  var self = this;
 
+  var _has = false;
+
+  if (!Template.empty || self._templateList[template_id]) {
+    _has = true;
+  }
+
+  return _has;
+};
 /**
  * прибиваем дефолтный селект для вывода опций
  */
-ISnew.Template.prototype._getDefault = function () {
+ISnew.Template.prototype._setDefault = function () {
   var self = this;
 
-  var option_default = '<div class="option-<%= option.handle %>">\n<label><%= option.title %></label>\n<select data-option-bind="<%= option.id %>">\n<% _.forEach(option.values, function (value){ %>\n<option\ndata-value-position="<%= value.position %>"\nvalue="<%= value.position %>"\n<% if (option.selected == value.position & init_option) { %>selected<% } %>\n>\n<%= value.title %>\n</option>\n<% }) %>\n</select>\n</div>';
+  var option_default = '<div class="option-<%= option.handle %>">\n<label><%= option.title %></label>\n<select data-option-bind="<%= option.id %>">\n<% _.forEach(option.values, function (value){ %>\n<option\ndata-value-position="<%= value.position %>"\nvalue="<%= value.position %>"\n<% if (option.selected == value.position & initOption) { %>selected<% } %>\n>\n<%= value.title %>\n</option>\n<% }) %>\n</select>\n</div>';
 
-  var search_default = '<% if (suggestions.length > 0){ %>\n<ul class="ajax_search-results">\n<% _.forEach(suggestions, function (product){ %>\n<li class="ajax_search-item">\n<a href="<%- product.url %>" class="ajax_search-link"><%= product.marked_title %></a>\n</li><% }) %>\n</ul>\n<% } %>';
+  var search_default = '<% if (suggestions.length > 0){ %>\n<ul class="ajax_search-results">\n<% _.forEach(suggestions, function (product){ %>\n<li class="ajax_search-item">\n<a href="<%- product.url %>" class="ajax_search-link"><%= product.markedTitle %></a>\n</li><% }) %>\n</ul>\n<% } %>';
 
-  self._templateList['option-default'] = _.template(option_default);
-  self._templateList['search-default'] = _.template(search_default);
+  self.load(option_default, 'option-default');
+  self.load(search_default, 'search-default');
 }
 /**
  * Event bus
@@ -16222,8 +16222,10 @@ ISnew.tools.Error = function (name, message) {
 /**
  * Класс для работы с валютой.
  */
-ISnew.Money = function () {
+ISnew.Money = function (params) {
   var self = this;
+
+  self._init(params);
 };
 
 /**
@@ -16265,39 +16267,40 @@ ISnew.Money.prototype.format = function (amount) {
 /**
  * производим транслитерацию строки
  */
-ISnew.tools.Translit = function( string ){
+ISnew.tools.Translit = function( string ) {
   var self = this;
+
+  var space = '_';
+
+  self.translit = {
+    'а': 'a', 'б': 'b', 'в': 'v', 'г': 'g', 'д': 'd', 'е': 'e', 'ё': 'e', 'ж': 'zh',
+    'з': 'z', 'и': 'i', 'й': 'j', 'к': 'k', 'л': 'l', 'м': 'm', 'н': 'n',
+    'о': 'o', 'п': 'p', 'р': 'r','с': 's', 'т': 't', 'у': 'u', 'ф': 'f', 'х': 'h',
+    'ц': 'c', 'ч': 'ch', 'ш': 'sh', 'щ': 'sh','ъ': space, 'ы': 'y', 'ь': space, 'э': 'e', 'ю': 'yu', 'я': 'ya',
+    ' ': space, '_': space, '`': space, '~': space, '!': space, '@': space,
+    '#': space, '$': space, '%': space, '^': space, '&': space, '*': space,
+    '(': space, ')': space,'-': space, '\=': space, '+': space, '[': space,
+    ']': space, '\\': space, '|': space, '/': space,'.': space, ',': space,
+    '{': space, '}': space, '\'': space, '"': space, ';': space, ':': space,
+    '?': space, '<': space, '>': space, '№':space
+  };
 };
 
+/*
+ * Основной метод.
+ */
 ISnew.tools.Translit.prototype.replace = function (string) {
-  var
-    space     = '_',
-    $translit = {
-      'а': 'a', 'б': 'b', 'в': 'v', 'г': 'g', 'д': 'd', 'е': 'e', 'ё': 'e', 'ж': 'zh',
-      'з': 'z', 'и': 'i', 'й': 'j', 'к': 'k', 'л': 'l', 'м': 'm', 'н': 'n',
-      'о': 'o', 'п': 'p', 'р': 'r','с': 's', 'т': 't', 'у': 'u', 'ф': 'f', 'х': 'h',
-      'ц': 'c', 'ч': 'ch', 'ш': 'sh', 'щ': 'sh','ъ': space, 'ы': 'y', 'ь': space, 'э': 'e', 'ю': 'yu', 'я': 'ya',
-      ' ': space, '_': space, '`': space, '~': space, '!': space, '@': space,
-      '#': space, '$': space, '%': space, '^': space, '&': space, '*': space,
-      '(': space, ')': space,'-': space, '\=': space, '+': space, '[': space,
-      ']': space, '\\': space, '|': space, '/': space,'.': space, ',': space,
-      '{': space, '}': space, '\'': space, '"': space, ';': space, ':': space,
-      '?': space, '<': space, '>': space, '№':space
-    },
-    result  = '',
-    current = '';
+  var self = this;
 
-  string = string.toLowerCase();
-
-  for(var i = 0; i < string.length; i++ ){
-    if( $translit[ string[ i ] ] !== undefined ){
-      result += $translit[ string[i] ];
-    }else{
-      result += string[ i ];
+  return _.reduce(string.toLowerCase(), function(test, symbol) {
+    if (self.translit[symbol] !== undefined) {
+      test += self.translit[symbol];
+    } else {
+      test += symbol;
     }
-  }
 
-  return result;
+    return test;
+  }, '');
 }
 /**
  * Тул для разбора url.
@@ -16305,22 +16308,18 @@ ISnew.tools.Translit.prototype.replace = function (string) {
 ISnew.tools.URL = function () {
   var self = this;
 
-  self.init();
+  self._init();
 };
 
 /**
  * Разбор урла
  */
-ISnew.tools.URL.prototype.init = function () {
+ISnew.tools.URL.prototype._init = function () {
   var self = this;
   self.keys = {};
+  self.location = window.location;
 
-  var windowLocation = window.location;
-  var temp;
-
-  //self.search = self.search;
-
-  _.chain(windowLocation.search.replace('?', ''))
+  _.chain(self.location.search.replace('?', ''))
     .split('&')
     .forEach(function (part) {
       if (part !== '') {
@@ -16332,6 +16331,7 @@ ISnew.tools.URL.prototype.init = function () {
 
   return;
 };
+
 /**
  * Вытаскиваем значение ключа
  */
@@ -17434,14 +17434,14 @@ ISnew.CartDOM.prototype._unlockButton = function (data, eventName) {
  *
  * @property {object} selector в объекте хранятся названия селекторов
  * @property {object} $product опорный DOM-узел, который описывает товар
- * @property {object} $native_select нативный селект который выводим через liquid
- * @property {object} $option_selector контейнер куда происходит рендер селекторов опций
+ * @property {object} $nativeSelect нативный селект который выводим через liquid
+ * @property {object} $optionSelector контейнер куда происходит рендер селекторов опций
  *
  */
-ISnew.OptionSelector = function (product, _owner) {
+ISnew.OptionSelector = function (_owner) {
   var self = this;
 
-  self._init(product, _owner);
+  self._init(_owner);
 }
 
 /**
@@ -17451,22 +17451,22 @@ ISnew.OptionSelector = function (product, _owner) {
  * @param {object} _owner ссылка на родительский класс ISnew.Products
  *
  */
-ISnew.OptionSelector.prototype._init = function (_product, _owner) {
+ISnew.OptionSelector.prototype._init = function (_owner) {
   var self = this;
 
-  self.selector = {};
+  self.selector = {
+    //  селектор формы
+    product: 'data-product-id',
+    // data атрибут нативного селекта
+    nativeSelect: 'data-product-variants',
+    // data атрибут блока в который происходит рендер модификаций
+    optionSelector: 'data-option-selector'
+  };
 
   self._owner = _owner;
 
-  //  селектор формы
-  self.selector.product = 'data-product-id';
-  // data атрибут нативного селекта
-  self.selector.native_select = 'data-product-variants';
-  // data атрибут блока в который происходит рендер модификаций
-  self.selector.option_selector = 'data-option-selector';
-
   // находим опорный DOM-узел, который описывает товар
-  self.$product = $('['+ self.selector.product +'="'+ _product.id +'"]');
+  self.$product = $('['+ self.selector.product +'="'+ self._owner.product.id +'"]');
 
   // если DOM-узла нет, выходим
   if (self.$product.length == 0) {
@@ -17474,23 +17474,23 @@ ISnew.OptionSelector.prototype._init = function (_product, _owner) {
   }
 
   // находим там нативный селект/точку для рендера
-  self.$native_select = self.$product.find('['+ self.selector.native_select +']');
+  self.$nativeSelect = self.$product.find('['+ self.selector.nativeSelect +']');
 
   // если нативного селектора нет, выходим
-  if (self.$native_select.length == 0) {
+  if (self.$nativeSelect.length == 0) {
     return;
   }
 
-  var option_selector_length = self.$native_select.next('[' + self.selector.option_selector + ']').length;
+  var optionSelector_length = self.$nativeSelect.next('[' + self.selector.optionSelector + ']').length;
 
   // создаем контейнер и сохраняем линк на него
   // проверка на рендер, если уже отрендерили то не добавляем новую обёртку
-  if (option_selector_length === 0) {
-    self.$native_select.after('<div class="option-selector" '+ self.selector.option_selector +'/>');
-    self._owner.is_render = true;
+  if (optionSelector_length === 0) {
+    self.$nativeSelect.after('<div class="option-selector" '+ self.selector.optionSelector +'/>');
+    self._owner.isRender = true;
   }
 
-  self.$option_selector = self.$product.find('['+ self.selector.option_selector +']');
+  self.$optionSelector = self.$product.find('['+ self.selector.optionSelector +']');
 
   // привязываем экземпляр Класса к товару
   self.$product[0]['OptionSelector'] = self;
@@ -17499,8 +17499,6 @@ ISnew.OptionSelector.prototype._init = function (_product, _owner) {
 
   //  вызов рендера и слушателя
   self._renderSelector();
-
-
 
   return;
 };
@@ -17511,50 +17509,39 @@ ISnew.OptionSelector.prototype._init = function (_product, _owner) {
 ISnew.OptionSelector.prototype._renderSelector = function () {
   var self = this;
 
-  if (self._owner.settings.show_variants) {
   var variants = self._owner.variants;
-  var variants_options = variants.options;
-  var optionsHTML = '';
+  var images = self._owner.images;
 
-  //  собираем данные которые пойдут в шаблон
-  _.forEach(variants_options, function(value, i) {
-    var _option = {}
-    var _tempListOption = variants.listOption;
+  // Если в настройках не отключили отображение селекторов
+  if (self._owner.settings.showVariants) {
+    //  собираем отрендеренные селекторы
+    var optionsHTML = _.reduce(variants.options, function (html, value, index) {
+      return html += self._renderOption({
+        option: variants.getFilterOption(index),
+        images: images,
+        fileUrl: self._owner.settings.fileUrl,
+        initOption: self._owner.settings.initOption
+      });
+    }, '');
 
-    _option.option = variants.getFilterOption(i);
-    _option.images = variants.images;
-    _option.file_url = self._owner.settings.file_url;
-    _option.init_option = self._owner.settings.init_option;
-
-    optionsHTML += self._renderOption(_option);
-  })
-
-  self.$option_selector.html(optionsHTML);
+    self.$optionSelector.html(optionsHTML);
   }
 };
+
 /**
  * Рендер разметки
  */
 ISnew.OptionSelector.prototype._renderOption = function (option) {
   var self = this;
 
-  var optionHTML = '';
-  var render_type = option.option.render_type;
-
-  //  Если шаблонов нет или переданный рендер render_type некорректный
-  if (Template.empty || !Template._templateList[render_type]) {
-    optionHTML = Template.render(option, self._owner.settings.options['default']);
-  }else{
-    optionHTML = Template.render(option, render_type);
-  }
-
+  var renderType = option.option.renderType;
 
   //  если не получили шаблон
-  if (!render_type) {
+  if (!renderType) {
     throw new ISnew.tools.Error('ErrorOptionSelector', 'ошибка в получении шаблона');
   }
 
-  return optionHTML;
+  return Template.render(option, renderType);
 };
 
 /**
@@ -17569,7 +17556,7 @@ ISnew.OptionSelector.prototype._bindSelect = function () {
     var OptionSelector = $product[0]['OptionSelector'];
 
     if ( OptionSelector ) {
-      OptionSelector.$native_select.val(data.id);
+      OptionSelector.$nativeSelect.val(data.id);
       OptionSelector._renderSelector();
     }
   });
@@ -17591,126 +17578,6 @@ $(document).on('change', '[data-product-variants]', function (event) {
   OptionSelector._owner.variants.setVariant(variantId);
 });
 /**
- * Объект создаёт new ISnew.Product на основе ajax запроса к json продуктов
- *
- * @class
- * @name ISnew.Products
- *
- * @example
- * var settings = {
- *   init_option: true,
- *   filtered: true,
- *   show_variants: true,
- *   file_url: fileUrl,
- *   options: {
- *     'Цвет': 'option-image',
- *     'Размер': 'option-span'
- *     }
- * }
- * var Products = new ISnew.Products(settings);
- *
- * @param {object} settings конфиг для рендера optionSelector
- *
- * @property {object} collection коллекция созданных экземпляров продукта
- */
-ISnew.Products = function (settings) {
-  var self = this;
-
-  self._init(settings);
-};
-
-/**
- * Инициализация, запускает _addProduct(settings)
- *
- * @param {object} settings конфиг для рендера optionSelector
- *
- */
-ISnew.Products.prototype._init = function (settings){
-  var self = this;
-
-  // объект для создаваемых продуктов
-  self.collection = {}
-
-  self._addProduct(settings)
-}
-
-
-/**
- * Добавление новых продуктов. Метод пробегает по формам и собирает их id в массив. После передает массив на _create(productsId, settings).
- *
- * @param {object} settings конфиг для рендера optionSelector
- */
-ISnew.Products.prototype._addProduct = function (settings){
-  var self = this;
-
-  $(function () {
-    var variantsCount = $('[data-product-id]').length - 1;
-    var productsId = [];
-
-    //  Проходим по всем формам и собираем id для создания новых продуктов
-    $('[data-product-id]').each(function(index, el) {
-       var thatProductId = $(el).data( 'product-id' );
-
-       if (thatProductId) {
-        productsId.push(thatProductId);
-       }
-       if (index === variantsCount) {
-        self._create(productsId, settings);
-       }
-    });
-  })
-}
-
-/**
- * Создание экземпляров продукта
- *
- * @param  {array} productsId массив id продуктов для ajax запроса
- * @param {object} settings конфиг для рендера optionSelector
- */
-ISnew.Products.prototype._create = function(productsId, settings){
-  var self = this;
-
-  ISnew.json.getProductsList(productsId)
-      .done(function (_newSelectors) {
-
-        _.forEach(_newSelectors, function(_new_product) {
-           self.collection[_new_product.id] = new ISnew.Product( _new_product , settings);
-        });
-
-      })
-      .fail(function (response) {
-        throw new ISnew.tools.Error('ErrorJson', 'ошибка при выполнени ajax запроса');
-      });
-}
-
-/**
- * Обновление настроек продуктов созданных через new ISnew.Products();
- *
- * @param {object} settings конфиг для рендера optionSelector
- *
- * @example
- * var Products = new ISnew.Products();
- * var settings = {
- *   init_option: true,
- *   filtered: true,
- *   show_variants: true,
- *   file_url: fileUrl,
- *   options: {
- *     'Цвет': 'option-image',
- *     'Размер': 'option-span'
- *     }
- * }
- * Products.setConfig(settings);
- *
- */
-ISnew.Products.prototype.setConfig = function (settings){
-  var self = this;
-
-  $.each(self.collection, function(index, product) {
-     product.setConfig(settings);
-  });
-}
-/**
  * Типы цен
  *
  * @class
@@ -17720,12 +17587,12 @@ ISnew.Products.prototype.setConfig = function (settings){
  * @param {object} _owner ссылка на родительский класс ISnew.Products
  *
  */
-ISnew.ProductPriceType = function (product, _owner) {
+ISnew.ProductPriceType = function (_owner) {
   var self = this;
   self._owner = _owner;
 
-  self.variant_id = product.variants[0].id;
-  self.price_kinds = self._initPrices(product);
+  self.variant_id = self._owner.product.variants[0].id;
+  self.price_kinds = self._initPrices(self._owner.product);
 
   return self;
 };
@@ -17829,36 +17696,41 @@ ISnew.ProductPriceType.prototype.setVariant = function (variant_id) {
 ISnew.Product = function (product, settings) {
   var self = this;
 
-  self._init(product, settings);
+  // Банхамер должен быть на входе
+  if (!product) {
+    throw new ISnew.tools.Error('ErrorProduct', 'ошибка в передаче продукта');
+  }
+
+  //  Валидация настроек
+  self.settings = new ISnew.ProductSettings(settings);
+
+  self.product = product;
+
+  // статус рендера
+  if (!self.isRender) {
+    self.isRender = false;
+  }
+
+  self.images = self._getImage(product.images);
+
+  self.quantity = 0;
+  self.price_kinds = new ISnew.ProductPriceType(self);
+
+  self._init(settings);
 };
 
 /**
  * Настройки
  */
-ISnew.Product.prototype._init = function (_product, settings){
+ISnew.Product.prototype._init = function (settings){
   var self = this;
 
-  //  Валидация настроек
-  self.validateSettings(settings);
-
-  if (!_product) {
-    throw new ISnew.tools.Error('ErrorProduct', 'ошибка в передаче продукта');
-  }
-
-  self.product = _product;
-
-  // статус рендера
-  if (!self.is_render) {
-    self.is_render = false;
-  }
-
-  self.quantity = 0;
-  self.price_kinds = new ISnew.ProductPriceType(_product, self);
-
-  //  если есть модификации и в настройках true - запускаем создание OptionSelector
-  if (self._isVariants(_product)) {
-    self.variants = new ISnew.ProductVariants(_product, self);
-    self.OptionSelector = new ISnew.OptionSelector(_product, self);
+  // Важно!!
+  // В товаре МОЖЕТ не быть ни одной опции, мы в таком варианте валимся
+  // TODO: залатать эту дыру в .variants - это поле ДОЛЖНО быть всегда
+  if (self._isVariants(self.product)) {
+    self.variants = new ISnew.ProductVariants(self);
+    self.OptionSelector = new ISnew.OptionSelector(self);
   }
 }
 
@@ -17901,63 +17773,216 @@ ISnew.Product.prototype._isVariants = function (_product) {
   return optionCount > 0;
 };
 
+// ====================================================================================
+//                          Методы по работе с изображениями продукта
+// ====================================================================================
+
 /**
- * Обновление настроек
+ * Получаем объект с изображениями где ключом является название изображения
+ *
+ * @param  {array} images массив изображений продукта (product.images)
+ *
+ * @return {object} _images объект с изображениями в виде {'image.title': {small_url: 'http//'}}
  */
-ISnew.Product.prototype.setConfig = function (settings){
+ISnew.Product.prototype._getImage = function (images) {
   var self = this;
 
-  self._init(self.product, settings);
+  var _images = {};
+
+  //  если у продукта есть изображения
+  if (_.size(images) > 0) {
+    _.forEach(images, function (image) {
+      //  если у изображения есть title
+      if (image['title']) {
+        var imageName = image['title'].toLowerCase();
+        _images[imageName] = {
+          thumb_url: image['thumb_url'],
+          small_url: image['small_url'],
+          medium_url: image['medium_url'],
+          large_url: image['large_url'],
+          original_url: image['original_url']
+        };
+      }
+    });
+  }
+
+  return _images;
+}
+/**
+ * Объект создаёт new ISnew.Product на основе ajax запроса к json продуктов
+ *
+ * @class
+ * @name ISnew.Products
+ *
+ * @example
+ * var settings = {
+ *   initOption: true,
+ *   filtered: true,
+ *   showVariants: true,
+ *   fileUrl: fileUrl,
+ *   options: {
+ *     'Цвет': 'option-image',
+ *     'Размер': 'option-span'
+ *     }
+ * }
+ * var Products = new ISnew.Products(settings);
+ *
+ * @param {object} settings конфиг для рендера optionSelector
+ *
+ * @property {object} collection коллекция созданных экземпляров продукта
+ */
+ISnew.Products = function (settings) {
+  var self = this;
+
+  self._init(settings);
+};
+
+/**
+ * Инициализация, запускает _addProduct(settings)
+ *
+ * @param {object} settings конфиг для рендера optionSelector
+ *
+ */
+ISnew.Products.prototype._init = function (settings){
+  var self = this;
+
+  // объект для создаваемых продуктов
+  self.collection = {}
+
+  self._addProduct(settings)
+}
+
+
+/**
+ * Добавление новых продуктов. Метод пробегает по формам и собирает их id в массив. После передает массив на _create(productsId, settings).
+ *
+ * @param {object} settings конфиг для рендера optionSelector
+ */
+ISnew.Products.prototype._addProduct = function (settings){
+  var self = this;
+
+  $(function () {
+    var variantsCount = $('[data-product-id]').length - 1;
+    var productsId = [];
+
+    //  Проходим по всем формам и собираем id для создания новых продуктов
+    $('[data-product-id]').each(function(index, el) {
+       var thatProductId = $(el).data( 'product-id' );
+
+       if (thatProductId) {
+        productsId.push(thatProductId);
+       }
+       if (index === variantsCount) {
+        self._create(productsId, settings);
+       }
+    });
+  })
 }
 
 /**
- * Валидация настроек
+ * Создание экземпляров продукта
+ *
+ * @param  {array} productsId массив id продуктов для ajax запроса
+ * @param {object} settings конфиг для рендера optionSelector
  */
-ISnew.Product.prototype.validateSettings = function (_settings) {
+ISnew.Products.prototype._create = function(productsId, settings){
   var self = this;
 
-  self.settings = _settings || {};
+  ISnew.json.getProductsList(productsId)
+      .done(function (_newSelectors) {
 
-  if (_.isNil(self.settings.options)) {
-    self.settings.options = {};
-    self.settings.options['default'] = 'option-default';
-  }else{
-    self.settings.options['default'] = 'option-default';
-  }
+        _.forEach(_newSelectors, function(_new_product) {
+           self.collection[_new_product.id] = new ISnew.Product( _new_product , settings);
+        });
 
-  //
-  if (_.isNil(self.settings.show_variants)) {
-    self.settings.show_variants = true;
-  }
-
-  if (_.isNil(self.settings.init_option)) {
-    self.settings.init_option = true;
-  }
-
-  if (_.isNil(self.settings.file_url)) {
-    self.settings.file_url = {};
-  }
-
-  if (_.isNil(self.settings.options)) {
-    self.settings.options = {};
-  }
-
-  if (_.isNil(self.settings.validate)) {
-    self.settings.validate = true;
-  }
-
+      })
+      .fail(function (response) {
+        throw new ISnew.tools.Error('ErrorJson', 'ошибка при выполнени ajax запроса');
+      });
 }
+
+/**
+ * Обновление настроек продуктов созданных через new ISnew.Products();
+ *
+ * @param {object} settings конфиг для рендера optionSelector
+ *
+ * @example
+ * var Products = new ISnew.Products();
+ * var settings = {
+ *   initOption: true,
+ *   filtered: true,
+ *   showVariants: true,
+ *   fileUrl: fileUrl,
+ *   options: {
+ *     'Цвет': 'option-image',
+ *     'Размер': 'option-span'
+ *     }
+ * }
+ * Products.setConfig(settings);
+ *
+ */
+ISnew.Products.prototype.setConfig = function (settings){
+  var self = this;
+
+  $.each(self.collection, function(index, product) {
+     product.setConfig(settings);
+  });
+}
+
+ISnew.Products.prototype.getProduct = function (id) {
+  var self = this;
+
+  return self.collection[parseInt(id)];
+}
+/**
+ * Класс для работы с настройками Продукта
+ */
+ISnew.ProductSettings = function (settings) {
+  var self = this;
+
+  self._default = {
+    options: {
+      default: 'option-default'
+    },
+    showVariants: true,
+    initOption: true,
+    fileUrl: {},
+    filtered: true
+  }
+
+  self.set(settings);
+}
+
+ISnew.ProductSettings.prototype.set = function (settings) {
+  var self = this;
+
+  _.merge(self, self._default, settings);
+
+  self._patch();
+};
+
+ISnew.ProductSettings.prototype._patch = function () {
+  var self = this;
+
+  _.forEach(self.options, function (templateId, option) {
+    // Патчим шаблоны для рендера.
+    // Если такой шаблон не подключен к системе - ставим дефолтный вариант
+    if (!Template.has(templateId)) {
+      self.options[option] = 'option-default';
+    }
+  });
+};
 /**
  * Конструктор объета по работе с вариантами продукта
  * @class
  * @name ISnew.ProductVariants
- * 
+ *
  * @example
  * self.variants = new ISnew.ProductVariants(_product, self);
  *
  * @param  {object} product продукт
  * @param  {object} _owner родительский объект класса Product
- * 
+ *
  * @property {array} variants массив модификаций продукта
  * @property {object} images картики продукта в виде {'title': {small_url: 'http//'}}
  * @property {number} urlVariant id варианта из урла
@@ -17965,32 +17990,31 @@ ISnew.Product.prototype.validateSettings = function (_settings) {
  * @property {object} tree дерево вариантов
  *
  */
-ISnew.ProductVariants = function (product, _owner) {
+ISnew.ProductVariants = function (_owner) {
   var self = this;
 
-  self._init(product, _owner)
+  self._owner = _owner;
+
+  self._init()
 };
 
 /**
  * Инициализация объекта по работе с вариантами
  */
-ISnew.ProductVariants.prototype._init = function (product, _owner) {
+ISnew.ProductVariants.prototype._init = function () {
   var self = this;
-  self._owner = _owner;
 
-  self.variants = product.variants;
-  self.images = self._getImage(product.images);
+  self.variants = self._owner.product.variants;
   self.urlVariant = Site.URL.getKeyValue('variant_id');
 
-  self.options = {};
-  self.options = self._initOptions(product.option_names);
-
-  self.tree = self._initTree(product.variants);
-
+  // создаем опции
+  self.options = self._initOptions(self._owner.product.option_names);
+  // создаем дерево
+  self.tree = self._initTree(self._owner.product.variants);
+  // проставляем выбранные опции
   self.options = self._selectedOptions(self.options);
 
-
-  if (self._owner.settings.init_option) {
+  if (self._owner.settings.initOption) {
     self._update();
   }
 }
@@ -18042,7 +18066,6 @@ ISnew.ProductVariants.prototype._initTree = function (variants) {
         };
       }
 
-
       leaf = leaf[option.position].tree;
     });
   });
@@ -18065,7 +18088,6 @@ ISnew.ProductVariants.prototype._initTree = function (variants) {
  */
 ISnew.ProductVariants.prototype._nodeAvailable = function (leaf) {
   var self = this;
-
 
   if (leaf.variant_id === undefined) {
     var isAvailable = false;
@@ -18103,6 +18125,37 @@ ISnew.ProductVariants.prototype._update = function () {
 };
 
 /**
+ * Получить значения с уровня
+ */
+ISnew.ProductVariants.prototype.getLevel = function (level) {
+  var self = this;
+  var leaf = self.tree;
+
+  _.forEach(self.options, function(option, option_level) {
+    if (level == option_level) {
+      return false;
+    }
+    leaf = leaf[option.selected].tree;
+  });
+
+  return leaf;
+};
+
+/**
+ * Получить первый элемент на уровне
+ */
+ISnew.ProductVariants.prototype.getFirst = function (leaf) {
+  var self = this;
+
+  var first = _.chain(leaf)
+    .toArray()
+    .first()
+    .value();
+
+  return first;
+};
+
+/**
  * Получаем выбранный вариант
  */
 ISnew.ProductVariants.prototype.getVariant = function () {
@@ -18135,9 +18188,12 @@ ISnew.ProductVariants.prototype.getVariant = function () {
  */
 ISnew.ProductVariants.prototype.setVariant = function (variant_id) {
   var self = this;
+  var settings = self._owner.settings
 
-  if (! self._owner.settings.init_option) {
-    self._owner.settings.init_option = true;
+  // TODO: пихнуть эту штуку в более актуальное место
+  // нужна для принудительного выбора модификации
+  if (!settings.initOption) {
+    settings.initOption = true;
   }
 
   self._setOptionByVariant(variant_id);
@@ -18145,7 +18201,6 @@ ISnew.ProductVariants.prototype.setVariant = function (variant_id) {
   self._update();
   return;
 };
-
 // ====================================================================================
 //                          Методы по работе с опциями
 // ====================================================================================
@@ -18164,22 +18219,14 @@ ISnew.ProductVariants.prototype._initOptions = function (options) {
   var settingsOptions = self._owner.settings.options;
 
   _.forEach(options, function(option, index) {
-    var optionTitle = options[index].title;
+    // название опции транслитом
+    option.handle = Site.Translit.replace(option.title);
 
-    var renderType = settingsOptions[optionTitle];
+    // Выставляем шаблон для опции, либо из настроек, либо дефолтный шаблон
+    option.renderType = settingsOptions[option.title] || settingsOptions.default;
 
-    //  если название шаблона для опции передано в параметрах
-    if (renderType) {
-      options[index].render_type = renderType;
-    }else{
-      options[index].render_type = settingsOptions['default'];
-    }
-
-    //  название опции транслитом
-    options[index].handle = Site.Translit.replace(optionTitle);
-
-    //  массив значений опции
-    options[index].values = {};
+    // массив значений опции
+    option.values = {};
   });
 
   return options;
@@ -18200,8 +18247,8 @@ ISnew.ProductVariants.prototype._addValues = function (value, index) {
     optionValues[value.position] = value;
     optionValues[value.position].name = optionValues[value.position].title.toLowerCase();
   }
-
 }
+
 /**
  * Устанавливаем selected
  *
@@ -18209,6 +18256,8 @@ ISnew.ProductVariants.prototype._addValues = function (value, index) {
  *
  * @return {object} options модифицированный self.options c новым свойством selected. option.selected содержит позицию выбранного значения.
  */
+
+// TODO: у нас может быть ситуация, когда нет опций в товаре.
 ISnew.ProductVariants.prototype._selectedOptions = function (options) {
   var self = this;
   var leaf = self.tree;
@@ -18217,7 +18266,6 @@ ISnew.ProductVariants.prototype._selectedOptions = function (options) {
     var first = self.getFirst(leaf);
 
     options[index].selected = first.position;
-
     leaf = first.tree;
   });
 
@@ -18231,13 +18279,12 @@ ISnew.ProductVariants.prototype._selectedOptions = function (options) {
 ISnew.ProductVariants.prototype.setOption = function (option) {
   var self = this;
 
-
   var index = _.findKey(self.options, function (_option) {
     return _option.id == option.option_name_id;
   });
 
   // Если не опцию не меняли - на выход
-  if (self.options[index].selected == option.position & self._owner.settings.init_option) {
+  if (self.options[index].selected == option.position & self._owner.settings.initOption) {
     return;
   }
 
@@ -18260,8 +18307,8 @@ ISnew.ProductVariants.prototype.setOption = function (option) {
     }
   });
 
-  if (! self._owner.settings.init_option) {
-    self._owner.settings.init_option = true;
+  if (! self._owner.settings.initOption) {
+    self._owner.settings.initOption = true;
   }
 
   self._update();
@@ -18275,37 +18322,6 @@ ISnew.ProductVariants.prototype.getOption = function (index) {
   var self = this;
 
   return self.options[index];
-};
-
-/**
- * Получить значения с уровня
- */
-ISnew.ProductVariants.prototype.getLevel = function (level) {
-  var self = this;
-  var leaf = self.tree;
-
-  _.forEach(self.options, function(option, option_level) {
-    if (level == option_level) {
-      return false;
-    }
-    leaf = leaf[option.selected].tree;
-  });
-
-  return leaf;
-};
-
-/**
- * Получить первый элемент на уровне
- */
-ISnew.ProductVariants.prototype.getFirst = function (leaf) {
-  var self = this;
-
-  var first = _.chain(leaf)
-    .toArray()
-    .first()
-    .value();
-
-  return first;
 };
 
 /**
@@ -18329,7 +18345,7 @@ ISnew.ProductVariants.prototype.getFilterOption = function (level) {
         delete option.values[index];
       }
     }
-  })
+  });
 
   return option;
 };
@@ -18369,41 +18385,6 @@ ISnew.ProductVariants.prototype._getSelectedVector = function (_length) {
 
   return vector;
 };
-
-// ====================================================================================
-//                          Методы по работе с изображениями продукта
-// ====================================================================================
-
-/**
- * Получаем объект с изображениями где ключом является название изображения
- *
- * @param  {array} images массив изображений продукта (product.images)
- *
- * @return {object} _images объект с изображениями в виде {'image.title': {small_url: 'http//'}}
- */
-ISnew.ProductVariants.prototype._getImage = function (images) {
-  var self = this;
-
-  var _images = {};
-
-  //  если у продукта есть изображения
-  if (_.size(images) > 0) {
-      _.forEach(images, function(image) {
-        //  если у изображения есть title
-        if(image['title']){
-          var imageName = image['title'].toLowerCase();
-          _images[imageName] = {};
-          _images[imageName].thumb_url = image['thumb_url'];
-          _images[imageName].small_url = image['small_url'];
-          _images[imageName].medium_url = image['medium_url'];
-          _images[imageName].large_url = image['large_url'];
-          _images[imageName].original_url = image['original_url'];
-        }
-      });
-  }
-
-  return _images;
-}
 /**
  * Сравнение товаров
  */
@@ -18659,8 +18640,18 @@ ISnew.CompareDOM.prototype._deleteItem = function ($button) {
  * @class
  * @name ISnew.Search
  */
-ISnew.Search = function( options ){
+ISnew.Search = function ( options ) {
   var self = this;
+
+  self._default = {
+    options: {
+      searchSelector: '[data-search-field]',
+      markerClass: 'ajax_search-marked',
+      letters: 3,
+      template: 'search-default',
+    },
+    path: '/search_suggestions'
+  };
 
   self._init(options);
 }
@@ -18669,85 +18660,80 @@ ISnew.Search = function( options ){
  *
  * @param  {object} options конфигурация поиска
  */
-ISnew.Search.prototype._init = function(options) {
+ISnew.Search.prototype._init = function (options) {
   var self = this;
 
-  var options = options || {};
+  self.setConfig(options);
 
-  self.options = {};
-  self.options.searchSelector = options.searchSelector || '[data-search-field]';
-  self.options.searchWrapper = options.searchWrapper || $(self.searchSelector).parents('form:first');
-  self.options.markerClass = options.markerClass || 'ajax_search-marked';
-  self.options.letters = options.letters || 3;
-  self.options.template = options.template || 'search-default';
+  self.$searchField = $(self.options.earchSelector);
+  self.$searchForm = self.$searchField.parents('form:first');
 
-  self.path = '/search_suggestions';
-
+  /*
   self.data = {
     account_id: Site.account.id,
     locale: Site.language.locale,
     fields: [ 'price_min', 'price_min_available' ],
     hide_items_out_of_stock: Site.account.hide_items,
   };
+  */
 
-  self.binding();
+  self._binding();
 };
+
 /**
  * Обработчик ввода символов
  */
-ISnew.Search.prototype.binding = function(){
+ISnew.Search.prototype._binding = function () {
   var self = this;
 
-  var
-    keyupTimeoutID = '',
-    $search = $( self.options.searchSelector );
+  self.keyupTimeoutID = '';
 
-  $(document).on( 'keyup', self.options.searchSelector, function(){
-    var
-      $data = {};
-
+  $(document).on( 'keyup', self.options.searchSelector, function (){
+    var data = {};
     var $input = $(this);
 
     self.data.query = $input.val();
 
-    clearTimeout( self.keyupTimeoutID );
+    clearTimeout(self.keyupTimeoutID);
 
-    if( self.data.query !== '' && self.data.query.length >= self.options.letters ){
-      self.keyupTimeoutID = setTimeout( function(){
-        $.getJSON( self.path, self.data,
-          function( response ){
-            $data = self.makeData( response, $search.val() );
+    if (self.data.query !== '' && self.data.query.length >= self.options.letters) {
+      self.keyupTimeoutID = setTimeout( function () {
+        $.getJSON(self.path, self.data,
+          function (response) {
+            data = self._patch (response, self.$searchField.val());
 
-            $data['action'] = {
+            data.action = {
               method: 'update',
               input: $input
             };
 
-            EventBus.publish('update_suggestions:insales:search', $data );
+            EventBus.publish('update_suggestions:insales:search', data);
           });
       }, 300 );
 
-      $( document ).on( 'click', 'body', self.outClick );
-    }else{
+      $(document).on('click', 'body', self._outClick);
+    } else {
       // возвращаем пустой объект, чтобы спрятать результат поиска
-      $data['suggestions'] = [];
-      $data['action'] = {
-              method: 'update',
-              input: $input
-            };
-      EventBus.publish('update_suggestions:insales:search', $data);
+      data = {
+        suggestions: [],
+        action: {
+          method: 'update',
+          input: $input
+        }
+      }
+      EventBus.publish('update_suggestions:insales:search', data);
 
-      $( document ).off( 'click', 'body', self.outClick );
+      $(document).off('click', 'body', self._outClick);
     }
   });
 };
+
 /**
  * Удаление данных из выдачи
  */
-ISnew.Search.prototype.outClick = function(){
-  var $search = $( AjaxSearch.options.searchWrapper );
-
-  var $data = {
+ISnew.Search.prototype._outClick = function () {
+  var self = this;
+  var data = {
     suggestions: [],
     action: {
       method: 'close',
@@ -18755,26 +18741,31 @@ ISnew.Search.prototype.outClick = function(){
     }
   };
 
-  if( $( event.target ).closest( $search ).length ) return;
-    EventBus.publish('update_suggestions:insales:search', $data );
+  if ($(event.target).closest(self.$searchForm).length) {
+    return
+  };
+  EventBus.publish('update_suggestions:insales:search', data);
   event.stopPropagation();
-  $( document ).off( 'click', 'body', self.outClick );
+  $(document).off('click', 'body', self._outClick);
 };
 
 /**
  * приводим в общий порядок список поиска
  */
-ISnew.Search.prototype.makeData = function( $data, keyword ){
+ISnew.Search.prototype._patch = function (data, keyword) {
   var self = this;
   var replacment = '<span class="'+ self.options.markerClass +'">$1</span>';
-  $.each( $data.suggestions, function( index, product ){
-    product.id    = product.data;
-    product.url   = '/product_by_id/'+ product.id;
+
+  console.log(data);
+
+  _.forEach(data.suggestions, function (product) {
+    product.id = product.data;
+    product.url = '/product_by_id/'+ product.id;
     product.title = product.value;
-    product.marked_title = product.value.replace( new RegExp( '('+ keyword +')', 'gi' ), replacment );
+    product.markedTitle = product.value.replace(new RegExp('('+ keyword +')', 'gi'), replacment);
   });
 
-  return $data;
+  return data;
 };
 
 /**
@@ -18783,17 +18774,7 @@ ISnew.Search.prototype.makeData = function( $data, keyword ){
 ISnew.Search.prototype.setConfig = function(options) {
   var self = this;
 
-  if (!options) {
-    return;
-  }
-
-  if (options.template) {
-    self.options.template = options.template;
-  }
-
-  if (options.letters) {
-    self.options.letters = options.letters;
-  }
+  _.merge(self, self._default, options);
 }
 
 /*
@@ -18802,6 +18783,7 @@ ISnew.Search.prototype.setConfig = function(options) {
 var Cart = new ISnew.Cart();
 var Template = new ISnew.Template();
 var Compare = new ISnew.Compare();
+var AjaxSearch = new ISnew.Search();
 
 Site.URL = new ISnew.tools.URL();
 Site.Translit = new ISnew.tools.Translit();
@@ -18814,24 +18796,22 @@ Site.Translit = new ISnew.tools.Translit();
 $(document).on('change click', '[data-option-bind]', function (event) {
   event.preventDefault();
 
-  var $select = $(this);
+  var $option = $(this);
 
-  if ($select.is('select')) {
-    if (event.type === 'click') {
-      return false;
-    }
+  if ($option.is('select') && event.type === 'click') {
+    return false;
   }
 
-  var $formProduct = $select.parents('form[data-product-id]:first');
+  var $formProduct = $option.parents('form[data-product-id]:first');
   var OptionSelector = $formProduct[0]['OptionSelector'];
 
   var option = {
-    option_name_id: $select.data('option-bind'),
-    position: $select.data('value-position')
+    option_name_id: $option.data('option-bind'),
+    position: $option.data('value-position')
   };
 
-  if ($select.is('select')) {
-    option.position = parseInt($select.val());
+  if ($option.is('select')) {
+    option.position = parseInt($option.val());
   }
 
   OptionSelector._owner.variants.setOption(option);
@@ -18840,24 +18820,30 @@ $(document).on('change click', '[data-option-bind]', function (event) {
 // =======================================================================================
 //                                      AJAX SEARCH
 // =======================================================================================
-if (!AjaxSearch) {
-  var AjaxSearch = {};
-}
 
 $(function() {
-  AjaxSearch = new ISnew.Search();
+  AjaxSearch.setConfig({
+    data: {
+      account_id: Site.account.id,
+      locale: Site.language.locale,
+      fields: [ 'price_min', 'price_min_available' ],
+      hide_items_out_of_stock: Site.account.hide_items
+    }
+  });
+
   EventBus.subscribe('update_suggestions:insales:search', function( data ){
     //  срабатывает на события внутри формы
     if (data.action.input) {
       var $input = $(data.action.input);
       var $form_suggestions = $input.parents('form:first')
 
-      $form_suggestions.find( '[data-search-result]' )
-          .html( Template.render(data, AjaxSearch.options.template) );
-    }else{
+      $form_suggestions
+        .find('[data-search-result]')
+          .html(Template.render(data, AjaxSearch.options.template));
+    } else {
       //  срабатывает на события вне формы
-      $( '[data-search-result]' )
-          .html( Template.render(data, AjaxSearch.options.template) );
+      $('[data-search-result]')
+        .html(Template.render(data, AjaxSearch.options.template));
     }
   });
 });

@@ -18,11 +18,11 @@ _.forEach(options, function (value)
 //  false отключает вывод optionSelector
 show_variants: true
 
-//  Данное свойство доступно в выводе опций, его можно комбинировать с option.selected == value.position & init_option. в таком случае визуально не будет выбранных опций.
+//  Данное свойство доступно в выводе опций, его можно комбинировать с option.selected == value.position & initOption. в таком случае визуально не будет выбранных опций.
 сделано по просьбе сделать невыбранными опции при загрузке.
 при этом в нативном селекторе первый option следует сделать пустым
 
-init_option: true
+initOption: true
 
 //  Задаём шаблоны для вывода опций
 options: {
@@ -30,20 +30,20 @@ options: {
 }
 
 //  Объект с картинками из файлов
-file_url: {
+fileUrl: {
   "красный": "http//"
 }
 
 ====== Пример вызова ======
 var ProductsConfig = {
-  show_variants: true,
-  file_url: fileUrl,
-  init_option: true,
+  showVariants: true,
+  fileUrl: fileUrl,
+  initOption: true,
   options: {
-      'Цвет': 'option-images',
-      'Размер': 'option-span',
-      'Материал': 'option-span',
-      'Жесткий диск': 'option-span'
-    }
+    'Цвет': 'option-images',
+    'Размер': 'option-span',
+    'Материал': 'option-span',
+    'Жесткий диск': 'option-span'
+  }
 }
 var Products = new ISnew.Products(ProductsConfig);

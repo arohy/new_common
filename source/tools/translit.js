@@ -1,7 +1,7 @@
 /**
  * производим транслитерацию строки
  */
-ISnew.tools.Translit = function( string ){
+ISnew.tools.Translit = function( string ) {
   var self = this;
 
   var space = '_';

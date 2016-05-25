@@ -20,8 +20,8 @@
 
 <p>var ProductsConfig = {<br />
 &nbsp; product_id: &#39;data-product-id&#39;,<br />
-&nbsp; show_variants: true,<br />
-&nbsp; init_option: true,<br />
+&nbsp; showVariants: true,<br />
+&nbsp; initOption: true,<br />
 &nbsp; options: {<br />
 &nbsp; &nbsp; &nbsp; &#39;Цвет&#39;: &#39;option-images&#39;,<br />
 &nbsp; &nbsp; &nbsp; &#39;Размер&#39;: &#39;option-span&#39;,<br />
@@ -38,13 +38,13 @@
 product_id: &#39;data-product-id&#39;</p>
 
 <p>// &nbsp;false отключает вывод optionSelector<br />
-show_variants: true</p>
+showVariants: true</p>
 
-<p>// &nbsp;Данное свойство доступно в выводе опций, его можно комбинировать с option.selected == value.position &amp; init_option. в таком случае визуально не будет выбранных опций.<br />
+<p>// &nbsp;Данное свойство доступно в выводе опций, его можно комбинировать с option.selected == value.position &amp; initOption. в таком случае визуально не будет выбранных опций.<br />
 сделано по просьбе сделать невыбранными опции при загрузке.<br />
 при этом в нативном селекторе первый option следует сделать пустым</p>
 
-<p>init_option: true</p>
+<p>initOption: true</p>
 
 <p>// &nbsp;Задаём шаблоны для вывода опций<br />
 options: {<br />
@@ -53,7 +53,7 @@ options: {<br />
 &nbsp;</p>
 
 
-  {% for product in collections.all.products limit: 2 %}
+  {% for product in collections.all.products limit: 20 %}
     <a class="super-title" href="{{ product.url }}">====== {{ product.title }} ========</a>
     <form action="{{ cart_url }}" method="post" data-product-id="{{ product.id }}">
     {% if product.show_variants? %}
