@@ -12,13 +12,10 @@ ISnew.tools.URL = function () {
  */
 ISnew.tools.URL.prototype._init = function () {
   var self = this;
-  var self = window.location;
-  var temp;
-
-  //self.search = self.search;
   self.keys = {};
+  self.location = window.location;
 
-  _.chain(self.search.replace('?', ''))
+  _.chain(self.location.search.replace('?', ''))
     .split('&')
     .forEach(function (part) {
       if (part !== '') {

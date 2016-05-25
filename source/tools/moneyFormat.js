@@ -1,8 +1,10 @@
 /**
  * Класс для работы с валютой.
  */
-ISnew.Money = function () {
+ISnew.Money = function (params) {
   var self = this;
+
+  self._init(params);
 };
 
 /**

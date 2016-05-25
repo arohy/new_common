@@ -1,16 +1,53 @@
 /**
- * Variants tree
+ * Конструктор объета по работе с вариантами продукта
+ * @class
+ * @name ISnew.ProductVariants
+ *
+ * @example
+ * self.variants = new ISnew.ProductVariants(_product, self);
+ *
+ * @param  {object} product продукт
+ * @param  {object} _owner родительский объект класса Product
+ *
+ * @property {array} variants массив модификаций продукта
+ * @property {object} images картики продукта в виде {'title': {small_url: 'http//'}}
+ * @property {number} urlVariant id варианта из урла
+ * @property {object} options все опции продукта со всеми своими значениями
+ * @property {object} tree дерево вариантов
+ *
  */
-ISnew.ProductVariants = function (product, _owner) {
+ISnew.ProductVariants = function (_owner) {
   var self = this;
+
   self._owner = _owner;
 
-  self.variants = product.variants;
-  self.tree = self._initTree(product.variants);
-  self.options = self._initOptions(product.option_names);
-
-  self._update();
+  self._init()
 };
+
+/**
+ * Инициализация объекта по работе с вариантами
+ */
+ISnew.ProductVariants.prototype._init = function () {
+  var self = this;
+
+  self.variants = self._owner.product.variants;
+  self.urlVariant = Site.URL.getKeyValue('variant_id');
+
+  // создаем опции
+  self.options = self._initOptions(self._owner.product.option_names);
+  // создаем дерево
+  self.tree = self._initTree(self._owner.product.variants);
+  // проставляем выбранные опции
+  self.options = self._selectedOptions(self.options);
+
+  if (self._owner.settings.initOption) {
+    self._update();
+  }
+}
+
+// ====================================================================================
+//                          Методы по работе с деревом вариантов
+// ====================================================================================
 
 /**
  * Строим дерево вариантов
@@ -29,6 +66,9 @@ ISnew.ProductVariants.prototype._initTree = function (variants) {
       var id;
       var isAvailable;
 
+      // Добавляем новое значение в опцию
+      self._addValues(option, index);
+
       // Если дошли до последней опции - выставляем вариант и доступность
       if (index == (variant.option_values.length - 1)) {
         id = variant_id;
@@ -41,6 +81,7 @@ ISnew.ProductVariants.prototype._initTree = function (variants) {
           id: _.toInteger(option.id),
           tree: {},
           title: option.title,
+          name: option.title.toLowerCase(),
           variant_id: id,
           position: _.toInteger(option.position)
         };
@@ -61,6 +102,10 @@ ISnew.ProductVariants.prototype._initTree = function (variants) {
 
   return tree;
 };
+
+// ====================================================================================
+//                          Методы по работе с вариантом
+// ====================================================================================
 
 /**
  * Установка доступности вариантов
@@ -95,6 +140,13 @@ ISnew.ProductVariants.prototype._update = function () {
   status.action = 'update_variant';
 
   self._owner._updateStatus(status);
+
+  //  если есть id в урле обновляем вариант
+  if (self.urlVariant) {
+    self._setOptionByVariant(self.urlVariant);
+    self.urlVariant = false;
+  }
+
   return;
 };
 
@@ -135,11 +187,24 @@ ISnew.ProductVariants.prototype.getFirst = function (leaf) {
 ISnew.ProductVariants.prototype.getVariant = function () {
   var self = this;
   var branch = _.get(self, self._getSelectedVector());
+  var branchId = branch.variant_id;
   var id;
 
+  //  если есть id в урле подменяем вариант
+  if (self.urlVariant) {
+    branchId = self.urlVariant;
+  }
+
   id = _.findKey(self.variants, function(variant) {
-    return variant.id == branch.variant_id;
+    return variant.id == branchId;
   });
+
+  //  если поиск по варианту из урла ничего не выдал
+  if (!id) {
+    id = _.findKey(self.variants, function(variant) {
+      return variant.id == branch.variant_id;
+    });
+  }
 
   return self.variants[id];
 };
@@ -149,111 +214,16 @@ ISnew.ProductVariants.prototype.getVariant = function () {
  */
 ISnew.ProductVariants.prototype.setVariant = function (variant_id) {
   var self = this;
+  var settings = self._owner.settings
+
+  // TODO: пихнуть эту штуку в более актуальное место
+  // нужна для принудительного выбора модификации
+  if (!settings.initOption) {
+    settings.initOption = true;
+  }
 
   self._setOptionByVariant(variant_id);
 
   self._update();
   return;
-};
-
-// ====================================================================================
-
-/**
- * Подготовка опций
- */
-ISnew.ProductVariants.prototype._initOptions = function (options) {
-  var self = this;
-  var leaf = self.tree;
-
-  _.forEach(options, function(option, index) {
-    var first = self.getFirst(leaf);
-
-    options[index].selected = first.position;
-    leaf = first.tree;
-  });
-
-  return options;
-};
-
-/**
- * Устанавливаем опцию внешним обработчиком.
- * АХТУНГ!!! Влечет обновление актуального варианта!
- */
-ISnew.ProductVariants.prototype.setOption = function (option) {
-  var self = this;
-
-  var index = _.findKey(self.options, function (_option) {
-    return _option.id == option.option_name_id;
-  });
-
-  // Если не опцию не меняли - на выход
-  if (self.options[index].selected == option.position) {
-    return;
-  }
-
-  self.options[index].selected = option.position;
-
-  /**
-   * Проходим по выбранным опциям и фиксим неприавльно выбранные.
-   * Неправильные - если при текущем варианте мы уходм в лес.
-   */
-  _.forEach(self.options, function (_option, index) {
-    var isLeaf = _.get(self, self._getSelectedVector(index + 1));
-
-    // Если мы не можем найти такую ветку - вытаскиваем строение уровня
-    // и помечаем первое свойство как выбранное
-    if (isLeaf === undefined) {
-      var leaf = self.getLevel(index);
-      var first = self.getFirst(leaf);
-
-      _option.selected = first.position;
-    }
-  });
-
-  self._update();
-  return;
-};
-
-/**
- * Получить опцию
- */
-ISnew.ProductVariants.prototype.getOption = function (index) {
-  var self = this;
-
-  return self.options[index];
-};
-
-/**
- * Установить опции по варианту
- */
-ISnew.ProductVariants.prototype._setOptionByVariant = function (variant_id) {
-  var self = this;
-
-  var index = _.findKey(self.variants, function (variant) {
-    return variant.id == variant_id;
-  });
-
-  _.forEach(self.variants[index].option_values, function(option, option_index) {
-    self.options[option_index].selected = option.position;
-  });
-
-  return;
-};
-
-/**
- * генерим путь по выбранным опциям
- */
-ISnew.ProductVariants.prototype._getSelectedVector = function (_length) {
-  var self = this;
-  var vector = '';
-  _length = (_length || self.options.length) - 1;
-
-  _.forEach(self.options, function(option, index) {
-    vector += '.tree['+ (option.selected) +']';
-    if (_length == index) {
-      return false;
-    }
-  });
-
-  return vector;
 };

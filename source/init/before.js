@@ -8,6 +8,11 @@ if (!ISnew) {
   var ISnew = {};
 }
 
+// Место для всяких утилиток
+if (!ISnew.tools) {
+  ISnew.tools = {};
+}
+
 // Глобальная информация о сайте.
 if (!Site) {
   var Site = {};
@@ -16,11 +21,6 @@ if (!Site) {
 // Место для всех оберток json
 if (!ISnew.json) {
   ISnew.json = {};
-}
-
-// Место для всяких утилиток
-if (!ISnew.tools) {
-  ISnew.tools = {};
 }
 
 if (!EventBus) {

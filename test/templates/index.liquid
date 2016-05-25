@@ -1,7 +1,9 @@
-<div class="" style="float: left; width: 50%">
+<div class="row-flex">
 
+<div class="flex-xl-6">
+{% comment %}
   <h2>products</h2>
-  {% for product in collections.sarome.products limit: 10 %}
+  {% for product in collections.all.products limit: 10 %}
     <div class="">
       <button compare-item-add="{{ product.id }}">+</button>
       <button compare-item-delete="{{ product.id }}">-</button>
@@ -13,14 +15,78 @@
     </div>
   {% endfor %}
 
+{% endcomment %}
   ==================<br />
-  {% for product in collections.tovar-dnya.products limit: 10 %}
-    <a href="{{product.url}}">{{ product.id }}</a> ->
-    {% for variant in product.variants %}
-      {{ variant.id }} ||
-    {% endfor %}
-    <br />
+
+<p>var ProductsConfig = {<br />
+&nbsp; product_id: &#39;data-product-id&#39;,<br />
+&nbsp; showVariants: true,<br />
+&nbsp; initOption: true,<br />
+&nbsp; options: {<br />
+&nbsp; &nbsp; &nbsp; &#39;Цвет&#39;: &#39;option-images&#39;,<br />
+&nbsp; &nbsp; &nbsp; &#39;Размер&#39;: &#39;option-span&#39;,<br />
+&nbsp; &nbsp; &nbsp; &#39;Материал&#39;: &#39;option-span&#39;,<br />
+&nbsp; &nbsp; &nbsp; &#39;Жесткий диск&#39;: &#39;option-span&#39;<br />
+&nbsp; &nbsp; }<br />
+}</p>
+
+<p>
+  var Products = new ISnew.Products(ProductsConfig);
+</p>
+
+<p>// &nbsp;можно поменять data атрибут формы<br />
+product_id: &#39;data-product-id&#39;</p>
+
+<p>// &nbsp;false отключает вывод optionSelector<br />
+showVariants: true</p>
+
+<p>// &nbsp;Данное свойство доступно в выводе опций, его можно комбинировать с option.selected == value.position &amp; initOption. в таком случае визуально не будет выбранных опций.<br />
+сделано по просьбе сделать невыбранными опции при загрузке.<br />
+при этом в нативном селекторе первый option следует сделать пустым</p>
+
+<p>initOption: true</p>
+
+<p>// &nbsp;Задаём шаблоны для вывода опций<br />
+options: {<br />
+&nbsp; &#39;Цвет&#39;: &#39;option-image&#39;<br />
+}<br />
+&nbsp;</p>
+
+
+  {% for product in collections.all.products limit: 20 %}
+    <a class="super-title" href="{{ product.url }}">====== {{ product.title }} ========</a>
+    <form action="{{ cart_url }}" method="post" data-product-id="{{ product.id }}">
+    {% if product.show_variants? %}
+
+    <select name="variant_id" data-product-variants>
+      {% for variant in product.variants %}
+        {% if forloop.first %}
+          <option value="false" selected="selected">Clear</option>
+        {% endif %}
+        <option value="{{ variant.id }}">{{ variant.title | escape }}</option>
+      {% endfor %}
+    </select>
+  {% else %}
+  <input type="hidden" name="variant_id" value="{{product.variants.first.id}}" >
+    {% endif %}
+    <input class="input-field" type="number" name="quantity" value="1" />
+
+
+  <div class="variant-info">
+
+  </div>
+
+  <button type="" cart-item-add class="btn">
+    Добавь одну
+  </button>
+</form>
   {% endfor %}
+
+
+<br>
+<br>
+<br>
+  <button class="btn" data-cart-remove>Очистить корзину</button>
 
   <h2>delivery_id</h2>
   {% for delivery in account.delivery_variants %}
@@ -31,15 +97,30 @@
   {% for payment in account.payment_gateways %}
   {{ payment.id }}
   {% endfor %}
-</div>2
+</div>
 
-<div class="" style="float: left; width: 50%">
+<div class="flex-xl-6">
   cart
-  <pre class="prettyprint js-cart"></pre>
+  <pre class="cart-widget js-cart"></pre>
+</div>
 </div>
 
 <script type="text/javascript">
 $(function(){
-  product = new ISnew.Product({{ collections.tovar-dnya.products.last | json }});
+  $('[data-cart-remove]').click(function(event) {
+    var orderNow = Cart.getOrder();
+    var variantTask = [];
+    var orderLineCount = orderNow.order_lines.length - 1;
+
+    $.each(orderNow.order_lines, function(index, _order_line) {
+       variantTask.push( _order_line.variant_id )
+       if (orderLineCount === index ) {
+        Cart.clear( variantTask );
+       }
+    });
+  });
 });
 </script>
+
+
+

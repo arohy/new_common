@@ -1,8 +1,19 @@
-var Cart = new ISnew.Cart();
-var Compare = new ISnew.Compare({
-  //maxItems: 2
+EventBus.subscribe('update_items:insales:cart', function (data) {
+  var cart_widget_html = Template.render(data, 'cart_widget')
+
+  $('.js-cart').html(cart_widget_html);
+
+  _.forEach(data.order_lines, function(value, key) {
+    $('[data-item-cart]').html('0');
+    $('[data-item-cart="'+value.variant_id+'"]').html(value.quantity);
+  });
+  if (data.order_lines.length === 0) {
+    $('[data-item-cart]').html('0');
+  }
 });
-EventBus.logger.add('cart');
+
+//EventBus.logger.add('product');
+//EventBus.logger.add('cart');
 /*
  * Тест для addCartItems()
  */
@@ -174,4 +185,46 @@ testUpdateCartItems = function (items, comments) {
       console.log('fail', response);
     })
 }
-var product;
+EventBus.subscribe('update_variant:insales:product', function (data){
+
+  var orderItem = 0;
+
+  var productPrice = data.price;
+  var productAvailable = data.available;
+  var productOldPrice = data.old_price || false;
+  var productSku = data.sku || false;
+  var productQuantity = (data.quantity === null) ? -1 : data.quantity;
+  var productId = data.product_id;
+  var variantId = data.id;
+
+  _.forEach(Cart.order.order_lines, function(value, key) {
+    if (value.variant_id == variantId) {
+      orderItem = value.quantity;
+    }
+  });
+
+  renderProd(productPrice, productOldPrice, productSku, productQuantity, productId, productAvailable, orderItem, variantId)
+})
+
+function renderProd(productPrice, productOldPrice, productSku, productQuantity, productId, productAvailable, orderItem, variantId) {
+  var $formSelector = $('[data-product-id="'+productId+'"]')
+  var $variantInfo = $formSelector.find('.variant-info');
+
+  var dataProduct = {
+    available: productAvailable,
+    variant_id: variantId,
+    price: productPrice,
+    old_price: productOldPrice,
+    sku: productSku,
+    order_item: orderItem,
+    quantity: productQuantity
+  }
+  //Функция которая компилирует шаблон
+    var compile = _.template(document.getElementById('variant-info').innerHTML);
+
+    //Передаём функции объект корзины и получаем скомпилированный HTML
+    var htmlTemplate = compile(dataProduct);
+
+    //Перезаписываем верстку виджета
+    $formSelector.find('.variant-info').html(htmlTemplate);
+}

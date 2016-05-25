@@ -1,12 +1,19 @@
 /**
  * Типы цен
+ *
+ * @class
+ * @name ISnew.ProductPriceType
+ *
+ * @param {json} product json с информацией о товаре
+ * @param {object} _owner ссылка на родительский класс ISnew.Products
+ *
  */
-ISnew.ProductPriceType = function (product, _owner) {
+ISnew.ProductPriceType = function (_owner) {
   var self = this;
   self._owner = _owner;
-  self.variant_id = product.variants[0].id;
 
-  self.price_kinds = self._initPrices(product);
+  self.variant_id = self._owner.product.variants[0].id;
+  self.price_kinds = self._initPrices(self._owner.product);
 
   return self;
 };

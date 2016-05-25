@@ -4,10 +4,24 @@ var concat = require('gulp-concat');
 var plumber = require('gulp-plumber');
 var combine = require('stream-combiner');
 var shell = require('gulp-shell');
+var rigger = require('gulp-rigger');
 
 // ==============================
-gulp.task('default', ['insup-load','common-watch', 'test-watch'], function() {
+// таска дял Win
+gulp.task('default', ['common-watch', 'test-watch'], function() {
   // пустая таска, главное - просто работает )
+});
+
+// таска для linux, mac os
+gulp.task('linux', ['insup-load', 'common-watch', 'test-watch'], function() {});
+
+gulp.task('dist', function () {
+  return gulp.src(['source/*.js'])
+    .pipe(combine(
+      plumber(),
+      rigger(),
+      gulp.dest('./dist')
+    ))
 });
 
 gulp.task('common-watch', function() {
@@ -25,10 +39,10 @@ gulp.task('test-watch', function() {
 })
 
 gulp.task('build-common', function() {
-  return gulp.src(['source/**/*.js'])
+  return gulp.src(['source/*.js'])
     .pipe(combine(
       plumber(),
-      concat('new_common.js'),
+      rigger(),
       gulp.dest('./test/media')
     ))
 });

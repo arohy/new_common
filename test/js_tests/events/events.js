@@ -1,1 +1,2 @@
-EventBus.logger.add('cart');
+//EventBus.logger.add('product');
+//EventBus.logger.add('cart');

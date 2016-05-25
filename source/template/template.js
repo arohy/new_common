@@ -43,9 +43,46 @@ ISnew.Template.prototype.load = function (template_body, template_id) {
 ISnew.Template.prototype._init = function () {
   var self = this;
 
+  //  устанавливаем lock пока не собирем все шаблоны
+  self.lock = true;
+
+  //  устанавливаем статус пусто
+  self.empty = true;
+
+  //  вытаскиваем дефолтный шаблон
+  self._setDefault();
+
   $(function () {
-    $('[data-template-id]').each(function () {
-      self.load($(this).html(), $(this).data('templateId'));
-    });
+    var $templates = $('[data-template-id]');
+
+    if ($templates.length) {
+      $templates.each(function (index, el) {
+        self.load($(el).html(), $(el).data('templateId'));
+
+        if ($(el).is(':last')) {
+          //  снимаем lock
+          self.lock = false;
+          //  обновляем статус
+          self.empty = false;
+        }
+      });
+    } else {
+      //  снимаем lock
+      self.lock = false;
+      //  обновляем статус
+      self.empty = true;
+    }
   });
+};
+
+ISnew.Template.prototype.has = function (template_id) {
+  var self = this;
+
+  var _has = false;
+
+  if (!Template.empty || self._templateList[template_id]) {
+    _has = true;
+  }
+
+  return _has;
 };

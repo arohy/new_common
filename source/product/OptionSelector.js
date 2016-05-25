@@ -1,43 +1,81 @@
 /**
- * OptionSelector
+ * Объект отвечающий за работу опшн селектора
+ *
+ * @class
+ * @name ISnew.OptionSelector
+ *
+ * @param {json} product json с информацией о товаре
+ * @param {object} _owner ссылка на родительский класс ISnew.Products
+ *
+ *
+ * @property {object} selector в объекте хранятся названия селекторов
+ * @property {object} $product опорный DOM-узел, который описывает товар
+ * @property {object} $nativeSelect нативный селект который выводим через liquid
+ * @property {object} $optionSelector контейнер куда происходит рендер селекторов опций
+ *
  */
-ISnew.OptionSelector = function (product, _owner) {
+ISnew.OptionSelector = function (_owner) {
   var self = this;
 
-  self._init(product, _owner);
-  self._renderSelector();
-
-  self._bindSelect();
+  self._init(_owner);
 }
 
 /**
- * Настройки
+ * Инициализация
+ *
+ * @param {json} product json с информацией о товаре
+ * @param {object} _owner ссылка на родительский класс ISnew.Products
+ *
  */
-ISnew.OptionSelector.prototype._init = function (_product, _owner) {
+ISnew.OptionSelector.prototype._init = function (_owner) {
   var self = this;
 
   self.selector = {
+    //  селектор формы
     product: 'data-product-id',
-    native_select: 'data-product-variants',
-
-    option_selector: 'data-option-selector',
-    option: 'data-product-option'
+    // data атрибут нативного селекта
+    nativeSelect: 'data-product-variants',
+    // data атрибут блока в который происходит рендер модификаций
+    optionSelector: 'data-option-selector'
   };
 
   self._owner = _owner;
 
   // находим опорный DOM-узел, который описывает товар
-  self.$product = $('['+ self.selector.product +'="'+ _product.id +'"]');
+  self.$product = $('['+ self.selector.product +'="'+ self._owner.product.id +'"]');
 
-  // находим там нативный селектор/точку для рендера
-  self.$native_select = self.$product.find('['+ self.selector.native_select +']');
+  // если DOM-узла нет, выходим
+  if (self.$product.length == 0) {
+    return;
+  }
+
+  // находим там нативный селект/точку для рендера
+  self.$nativeSelect = self.$product.find('['+ self.selector.nativeSelect +']');
+
+  // если нативного селектора нет, выходим
+  if (self.$nativeSelect.length == 0) {
+    return;
+  }
+
+  var optionSelector_length = self.$nativeSelect.next('[' + self.selector.optionSelector + ']').length;
 
   // создаем контейнер и сохраняем линк на него
-  self.$native_select.after('<div class="option-selector" '+ self.selector.option_selector +'/>');
-  self.$option_selector = self.$product.find('['+ self.selector.option_selector +']');
+  // проверка на рендер, если уже отрендерили то не добавляем новую обёртку
+  if (optionSelector_length === 0) {
+    self.$nativeSelect.after('<div class="option-selector" '+ self.selector.optionSelector +'/>');
+    self._owner.isRender = true;
+  }
+
+  self.$optionSelector = self.$product.find('['+ self.selector.optionSelector +']');
 
   // привязываем экземпляр Класса к товару
   self.$product[0]['OptionSelector'] = self;
+
+  self._bindSelect();
+
+  //  вызов рендера и слушателя
+  self._renderSelector();
+
   return;
 };
 
@@ -48,18 +86,22 @@ ISnew.OptionSelector.prototype._renderSelector = function () {
   var self = this;
 
   var variants = self._owner.variants;
-  var deep = variants.options.length;
+  var images = self._owner.images;
 
-  var optionsHTML = '';
+  // Если в настройках не отключили отображение селекторов
+  if (self._owner.settings.showVariants) {
+    //  собираем отрендеренные селекторы
+    var optionsHTML = _.reduce(variants.options, function (html, value, index) {
+      return html += self._renderOption({
+        option: variants.getFilterOption(index),
+        images: images,
+        fileUrl: self._owner.settings.fileUrl,
+        initOption: self._owner.settings.initOption
+      });
+    }, '');
 
-  for(var i = 0; i < deep; i++) {
-    optionsHTML += self._renderOption({
-      option: variants.getOption(i),
-      values: variants.getLevel(i)
-    });
+    self.$optionSelector.html(optionsHTML);
   }
-
-  self.$option_selector.html(optionsHTML);
 };
 
 /**
@@ -68,42 +110,46 @@ ISnew.OptionSelector.prototype._renderSelector = function () {
 ISnew.OptionSelector.prototype._renderOption = function (option) {
   var self = this;
 
-  var optionHTML = '';
+  var renderType = option.option.renderType;
 
-  //console.log(option);
+  //  если не получили шаблон
+  if (!renderType) {
+    throw new ISnew.tools.Error('ErrorOptionSelector', 'ошибка в получении шаблона');
+  }
 
-  optionHTML = Template.render(option,'option-select');
-
-  return optionHTML;
+  return Template.render(option, renderType);
 };
 
+/**
+ * Биндинг селекторов
+ */
 ISnew.OptionSelector.prototype._bindSelect = function () {
   var self = this;
 
-  $(document).on('click change', '[data-option-select]', function (event) {
-    event.preventDefault();
-
-    var $select = $(this);
-    var $product = $select.parents('['+ self.selector.product +']:first');
-    var OptionSelector = $product[0]['OptionSelector'];
-
-    var option = {
-      option_name_id: $select.data('option_name_id'),
-      position: $select.data('position-id')
-    };
-
-    if ($select.is('select')) {
-      option.position = parseInt($select.val());
-    }
-
-    OptionSelector._owner.variants.setOption(option);
-  });
-
+  //  подписываемся на обновление вариантов
   EventBus.subscribe('update_variant:insales:product', function (data) {
     var $product = $('['+ self.selector.product +'='+ data.product_id +']');
     var OptionSelector = $product[0]['OptionSelector'];
 
-    OptionSelector.$native_select.val(data.id);
-    OptionSelector._renderSelector();
+    if ( OptionSelector ) {
+      OptionSelector.$nativeSelect.val(data.id);
+      OptionSelector._renderSelector();
+    }
   });
 };
+
+//  Слушаем изменения в нативном селекте
+$(document).on('change', '[data-product-variants]', function (event) {
+  event.preventDefault();
+  var $select = $(this);
+
+  var variantId = parseInt($(this).val());
+  var $formProduct = $select.parents('form:first');
+  if ($formProduct[0]) {
+    var OptionSelector = $formProduct[0]['OptionSelector'];
+  }else{
+    return;
+  }
+
+  OptionSelector._owner.variants.setVariant(variantId);
+});

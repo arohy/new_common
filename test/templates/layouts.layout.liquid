@@ -4,44 +4,67 @@
 <head>
   <title>{{ title }}</title>
   <meta name="robots" content="index,follow" />
-
-  <script type="text/javascript" src="{{ 'lodash.js' | asset_url }}"></script>
-  <script type="text/javascript" src="{{ 'new_common.js' | asset_url }}"></script>
+  <link rel="stylesheet" href="{{ 'core.css' | asset_url }}">
+  <link rel="stylesheet" href="{{ 'main.css' | asset_url }}">
+  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">
+  {% include 'insales_config' %}
 </head>
 
 <body class="adaptive">
-  {{ content_for_layout }}
-  <script type="text/javascript" src="{{ 'tests.js' | asset_url }}"></script>
-  <script type="text/javascript">
-    var Template = new ISnew.Template();
-    var cv_currency_format = '{{ money_with_currency_format }}';
-    var money = new ISnew.Money();
-    money.set(cv_currency_format);
-  </script>
+  <div class="container">
+    <div class="row-flex">
+      <div class="flex-4">
+        {% include 'search_widget' with 'header' %}
+      </div>
+    </div>
+    {{ content_for_layout }}
+  </div>
+
+
 
   <script type="text/template" data-template-id="cart_widget">
-    <% if (user) { %>
-      hello!! <%- user %>!
+    <% if (order_lines.length > 0) { %>
+
+
+    <% _.each(order_lines, function(item) { %>
+    <div class="row-flex cart-item">
+      <div class="flex-xl-4"><%- item.title %></div>
+      <div class="flex-xl-4">
+        <%- item.quantity %>
+        &times;
+        <%- item.sale_price %>
+        =
+        <%- item.total_price %>
+        </div>
+      <div class="flex-xl-4"><div cart-item-delete="<%- item.variant_id %>" class="btn">Удалить</div></div>
+    </div>
+    <% }); %>
+
+    <div>
+      <div>Итого: <%- total_price %></div>
+      <div>Товаров в корзине: <%- items_count %></div>
+    </div>
+
+    <% }else{ %>
+
+    <div>
+      Корзина пуста
+    </div>
+
     <% } %>
+
   </script>
 
-  <script type="text/javascript">
-    $(function () {
-      product = new ISnew.Product({{ product | json }});
-    });
-  </script>
 
   <script type="text/template" data-template-id="option-select">
-    <div>
+    <div class="option-item">
       <label><%= option.title %></label>
       <select
-        data-option-selector
-        data-option-select
-        data-option_name_id="<%= option.id %>"
+        class="select-field"
+        data-option-bind="<%= option.id %>"
       >
-        <% _.forEach(values, function (value){ %>
+        <% _.forEach(option.values, function (value){ %>
           <option
-            data-selctor-variant="<%= value.id %>"
             data-value-position="<%= value.position %>"
             value="<%= value.position %>"
             <% if (option.selected == value.position) { %>selected<% } %>
@@ -52,5 +75,193 @@
       </select>
     </div>
   </script>
+
+  <script type="text/template" data-template-id="option-defaults">
+    <div>
+      <label><%= option.title %></label>
+      <select
+        class="select-field"
+        data-option-selector=""
+        data-option-change
+        data-option_name_id="<%= option.id %>"
+      >
+        <% _.forEach(option.values, function (value){ %>
+          <option
+            data-selector-variant="<%= value.id %>"
+            data-value-position="<%= value.position %>"
+            data-position-id=""
+            value="<%= value.position %>"
+            <% if (option.selected == value.position) { %>selected<% } %>
+          >
+            <%= value.title %>
+          </option>
+        <% }) %>
+      </select>
+    </div>
+  </script>
+
+
+  <script type="text/template" data-template-id="option-image">
+    <div class="option-item">
+      <label><%= option.title %></label>
+      <div>
+        <% _.forEach(option.values, function (value){ %>
+          <span
+            data-option-bind="<%= option.id %>"
+            data-value-position="<%= value.position %>"
+            class="option-image <% if (option.selected == value.position) { %>option-active<% } %>
+            <% if (value.disabled) { %>disabled<% } %>"
+          >
+            <% if (images[value.name]) { %>
+              <img src="<%= images[value.name].small_url %>" alt="<%= value.title %>">
+            <% }else{ %>
+              <span><%= value.title %></span>
+            <% } %>
+          </span>
+        <% }) %>
+      </div>
+    </div>
+  </script>
+
+  <script type="text/template" data-template-id="option-images">
+    <div class="option-item">
+      <label><%= option.title %></label>
+      <div
+        class=""
+        data-option-selector=""
+        data-option-click
+        data-position-id=""
+        data-option_name_id="<%= option.id %>"
+      >
+        <% _.forEach(options, function (value){ %>
+          <span
+            data-selector-variant="<%= value.id %>"
+            data-value-position="<%= value.position %>"
+            class="option-image <% if (option.selected == value.position) { %>option-active<% } %>
+            <% if (value.disabled) { %>disabled<% } %>"
+          >
+            <% if (fileUrl[value.name]) { %>
+              <img src="<%= fileUrl[value.name] %>" alt="<%= value.title %>">
+            <% }else{ %>
+              <span><%= value.title %></span>
+            <% } %>
+          </span>
+        <% }) %>
+      </div>
+    </div>
+  </script>
+
+  <script type="text/template" data-template-id="option-span">
+    <div class="option-item">
+      <label><%= option.title %></label>
+      <div
+        class="<%= option.handle %>"
+      >
+        <% _.forEach(option.values, function (value){ %>
+          <span
+            data-option-bind="<%= option.id %>"
+            data-value-position="<%= value.position %>"
+            class="btn <% if (option.selected == value.position & initOption) { %>active<% } %>
+            <% if (value.disabled) { %>disabled<% } %>"
+          >
+              <span><%= value.title %></span>
+          </span>
+        <% }) %>
+      </div>
+    </div>
+  </script>
+
+    <script type="text/template" data-template-id="option-radio">
+    <div class="option-item">
+      <label><%= option.title %></label>
+      <div
+        class="<%= option.handle %>"
+      >
+        <% _.forEach(option.values, function (value){ %>
+          <input
+            data-option-bind="<%= option.id %>"
+            data-value-position="<%= value.position %>"
+            <% if (option.selected == value.position & initOption) { %>checked="checked"<% } %>
+            class="btn <% if (option.selected == value.position & initOption) { %>active<% } %>
+            <% if (value.disabled) { %>disabled<% } %>"
+                type="radio" name="<%= option.handle %>" id="<%= option.handle %>-<%= value.id %>" value="<%= value.position %>"><label for="<%= option.handle %>-<%= value.id %>"><%= value.title %></label><Br>
+        <% }) %>
+      </div>
+    </div>
+  </script>
+
+  <script type="text/template" data-template-id="option-checkbox">
+    <div class="option-item">
+      <label><%= option.title %></label>
+      <div
+        class="<%= option.handle %>"
+      >
+        <% _.forEach(option.values, function (value){ %>
+          <input
+            data-option-bind="<%= option.id %>"
+            data-value-position="<%= value.position %>"
+            <% if (option.selected == value.position & initOption) { %>checked="checked"<% } %>
+            class="btn <% if (option.selected == value.position & initOption) { %>active<% } %>
+            <% if (value.disabled) { %>disabled<% } %>"
+                type="checkbox" name="<%= option.handle %>" id="<%= option.handle %>-<%= value.id %>" value="<%= value.position %>"><label for="<%= option.handle %>-<%= value.id %>"><%= value.title %></label><Br>
+        <% }) %>
+      </div>
+    </div>
+  </script>
+
+
+<script type="text/template" data-template-id="ajax-search">
+  <% if (suggestions.length > 0){ %>
+    <ul class="ajax_search-results">
+      <% _.forEach(suggestions, function (product){ %>
+        <li class="ajax_search-item">
+          <a href="<%- product.url %>" class="ajax_search-link">
+            <%= product.markedTitle %>
+            <span class="ajax_search-prices">
+              <%= money.format( product.fields.price_min ) %>
+            </span>
+          </a>
+        </li>
+      <% }) %>
+    </ul>
+  <% } %>
+</script>
+
+
+  <script type="text/template" id="variant-info">
+
+    <div class="row-flex">
+      <div class="flex-xl-6">Цена:</div>
+      <div class="flex-xl-6 text-left"><%- price %></div>
+      <% if (old_price) { %>
+        <div class="flex-xl-6">Старая цена:</div>
+        <div class="flex-xl-6 text-left"><%- old_price %></div>
+      <% } %>
+      <% if (sku) { %>
+        <div class="flex-xl-6">Артикул:</div>
+        <div class="flex-xl-6 text-left"><%- sku %></div>
+      <% } %>
+      <% if (quantity >= 0) { %>
+        <div class="flex-xl-6">Доступно:</div>
+        <div class="flex-xl-6 text-left"><%- quantity %></div>
+      <% }else{ %>
+        <div class="flex-xl-6">Доступно:</div>
+        <div class="flex-xl-6 text-left">Много</div>
+      <% } %>
+      <% if (available) { %>
+        <div class="flex-xl-6">Наличие:</div>
+        <div class="flex-xl-6 text-left">В наличии</div>
+      <% }else{ %>
+        <div class="flex-xl-6">Наличие:</div>
+        <div class="flex-xl-6 text-left">отсутствует</div>
+      <% } %>
+        <div class="flex-xl-6">В корзине таких:</div>
+        <div class="flex-xl-6 text-left" data-item-cart="<%- variant_id %>"><%- order_item %></div>
+
+    </div>
+</script>
+
+    <script type="text/javascript" src="{{ 'tests.js' | asset_url }}"></script>
+
 </body>
 </html>
