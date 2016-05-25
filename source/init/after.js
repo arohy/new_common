@@ -16,24 +16,22 @@ Site.Translit = new ISnew.tools.Translit();
 $(document).on('change click', '[data-option-bind]', function (event) {
   event.preventDefault();
 
-  var $select = $(this);
+  var $option = $(this);
 
-  if ($select.is('select')) {
-    if (event.type === 'click') {
-      return false;
-    }
+  if ($option.is('select') && event.type === 'click') {
+    return false;
   }
 
-  var $formProduct = $select.parents('form[data-product-id]:first');
+  var $formProduct = $option.parents('form[data-product-id]:first');
   var OptionSelector = $formProduct[0]['OptionSelector'];
 
   var option = {
-    option_name_id: $select.data('option-bind'),
-    position: $select.data('value-position')
+    option_name_id: $option.data('option-bind'),
+    position: $option.data('value-position')
   };
 
-  if ($select.is('select')) {
-    option.position = parseInt($select.val());
+  if ($option.is('select')) {
+    option.position = parseInt($option.val());
   }
 
   OptionSelector._owner.variants.setOption(option);
