@@ -6,14 +6,15 @@
 
 В ответе приходит json продукта со всей информацией о товаре.
 
+**Важно!**
+
+Если при получении данных от платформы происходит ошибка в ответ приходит пустой объект `{}`. Так же всегда приходит `promise.resolve()`.
+
 Пример.
 
 ````javascript
 ISnew.json.getProduct(123456)
   .done(function (response) {
     console.log(response);
-  })
-  .fail(function (response) {
-    console.log('что-то пошло не так!! ', response);
   });
 ````
