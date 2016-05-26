@@ -16442,7 +16442,18 @@ ISnew.json.getCompareItems = function (id) {
  */
 
 ISnew.json.getProduct = function (id) {
-  return $.getJSON('/product_by_id/'+ _.toInteger(id) +'.json', {format: 'json'});
+  var result = $.Deferred();
+
+  $.getJSON('/product_by_id/'+ _.toInteger(id) +'.json', { format: 'json' })
+    .done(function (response) {
+      result.resolve(response.product);
+    })
+    .fail(function (response) {
+      console.log('JSON: ошибка при получении данных от платформы', response);
+      result.resolve({});
+    });
+
+  return result.promise();
 };
 /*
  * Получение информации о списке товаров
@@ -17823,61 +17834,72 @@ ISnew.Product.prototype._getImage = function (images) {
  *   options: {
  *     'Цвет': 'option-image',
  *     'Размер': 'option-span'
- *     }
+ *   }
  * }
  * var Products = new ISnew.Products(settings);
  *
  * @param {object} settings конфиг для рендера optionSelector
  *
- * @property {object} collection коллекция созданных экземпляров продукта
+ * @property {object} _list коллекция созданных экземпляров продукта
+ * @property {object} _settings текущие настройки для товаров
  */
 ISnew.Products = function (settings) {
   var self = this;
+
+  // объект для создаваемых продуктов
+  self._list = {}
+  self._settings = settings || {};
 
   self._init(settings);
 };
 
 /**
- * Инициализация, запускает _addProduct(settings)
- *
- * @param {object} settings конфиг для рендера optionSelector
+ * Инициализация, запускает _loadList(id)
  *
  */
-ISnew.Products.prototype._init = function (settings){
+ISnew.Products.prototype._init = function () {
   var self = this;
 
-  // объект для создаваемых продуктов
-  self.collection = {}
-
-  self._addProduct(settings)
+  // забираем ID-шники
+  self._getID()
+    .done(function (productsId) {
+      // грузим инфу по товарам
+      self._loadList(productsId);
+    });
 }
-
 
 /**
- * Добавление новых продуктов. Метод пробегает по формам и собирает их id в массив. После передает массив на _create(productsId, settings).
- *
- * @param {object} settings конфиг для рендера optionSelector
+ * Собираем id из DOM
  */
-ISnew.Products.prototype._addProduct = function (settings){
+ISnew.Products.prototype._getID = function () {
   var self = this;
 
+  var result = $.Deferred();
+  var productsId = {};
+
+  // пробегаем по формам и собирает их id в массив. После передаем массив в _load();
   $(function () {
-    var variantsCount = $('[data-product-id]').length - 1;
-    var productsId = [];
-
     //  Проходим по всем формам и собираем id для создания новых продуктов
-    $('[data-product-id]').each(function(index, el) {
-       var thatProductId = $(el).data( 'product-id' );
+    $('[data-product-id]').each(function (index, el) {
+      var id = _.toInteger($(el).data('product-id'));
 
-       if (thatProductId) {
-        productsId.push(thatProductId);
-       }
-       if (index === variantsCount) {
-        self._create(productsId, settings);
-       }
+      if (id) {
+        productsId[id] = 0;
+      }
     });
-  })
-}
+
+    result.resolve(_.keys(productsId));
+  });
+
+  // возвращаем результат
+  return result.promise();
+};
+
+ISnew.Products.prototype._addProduct = function (product) {
+  var self = this;
+
+  self._list[product.id] = new ISnew.Product(product, self.settings);
+};
 
 /**
  * Создание экземпляров продукта
@@ -17885,21 +17907,20 @@ ISnew.Products.prototype._addProduct = function (settings){
  * @param  {array} productsId массив id продуктов для ajax запроса
  * @param {object} settings конфиг для рендера optionSelector
  */
-ISnew.Products.prototype._create = function(productsId, settings){
+
+ISnew.Products.prototype._loadList = function (productsId) {
   var self = this;
 
   ISnew.json.getProductsList(productsId)
-      .done(function (_newSelectors) {
-
-        _.forEach(_newSelectors, function(_new_product) {
-           self.collection[_new_product.id] = new ISnew.Product( _new_product , settings);
-        });
-
-      })
-      .fail(function (response) {
-        throw new ISnew.tools.Error('ErrorJson', 'ошибка при выполнени ajax запроса');
+    .done(function (_productsList) {
+      _.forEach(_productsList, function (product) {
+        self._addProduct(product);
       });
-}
+    })
+    .fail(function (response) {
+      throw new ISnew.tools.Error('ErrorJson', 'ошибка при выполнени ajax запроса');
+    });
+};
 
 /**
  * Обновление настроек продуктов созданных через new ISnew.Products();
@@ -17907,7 +17928,6 @@ ISnew.Products.prototype._create = function(productsId, settings){
  * @param {object} settings конфиг для рендера optionSelector
  *
  * @example
- * var Products = new ISnew.Products();
  * var settings = {
  *   initOption: true,
  *   filtered: true,
@@ -17924,16 +17944,48 @@ ISnew.Products.prototype._create = function(productsId, settings){
 ISnew.Products.prototype.setConfig = function (settings){
   var self = this;
 
-  $.each(self.collection, function(index, product) {
-     product.setConfig(settings);
+  self.settings = settings;
+
+  _.forEach(self._list, function(product) {
+    product.settings.set(self.settings);
   });
 }
 
-ISnew.Products.prototype.getProduct = function (id) {
+/**
+ * Получаем готовый к употреблению товар
+ */
+ISnew.Products.prototype.get = function (id) {
   var self = this;
 
-  return self.collection[parseInt(id)];
+  id = parseInt(id);
+
+  var result = $.Deferred();
+  var product = self._get(id);
+
+  // Был такой товар в списке?
+  // если да - resolve
+  // иначе - добираем данные с сервера
+  if (!_.isEmpty(product)) {
+    result.resolve(product);
+  } else {
+    ISnew.json.getProduct(id)
+      .done(function (product) {
+        self._addProduct(product);
+        result.resolve(self._get(id));
+      });
+  }
+
+  return result.promise();
 }
+
+/**
+ * Забираем нужный товар
+ */
+ISnew.Products.prototype._get = function (id) {
+  var self = this;
+
+  return self._list[parseInt(id)];
+};
 /**
  * Класс для работы с настройками Продукта
  */
@@ -18784,6 +18836,7 @@ var Cart = new ISnew.Cart();
 var Template = new ISnew.Template();
 var Compare = new ISnew.Compare();
 var AjaxSearch = new ISnew.Search();
+var Products = new ISnew.Products();
 
 Site.URL = new ISnew.tools.URL();
 Site.Translit = new ISnew.tools.Translit();
