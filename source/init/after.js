@@ -38,34 +38,3 @@ $(document).on('change click', '[data-option-bind]', function (event) {
 
   OptionSelector._owner.variants.setOption(option);
 });
-
-// =======================================================================================
-//                                      AJAX SEARCH
-// =======================================================================================
-
-$(function() {
-  AjaxSearch.setConfig({
-    data: {
-      account_id: Site.account.id,
-      locale: Site.language.locale,
-      fields: [ 'price_min', 'price_min_available' ],
-      hide_items_out_of_stock: Site.account.hide_items
-    }
-  });
-
-  EventBus.subscribe('update_suggestions:insales:search', function( data ){
-    //  срабатывает на события внутри формы
-    if (data.action.input) {
-      var $input = $(data.action.input);
-      var $form_suggestions = $input.parents('form:first')
-
-      $form_suggestions
-        .find('[data-search-result]')
-          .html(Template.render(data, AjaxSearch.options.template));
-    } else {
-      //  срабатывает на события вне формы
-      $('[data-search-result]')
-        .html(Template.render(data, AjaxSearch.options.template));
-    }
-  });
-});
