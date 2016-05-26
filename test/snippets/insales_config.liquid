@@ -1,6 +1,6 @@
 <script type="text/javascript" src="{{ 'new_common.js' | asset_url }}"></script>
-<script>
 
+<script>
   {% comment %}
     создание объекта с картинками из файлов
   {% endcomment %}
@@ -47,18 +47,16 @@
     })
   });
 
-  var ProductsConfig = {
-  initOption: true,
-  filtered: false,
-  showVariants: true,
-  fileUrl: fileUrl,
-  options: {
+  Products.setConfig({
+    initOption: true,
+    filtered: false,
+    showVariants: true,
+    fileUrl: fileUrl,
+    options: {
       'Цвет': 'option-image',
       'Размер': 'option-radio',
       'Материал': 'option-select',
       'Жесткий диск': 'option-span'
     }
-  }
-
-  Products = new ISnew.Products(ProductsConfig);
+  });
 </script>

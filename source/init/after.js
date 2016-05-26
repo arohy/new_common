@@ -5,6 +5,7 @@ var Cart = new ISnew.Cart();
 var Template = new ISnew.Template();
 var Compare = new ISnew.Compare();
 var AjaxSearch = new ISnew.Search();
+var Products = new ISnew.Products();
 
 Site.URL = new ISnew.tools.URL();
 Site.Translit = new ISnew.tools.Translit();

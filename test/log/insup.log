@@ -8092,3 +8092,158 @@
 2016-05-24 09:57:57 +0300 - INFO	: --> 200 OK 426 (273.0ms) 
 2016-05-24 09:58:59 +0300 - INFO	: PUT http://shop-48497.myinsales.ru:80/admin/themes/626874/assets/58374880.xml 
 2016-05-24 09:58:59 +0300 - INFO	: --> 200 OK 353 (274.0ms) 
+2016-05-25 17:25:13 +0300 - INFO	: GET http://arohy.myinsales.ru:80/admin/themes.xml 
+2016-05-25 17:25:13 +0300 - INFO	: --> 200 OK 2055 (144.5ms) 
+2016-05-25 17:25:14 +0300 - INFO	: GET http://arohy.myinsales.ru:80/admin/themes/604937/assets.xml 
+2016-05-25 17:25:14 +0300 - INFO	: --> 200 OK 8502 (104.5ms) 
+2016-05-25 17:25:23 +0300 - INFO	: PUT http://arohy.myinsales.ru:80/admin/themes/604937/assets/55183292.xml 
+2016-05-25 17:25:23 +0300 - INFO	: --> 200 OK 426 (565.9ms) 
+2016-05-25 17:26:01 +0300 - INFO	: PUT http://arohy.myinsales.ru:80/admin/themes/604937/assets/58641164.xml 
+2016-05-25 17:26:01 +0300 - INFO	: --> 200 OK 353 (567.0ms) 
+2016-05-25 17:26:35 +0300 - INFO	: PUT http://arohy.myinsales.ru:80/admin/themes/604937/assets/58641164.xml 
+2016-05-25 17:26:35 +0300 - INFO	: --> 200 OK 353 (358.4ms) 
+2016-05-25 17:27:03 +0300 - INFO	: PUT http://arohy.myinsales.ru:80/admin/themes/604937/assets/58641164.xml 
+2016-05-25 17:27:03 +0300 - INFO	: --> 200 OK 353 (300.9ms) 
+2016-05-25 17:27:47 +0300 - INFO	: PUT http://arohy.myinsales.ru:80/admin/themes/604937/assets/55183291.xml 
+2016-05-25 17:27:47 +0300 - INFO	: --> 200 OK 342 (194.6ms) 
+2016-05-25 17:27:48 +0300 - INFO	: PUT http://arohy.myinsales.ru:80/admin/themes/604937/assets/55183290.xml 
+2016-05-25 17:27:48 +0300 - INFO	: --> 200 OK 343 (134.3ms) 
+2016-05-25 17:27:50 +0300 - INFO	: PUT http://arohy.myinsales.ru:80/admin/themes/604937/assets/55183288.xml 
+2016-05-25 17:27:50 +0300 - INFO	: --> 200 OK 343 (189.4ms) 
+2016-05-25 17:27:51 +0300 - INFO	: PUT http://arohy.myinsales.ru:80/admin/themes/604937/assets/55183289.xml 
+2016-05-25 17:27:51 +0300 - INFO	: --> 200 OK 334 (113.9ms) 
+2016-05-25 17:27:53 +0300 - INFO	: PUT http://arohy.myinsales.ru:80/admin/themes/604937/assets/55183287.xml 
+2016-05-25 17:27:53 +0300 - INFO	: --> 200 OK 344 (217.9ms) 
+2016-05-25 17:27:54 +0300 - INFO	: PUT http://arohy.myinsales.ru:80/admin/themes/604937/assets/55183286.xml 
+2016-05-25 17:27:54 +0300 - INFO	: --> 200 OK 345 (384.4ms) 
+2016-05-25 17:28:59 +0300 - INFO	: PUT http://arohy.myinsales.ru:80/admin/themes/604937/assets/55183292.xml 
+2016-05-25 17:28:59 +0300 - INFO	: --> 200 OK 426 (397.8ms) 
+2016-05-25 17:29:53 +0300 - INFO	: PUT http://arohy.myinsales.ru:80/admin/themes/604937/assets/55183292.xml 
+2016-05-25 17:29:53 +0300 - INFO	: --> 200 OK 426 (451.8ms) 
+2016-05-25 17:30:10 +0300 - INFO	: PUT http://arohy.myinsales.ru:80/admin/themes/604937/assets/55183292.xml 
+2016-05-25 17:30:10 +0300 - INFO	: --> 200 OK 426 (475.6ms) 
+2016-05-25 17:30:51 +0300 - INFO	: PUT http://arohy.myinsales.ru:80/admin/themes/604937/assets/55183292.xml 
+2016-05-25 17:30:51 +0300 - INFO	: --> 200 OK 426 (476.4ms) 
+2016-05-25 17:31:00 +0300 - INFO	: PUT http://arohy.myinsales.ru:80/admin/themes/604937/assets/55183292.xml 
+2016-05-25 17:31:00 +0300 - INFO	: --> 200 OK 426 (463.1ms) 
+2016-05-25 17:32:02 +0300 - INFO	: PUT http://arohy.myinsales.ru:80/admin/themes/604937/assets/55183292.xml 
+2016-05-25 17:32:02 +0300 - INFO	: --> 200 OK 426 (355.4ms) 
+2016-05-25 17:32:27 +0300 - INFO	: PUT http://arohy.myinsales.ru:80/admin/themes/604937/assets/55183292.xml 
+2016-05-25 17:32:27 +0300 - INFO	: --> 200 OK 426 (427.8ms) 
+2016-05-25 17:32:46 +0300 - INFO	: PUT http://arohy.myinsales.ru:80/admin/themes/604937/assets/55183292.xml 
+2016-05-25 17:32:46 +0300 - INFO	: --> 200 OK 426 (449.4ms) 
+2016-05-25 17:34:05 +0300 - INFO	: PUT http://arohy.myinsales.ru:80/admin/themes/604937/assets/55183292.xml 
+2016-05-25 17:34:05 +0300 - INFO	: --> 200 OK 426 (382.5ms) 
+2016-05-25 17:36:17 +0300 - INFO	: PUT http://arohy.myinsales.ru:80/admin/themes/604937/assets/55183292.xml 
+2016-05-25 17:36:17 +0300 - INFO	: --> 200 OK 426 (387.5ms) 
+2016-05-25 17:36:27 +0300 - INFO	: PUT http://arohy.myinsales.ru:80/admin/themes/604937/assets/55183292.xml 
+2016-05-25 17:36:27 +0300 - INFO	: --> 200 OK 426 (390.8ms) 
+2016-05-25 17:36:44 +0300 - INFO	: PUT http://arohy.myinsales.ru:80/admin/themes/604937/assets/55183292.xml 
+2016-05-25 17:36:44 +0300 - INFO	: --> 200 OK 426 (444.9ms) 
+2016-05-25 17:38:44 +0300 - INFO	: PUT http://arohy.myinsales.ru:80/admin/themes/604937/assets/55183292.xml 
+2016-05-25 17:38:44 +0300 - INFO	: --> 200 OK 426 (520.8ms) 
+2016-05-25 17:40:51 +0300 - INFO	: PUT http://arohy.myinsales.ru:80/admin/themes/604937/assets/55183292.xml 
+2016-05-25 17:40:51 +0300 - INFO	: --> 200 OK 426 (5355.5ms) 
+2016-05-25 17:51:38 +0300 - INFO	: PUT http://arohy.myinsales.ru:80/admin/themes/604937/assets/55183292.xml 
+2016-05-25 17:51:38 +0300 - INFO	: --> 200 OK 426 (532.3ms) 
+2016-05-25 17:53:04 +0300 - INFO	: PUT http://arohy.myinsales.ru:80/admin/themes/604937/assets/55183292.xml 
+2016-05-25 17:53:04 +0300 - INFO	: --> 200 OK 426 (493.4ms) 
+2016-05-25 17:54:01 +0300 - INFO	: PUT http://arohy.myinsales.ru:80/admin/themes/604937/assets/55183292.xml 
+2016-05-25 17:54:01 +0300 - INFO	: --> 200 OK 426 (486.2ms) 
+2016-05-25 17:54:27 +0300 - INFO	: PUT http://arohy.myinsales.ru:80/admin/themes/604937/assets/55183292.xml 
+2016-05-25 17:54:27 +0300 - INFO	: --> 200 OK 426 (525.7ms) 
+2016-05-25 18:02:50 +0300 - INFO	: PUT http://arohy.myinsales.ru:80/admin/themes/604937/assets/55183292.xml 
+2016-05-25 18:02:50 +0300 - INFO	: --> 200 OK 426 (617.1ms) 
+2016-05-25 18:09:39 +0300 - INFO	: PUT http://arohy.myinsales.ru:80/admin/themes/604937/assets/55183292.xml 
+2016-05-25 18:09:39 +0300 - INFO	: --> 200 OK 426 (585.7ms) 
+2016-05-25 18:10:45 +0300 - INFO	: PUT http://arohy.myinsales.ru:80/admin/themes/604937/assets/55183292.xml 
+2016-05-25 18:10:45 +0300 - INFO	: --> 200 OK 426 (610.0ms) 
+2016-05-25 18:22:34 +0300 - INFO	: PUT http://arohy.myinsales.ru:80/admin/themes/604937/assets/55183292.xml 
+2016-05-25 18:22:34 +0300 - INFO	: --> 200 OK 426 (497.7ms) 
+2016-05-25 18:22:45 +0300 - INFO	: PUT http://arohy.myinsales.ru:80/admin/themes/604937/assets/55183292.xml 
+2016-05-25 18:22:45 +0300 - INFO	: --> 200 OK 426 (351.5ms) 
+2016-05-25 18:25:15 +0300 - INFO	: PUT http://arohy.myinsales.ru:80/admin/themes/604937/assets/55183292.xml 
+2016-05-25 18:25:15 +0300 - INFO	: --> 200 OK 426 (507.8ms) 
+2016-05-25 18:25:46 +0300 - INFO	: PUT http://arohy.myinsales.ru:80/admin/themes/604937/assets/55183292.xml 
+2016-05-25 18:25:46 +0300 - INFO	: --> 200 OK 426 (513.0ms) 
+2016-05-25 18:27:14 +0300 - INFO	: PUT http://arohy.myinsales.ru:80/admin/themes/604937/assets/55183292.xml 
+2016-05-25 18:27:14 +0300 - INFO	: --> 200 OK 426 (945.4ms) 
+2016-05-25 18:27:23 +0300 - INFO	: PUT http://arohy.myinsales.ru:80/admin/themes/604937/assets/55183292.xml 
+2016-05-25 18:27:23 +0300 - INFO	: --> 200 OK 426 (495.7ms) 
+2016-05-25 18:27:47 +0300 - INFO	: PUT http://arohy.myinsales.ru:80/admin/themes/604937/assets/55183292.xml 
+2016-05-25 18:27:47 +0300 - INFO	: --> 200 OK 426 (444.9ms) 
+2016-05-25 18:28:06 +0300 - INFO	: PUT http://arohy.myinsales.ru:80/admin/themes/604937/assets/55183292.xml 
+2016-05-25 18:28:06 +0300 - INFO	: --> 200 OK 426 (494.0ms) 
+2016-05-25 18:28:50 +0300 - INFO	: PUT http://arohy.myinsales.ru:80/admin/themes/604937/assets/55183292.xml 
+2016-05-25 18:28:50 +0300 - INFO	: --> 200 OK 426 (479.6ms) 
+2016-05-25 18:29:12 +0300 - INFO	: PUT http://arohy.myinsales.ru:80/admin/themes/604937/assets/55183292.xml 
+2016-05-25 18:29:12 +0300 - INFO	: --> 200 OK 426 (470.1ms) 
+2016-05-25 18:31:04 +0300 - INFO	: PUT http://arohy.myinsales.ru:80/admin/themes/604937/assets/55183292.xml 
+2016-05-25 18:31:04 +0300 - INFO	: --> 200 OK 426 (419.3ms) 
+2016-05-25 18:32:21 +0300 - INFO	: PUT http://arohy.myinsales.ru:80/admin/themes/604937/assets/55183292.xml 
+2016-05-25 18:32:21 +0300 - INFO	: --> 200 OK 426 (575.3ms) 
+2016-05-25 18:33:22 +0300 - INFO	: PUT http://arohy.myinsales.ru:80/admin/themes/604937/assets/55183292.xml 
+2016-05-25 18:33:22 +0300 - INFO	: --> 200 OK 426 (455.6ms) 
+2016-05-25 18:34:03 +0300 - INFO	: PUT http://arohy.myinsales.ru:80/admin/themes/604937/assets/55183292.xml 
+2016-05-25 18:34:03 +0300 - INFO	: --> 200 OK 426 (449.9ms) 
+2016-05-25 18:36:06 +0300 - INFO	: PUT http://arohy.myinsales.ru:80/admin/themes/604937/assets/55183292.xml 
+2016-05-25 18:36:06 +0300 - INFO	: --> 200 OK 426 (455.4ms) 
+2016-05-25 18:45:05 +0300 - INFO	: PUT http://arohy.myinsales.ru:80/admin/themes/604937/assets/55183292.xml 
+2016-05-25 18:45:05 +0300 - INFO	: --> 200 OK 426 (392.0ms) 
+2016-05-25 18:46:47 +0300 - INFO	: PUT http://arohy.myinsales.ru:80/admin/themes/604937/assets/55183292.xml 
+2016-05-25 18:46:47 +0300 - INFO	: --> 200 OK 426 (395.4ms) 
+2016-05-25 18:52:21 +0300 - INFO	: PUT http://arohy.myinsales.ru:80/admin/themes/604937/assets/55183292.xml 
+2016-05-25 18:52:21 +0300 - INFO	: --> 200 OK 426 (396.3ms) 
+2016-05-25 18:52:50 +0300 - INFO	: PUT http://arohy.myinsales.ru:80/admin/themes/604937/assets/55183292.xml 
+2016-05-25 18:52:50 +0300 - INFO	: --> 200 OK 426 (514.0ms) 
+2016-05-25 18:55:46 +0300 - INFO	: PUT http://arohy.myinsales.ru:80/admin/themes/604937/assets/55183292.xml 
+2016-05-25 18:55:46 +0300 - INFO	: --> 200 OK 426 (651.5ms) 
+2016-05-25 18:56:23 +0300 - INFO	: PUT http://arohy.myinsales.ru:80/admin/themes/604937/assets/55183292.xml 
+2016-05-25 18:56:23 +0300 - INFO	: --> 200 OK 426 (286.9ms) 
+2016-05-25 19:02:21 +0300 - INFO	: PUT http://arohy.myinsales.ru:80/admin/themes/604937/assets/55183292.xml 
+2016-05-25 19:02:21 +0300 - INFO	: --> 200 OK 426 (906.4ms) 
+2016-05-25 19:05:39 +0300 - INFO	: PUT http://arohy.myinsales.ru:80/admin/themes/604937/assets/55183292.xml 
+2016-05-25 19:05:39 +0300 - INFO	: --> 200 OK 426 (577.6ms) 
+2016-05-25 19:06:49 +0300 - INFO	: PUT http://arohy.myinsales.ru:80/admin/themes/604937/assets/55183292.xml 
+2016-05-25 19:06:49 +0300 - INFO	: --> 200 OK 426 (350.0ms) 
+2016-05-25 19:07:34 +0300 - ERROR	: SIGHUP 
+/var/lib/gems/2.1.0/gems/insup-0.4/lib/insup/console.rb:124:in `sleep'
+/var/lib/gems/2.1.0/gems/insup-0.4/lib/insup/console.rb:124:in `listen'
+/var/lib/gems/2.1.0/gems/insup-0.4/bin/insup:85:in `block (2 levels) in <top (required)>'
+/var/lib/gems/2.1.0/gems/gli-2.13.4/lib/gli/command_support.rb:126:in `call'
+/var/lib/gems/2.1.0/gems/gli-2.13.4/lib/gli/command_support.rb:126:in `execute'
+/var/lib/gems/2.1.0/gems/gli-2.13.4/lib/gli/app_support.rb:296:in `block in call_command'
+/var/lib/gems/2.1.0/gems/gli-2.13.4/lib/gli/app_support.rb:309:in `call'
+/var/lib/gems/2.1.0/gems/gli-2.13.4/lib/gli/app_support.rb:309:in `call_command'
+/var/lib/gems/2.1.0/gems/gli-2.13.4/lib/gli/app_support.rb:83:in `run'
+/var/lib/gems/2.1.0/gems/insup-0.4/bin/insup:111:in `<top (required)>'
+/usr/local/bin/insup:23:in `load'
+/usr/local/bin/insup:23:in `<main>'
+2016-05-26 09:31:02 +0300 - INFO	: GET http://arohy.myinsales.ru:80/admin/themes.xml 
+2016-05-26 09:31:02 +0300 - INFO	: --> 200 OK 2055 (378.8ms) 
+2016-05-26 09:31:02 +0300 - INFO	: GET http://arohy.myinsales.ru:80/admin/themes/604937/assets.xml 
+2016-05-26 09:31:02 +0300 - INFO	: --> 200 OK 8502 (99.4ms) 
+2016-05-26 09:47:47 +0300 - INFO	: PUT http://arohy.myinsales.ru:80/admin/themes/604937/assets/55183292.xml 
+2016-05-26 09:47:47 +0300 - INFO	: --> 200 OK 426 (539.7ms) 
+2016-05-26 09:59:12 +0300 - INFO	: PUT http://arohy.myinsales.ru:80/admin/themes/604937/assets/55183292.xml 
+2016-05-26 09:59:12 +0300 - INFO	: --> 200 OK 426 (433.5ms) 
+2016-05-26 10:01:18 +0300 - INFO	: PUT http://arohy.myinsales.ru:80/admin/themes/604937/assets/55183292.xml 
+2016-05-26 10:01:18 +0300 - INFO	: --> 200 OK 426 (693.8ms) 
+2016-05-26 10:02:27 +0300 - INFO	: PUT http://arohy.myinsales.ru:80/admin/themes/604937/assets/55183292.xml 
+2016-05-26 10:02:27 +0300 - INFO	: --> 200 OK 426 (544.9ms) 
+2016-05-26 10:02:29 +0300 - INFO	: PUT http://arohy.myinsales.ru:80/admin/themes/604937/assets/55183292.xml 
+2016-05-26 10:02:29 +0300 - INFO	: --> 200 OK 426 (426.2ms) 
+2016-05-26 10:21:46 +0300 - INFO	: PUT http://arohy.myinsales.ru:80/admin/themes/604937/assets/55183292.xml 
+2016-05-26 10:21:46 +0300 - INFO	: --> 200 OK 426 (582.2ms) 
+2016-05-26 10:22:08 +0300 - INFO	: PUT http://arohy.myinsales.ru:80/admin/themes/604937/assets/55183292.xml 
+2016-05-26 10:22:08 +0300 - INFO	: --> 200 OK 426 (406.5ms) 
+2016-05-26 10:51:00 +0300 - INFO	: PUT http://arohy.myinsales.ru:80/admin/themes/604937/assets/55183292.xml 
+2016-05-26 10:51:00 +0300 - INFO	: --> 200 OK 426 (381.3ms) 
+2016-05-26 10:51:32 +0300 - INFO	: PUT http://arohy.myinsales.ru:80/admin/themes/604937/assets/55183292.xml 
+2016-05-26 10:51:32 +0300 - INFO	: --> 200 OK 426 (436.7ms) 
+2016-05-26 10:54:37 +0300 - INFO	: PUT http://arohy.myinsales.ru:80/admin/themes/604937/assets/55183292.xml 
+2016-05-26 10:54:37 +0300 - INFO	: --> 200 OK 426 (424.0ms) 
+2016-05-26 10:54:51 +0300 - INFO	: PUT http://arohy.myinsales.ru:80/admin/themes/604937/assets/55344164.xml 
+2016-05-26 10:54:51 +0300 - INFO	: --> 200 OK 409 (461.7ms) 
+2016-05-26 11:06:09 +0300 - INFO	: PUT http://arohy.myinsales.ru:80/admin/themes/604937/assets/55183292.xml 
+2016-05-26 11:06:09 +0300 - INFO	: --> 200 OK 426 (390.5ms) 
