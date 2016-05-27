@@ -17808,33 +17808,34 @@ ISnew.Product = function (product, settings) {
   }
 
   //  Валидация настроек
-  self.settings = new ISnew.ProductSettings(settings);
+  self.settings = new ISnew.ProductSettings(settings, self);
 
   self.product = product;
 
   // статус рендера
   if (!self.isRender) {
     self.isRender = false;
-  }
+  };
 
   self.images = self._getImage(product.images);
 
   self.quantity = 0;
   self.price_kinds = new ISnew.ProductPriceType(self);
 
-  self._init(settings);
+  self._init();
 };
 
 /**
  * Настройки
  */
-ISnew.Product.prototype._init = function (settings){
+ISnew.Product.prototype._init = function (){
   var self = this;
 
   // Важно!!
   // В товаре МОЖЕТ не быть ни одной опции, мы в таком варианте валимся
   // TODO: залатать эту дыру в .variants - это поле ДОЛЖНО быть всегда
-  if (self._isVariants(self.product)) {
+  console.log(self);
+  if (self._hasOption()) {
     self.variants = new ISnew.ProductVariants(self);
     self.OptionSelector = new ISnew.OptionSelector(self);
   }
@@ -17871,9 +17872,13 @@ ISnew.Product.prototype.setQuantity = function (quantity) {
 };
 
 /**
- * Проверка на наличие модификаций
+ * Проверка на наличие Опций модификаций
  */
-ISnew.Product.prototype._isVariants = function (_product) {
+ISnew.Product.prototype._hasOption = function () {
+  var self = this;
+
+  var _product = self.product;
+  console.log(self);
   var optionCount = _product.option_names.length;
 
   return optionCount > 0;
@@ -17917,7 +17922,7 @@ ISnew.Product.prototype._getImage = function (images) {
 /**
  * Класс для работы с настройками Продукта
  */
-ISnew.ProductSettings = function (settings) {
+ISnew.ProductSettings = function (settings, _owner) {
   var self = this;
 
   self._default = {
@@ -17928,12 +17933,17 @@ ISnew.ProductSettings = function (settings) {
     initOption: true,
     fileUrl: {},
     filtered: true
-  }
+  };
 
-  self.set(settings);
+  self._owner = _owner;
+
+  self._set(settings);
 }
 
-ISnew.ProductSettings.prototype.set = function (settings) {
+/**
+ * Выставляем настройки, делаем немного магии
+ */
+ISnew.ProductSettings.prototype._set = function (settings) {
   var self = this;
 
   _.merge(self, self._default, settings);
@@ -17941,6 +17951,9 @@ ISnew.ProductSettings.prototype.set = function (settings) {
   self._patch();
 };
 
+/**
+ * всякие доп проверки
+ */
 ISnew.ProductSettings.prototype._patch = function () {
   var self = this;
 
@@ -17951,6 +17964,17 @@ ISnew.ProductSettings.prototype._patch = function () {
       self.options[option] = 'option-default';
     }
   });
+};
+
+/**
+ * Жестко ставим настройки из-вне
+ */
+ISnew.ProductSettings.prototype.set = function (settings) {
+  var self = this;
+
+  self._set(settings);
+
+  self._owner._init();
 };
 /**
  * Конструктор объета по работе с вариантами продукта
@@ -18512,7 +18536,6 @@ ISnew.Products.prototype._initProduct = function (_productJSON) {
 
   self._products[_productJSON.id] = new ISnew.Product(_productJSON, self._settings);
 };
-
 /**
  * Класс Хранилища json Товаров
  * управляет всем процессом получения и хранения json'ов
@@ -18620,7 +18643,6 @@ ISnew.ProductsStorage.prototype._updateJSON = function (_JSONs) {
 
   return;
 };
-
 /**
  * Сравнение товаров
  */

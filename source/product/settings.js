@@ -1,7 +1,7 @@
 /**
  * Класс для работы с настройками Продукта
  */
-ISnew.ProductSettings = function (settings) {
+ISnew.ProductSettings = function (settings, _owner) {
   var self = this;
 
   self._default = {
@@ -12,12 +12,17 @@ ISnew.ProductSettings = function (settings) {
     initOption: true,
     fileUrl: {},
     filtered: true
-  }
+  };
 
-  self.set(settings);
+  self._owner = _owner;
+
+  self._set(settings);
 }
 
-ISnew.ProductSettings.prototype.set = function (settings) {
+/**
+ * Выставляем настройки, делаем немного магии
+ */
+ISnew.ProductSettings.prototype._set = function (settings) {
   var self = this;
 
   _.merge(self, self._default, settings);
@@ -25,6 +30,9 @@ ISnew.ProductSettings.prototype.set = function (settings) {
   self._patch();
 };
 
+/**
+ * всякие доп проверки
+ */
 ISnew.ProductSettings.prototype._patch = function () {
   var self = this;
 
@@ -35,4 +43,15 @@ ISnew.ProductSettings.prototype._patch = function () {
       self.options[option] = 'option-default';
     }
   });
+};
+
+/**
+ * Жестко ставим настройки из-вне
+ */
+ISnew.ProductSettings.prototype.set = function (settings) {
+  var self = this;
+
+  self._set(settings);
+
+  self._owner._init();
 };
