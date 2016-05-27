@@ -15941,6 +15941,79 @@ if (!EventBus) {
 }
 
 /**
+ * Класс для работы с клиентом сайта
+ */
+
+ISnew.Client = function (_owner) {
+  var self = this;
+
+  self._owner = _owner;
+
+  self._init();
+}
+
+/**
+ * Инициализация
+ */
+ISnew.Client.prototype._init = function () {
+  var self = this;
+
+  self._get();
+};
+
+/**
+ * Забираем инфу с сервера
+ */
+ISnew.Client.prototype._get = function () {
+  var self = this;
+  var result = $.Deferred();
+
+  ISnew.json.getClientInfo()
+    .done(function (response) {
+      _.merge(self, response);
+      result.resolve(self);
+    })
+    .fail(function (response) {
+      console.log('ISnew.Client: _get: fail: ', response);
+      result.reject(response);
+    });
+
+  return result.promise();
+};
+
+/**
+ * Обновление данных
+ */
+ISnew.Client.prototype.get = function () {
+  var self = this;
+
+  return self._get();
+};
+/**
+ * Класс для работы с Магазином??
+ */
+
+ISnew.Shop = function () {
+  var self = this;
+
+  self.client = new ISnew.Client(self);
+
+  self._init();
+}
+
+ISnew.Shop.prototype._init = function () {
+  var self = this;
+};
+
+/**
+ * Отправка сообщений
+ */
+ISnew.Shop.prototype.sendMessage = function (message) {
+  var self = this;
+
+  return ISnew.json.sendMessage(message);
+};
+/**
  * Обертка для шаблонизатора
  */
 
@@ -16409,7 +16482,27 @@ ISnew.json.getCartItems = function () {
   return result.promise();
 };
 ISnew.json.getClientInfo = function (){
-  return $.getJSON('/client_account/contacts.json');
+  var result = $.Deferred();
+
+  $.getJSON('/client_account/contacts.json')
+    .done(function (response) {
+      switch (response.status) {
+        case 'error':
+          result.resolve({
+            message: response.message,
+            url: response.url,
+            authorized: false
+          });
+          break;
+        default:
+          result.resolve(_.merge(response.client, { authorized: true }));
+      }
+    })
+    .fail(function (response) {
+      console.log('json.getClientInfo: fail: ', response);
+    });
+
+  return result.promise();
 };
 /*
  * Получение информации о коллекции
@@ -18923,6 +19016,7 @@ var Template = new ISnew.Template();
 var Compare = new ISnew.Compare();
 var AjaxSearch = new ISnew.Search();
 var Products = new ISnew.Products();
+var Shop = new ISnew.Shop();
 
 Site.URL = new ISnew.tools.URL();
 Site.Translit = new ISnew.tools.Translit();

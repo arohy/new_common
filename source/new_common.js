@@ -1,6 +1,7 @@
 //= ./lib/lodash.js
 //= ./init/before.js
 
+//= ./shop/
 //= ./template/
 //= ./events/
 //= ./tools/
