@@ -8,6 +8,7 @@
 //= ./json/
 //= ./cart/
 //= ./product/
+//= ./products/
 //= ./compare/
 //= ./search/
 

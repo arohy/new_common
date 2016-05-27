@@ -35,7 +35,7 @@
 
 ### ISnew.Products
 
-Данный класс инициализирует все продукты на сайте с атрибутом data-product-id <br>
+Данный класс предназначен для работы с товарами на сайте и инициализирует все продукты на сайте с атрибутом data-product-id <br>
 Скрипт автоматически проходится по всем формам, через ajax получает информацию о товаре и рисует optionSelector.
 
 ```js
@@ -52,6 +52,12 @@ var ProductsConfig = {
   }
 var Products = new ISnew.Products(ProductsConfig);
 ```
+
+Методы
+
+* `Products.get(id)` - получить инициализированный экземпляр Товара.
+* `Products.getList(idList)` - получить список экземпляров Товаров.
+* `Products.setConfig(settings)` - задать настройки.
 
 ### ISnew.Product
 

@@ -17915,173 +17915,6 @@ ISnew.Product.prototype._getImage = function (images) {
   return _images;
 }
 /**
- * Объект создаёт new ISnew.Product на основе ajax запроса к json продуктов
- *
- * @class
- * @name ISnew.Products
- *
- * @example
- * var settings = {
- *   initOption: true,
- *   filtered: true,
- *   showVariants: true,
- *   fileUrl: fileUrl,
- *   options: {
- *     'Цвет': 'option-image',
- *     'Размер': 'option-span'
- *   }
- * }
- * var Products = new ISnew.Products(settings);
- *
- * @param {object} settings конфиг для рендера optionSelector
- *
- * @property {object} _list коллекция созданных экземпляров продукта
- * @property {object} _settings текущие настройки для товаров
- */
-ISnew.Products = function (settings) {
-  var self = this;
-
-  // объект для создаваемых продуктов
-  self._list = {}
-  self._settings = settings || {};
-
-  self._init(settings);
-};
-
-/**
- * Инициализация, запускает _loadList(id)
- *
- */
-ISnew.Products.prototype._init = function () {
-  var self = this;
-
-  // забираем ID-шники
-  self._getID()
-    .done(function (productsId) {
-      // грузим инфу по товарам
-      self._loadList(productsId);
-    });
-}
-
-/**
- * Собираем id из DOM
- */
-ISnew.Products.prototype._getID = function () {
-  var self = this;
-
-  var result = $.Deferred();
-  var productsId = {};
-
-  // пробегаем по формам и собирает их id в массив. После передаем массив в _load();
-  $(function () {
-    //  Проходим по всем формам и собираем id для создания новых продуктов
-    $('[data-product-id]').each(function (index, el) {
-      var id = _.toInteger($(el).data('product-id'));
-
-      if (id) {
-        productsId[id] = 0;
-      }
-    });
-
-    result.resolve(_.keys(productsId));
-  });
-
-  // возвращаем результат
-  return result.promise();
-};
-
-ISnew.Products.prototype._addProduct = function (product) {
-  var self = this;
-
-  self._list[product.id] = new ISnew.Product(product, self.settings);
-};
-
-/**
- * Создание экземпляров продукта
- *
- * @param  {array} productsId массив id продуктов для ajax запроса
- * @param {object} settings конфиг для рендера optionSelector
- */
-
-ISnew.Products.prototype._loadList = function (productsId) {
-  var self = this;
-
-  ISnew.json.getProductsList(productsId)
-    .done(function (_productsList) {
-      _.forEach(_productsList, function (product) {
-        self._addProduct(product);
-      });
-    })
-    .fail(function (response) {
-      throw new ISnew.tools.Error('ErrorJson', 'ошибка при выполнени ajax запроса');
-    });
-};
-
-/**
- * Обновление настроек продуктов созданных через new ISnew.Products();
- *
- * @param {object} settings конфиг для рендера optionSelector
- *
- * @example
- * var settings = {
- *   initOption: true,
- *   filtered: true,
- *   showVariants: true,
- *   fileUrl: fileUrl,
- *   options: {
- *     'Цвет': 'option-image',
- *     'Размер': 'option-span'
- *     }
- * }
- * Products.setConfig(settings);
- *
- */
-ISnew.Products.prototype.setConfig = function (settings){
-  var self = this;
-
-  self.settings = settings;
-
-  _.forEach(self._list, function(product) {
-    product.settings.set(self.settings);
-  });
-}
-
-/**
- * Получаем готовый к употреблению товар
- */
-ISnew.Products.prototype.get = function (id) {
-  var self = this;
-
-  id = parseInt(id);
-
-  var result = $.Deferred();
-  var product = self._get(id);
-
-  // Был такой товар в списке?
-  // если да - resolve
-  // иначе - добираем данные с сервера
-  if (!_.isEmpty(product)) {
-    result.resolve(product);
-  } else {
-    ISnew.json.getProduct(id)
-      .done(function (product) {
-        self._addProduct(product);
-        result.resolve(self._get(id));
-      });
-  }
-
-  return result.promise();
-}
-
-/**
- * Забираем нужный товар
- */
-ISnew.Products.prototype._get = function (id) {
-  var self = this;
-
-  return self._list[parseInt(id)];
-};
-/**
  * Класс для работы с настройками Продукта
  */
 ISnew.ProductSettings = function (settings) {
@@ -18532,6 +18365,262 @@ ISnew.ProductVariants.prototype._getSelectedVector = function (_length) {
 
   return vector;
 };
+/**
+ * Централизованная работа с товарами
+ */
+ISnew.Products = function () {
+  var self = this;
+
+  // настройки
+  self._settings = {};
+  // объект с готовыми к употреблению товарами
+  self._products = {};
+
+  // массив с актуальными id (которые есть на странице +-)
+  self._storage = new ISnew.ProductsStorage(self);
+
+  self._init();
+};
+
+/**
+ * Инициализация
+ */
+ISnew.Products.prototype._init = function () {
+  var self = this;
+
+  self._getDomId()
+    .done(function (idList) {
+      self._getList(idList);
+    });
+};
+
+/**
+ * Получаем готовый к употреблению товар
+ */
+ISnew.Products.prototype.get = function (id) {
+  var self = this;
+
+  id = _.toInteger(id);
+
+  return self._getOne(id);
+};
+
+/**
+ * Получение списка товаров
+ */
+ISnew.Products.prototype.getList = function (idList) {
+  var self = this;
+
+  idList = _.toArray(idList);
+
+  return self._getList(idList);
+};
+
+/**
+ * Обновление настроек продуктов созданных через
+ */
+ISnew.Products.prototype.setConfig = function (settings){
+  var self = this;
+
+  self._settings = settings;
+
+  _.forEach(self._products, function (product) {
+    product.settings.set(self._settings);
+  });
+};
+
+/**
+ * Получение списка из id из DOM
+ */
+ISnew.Products.prototype._getDomId = function () {
+  var self = this;
+  var result = $.Deferred();
+  var _idList = [];
+
+  $(function () {
+    $('[data-product-id]').each(function (index, form) {
+      var id = _.toInteger($(form).data('product-id'));
+
+      _idList.push(id);
+    });
+
+    //console.log('Products: _getDomId: ', _.size(_idList), _idList);
+    result.resolve(_.uniq(_idList));
+  });
+
+  return result.promise();
+};
+
+/**
+ * Получение списка товаров
+ */
+ISnew.Products.prototype._getList = function (_idList) {
+  var self = this;
+  var result = $.Deferred();
+
+  // проверить все ли товары инициализированны?
+  var diffId = _.difference(_idList, self._actualId);
+  /*
+  console.log('Products: _getList: _idList', _idList);
+  console.log('Products: _getList: diffId', diffId);
+  */
+
+  if (diffId.length) {
+    // чего-то нет
+    // Забираем из харнилища
+    self._storage.getProducts(diffId)
+      .done(function (products) {
+        // инитим товары
+        _.forEach(products, function (product) {
+          self._initProduct(product);
+        });
+
+        // отдаем результат
+        result.resolve(_.pick(self._products, _idList));
+      });
+  } else {
+    // всё есть - отдаем
+    result.resolve(_.pick(self._products, _idList));
+  }
+
+  return result.promise();
+};
+
+/**
+ * Получение информации о товаре
+ */
+ISnew.Products.prototype._getOne = function (_id) {
+  var self = this;
+  var result = $.Deferred();
+
+  // а по сути нужно сделать все тоже, что и в
+  // _getList, но забрать первый элемент
+  self._getList([_id])
+    .done(function (products) {
+      products = _.toArray(products);
+      result.resolve(products[0]);
+    });
+
+  return result.promise();
+};
+
+/**
+ *
+ */
+ISnew.Products.prototype._initProduct = function (_productJSON) {
+  var self = this;
+
+  self._products[_productJSON.id] = new ISnew.Product(_productJSON, self._settings);
+};
+
+/**
+ * Класс Хранилища json Товаров
+ * управляет всем процессом получения и хранения json'ов
+ */
+ISnew.ProductsStorage = function (_owner) {
+  var self = this;
+
+  self._settings = {
+    maxProducts: 100,
+    json: 'products',
+    liveTime: 30000
+  };
+
+  self._owner = _owner;
+  self._storage = localStorage;
+
+  // массив с id-ками
+  self._idList = [];
+  // объект для хранения json
+  self._json = {};
+
+  self._init();
+}
+
+/**
+ * Инициализация
+ */
+ISnew.ProductsStorage.prototype._init = function () {
+  var self = this;
+
+  // грузим сохраненные товары
+  self._json = self._loadJSON();
+};
+
+/**
+ * Отдаем json'ы товаров и хранилища
+ */
+ISnew.ProductsStorage.prototype.getProducts = function (_idList) {
+  var self = this;
+  var result = $.Deferred();
+
+  // проверим, про какие товары мы ничего не знаеи?
+  var diffId = _.differenceBy(_idList, _.keys(self._json), _.toInteger);
+  /*
+  console.log('Storage: getProducts: diffId', _.keys(self._json));
+  console.log('Storage: getProducts: diffId', diffId);
+  */
+
+  if (diffId.length) {
+    // если про что-то не знаем - тащим всю портянку
+    ISnew.json.getProductsList(diffId)
+      .done(function (_JSONs) {
+        // обрабатываем ответы
+        self._updateJSON(_JSONs);
+
+        // отдаем результат
+        result.resolve(_.pick(self._json, _idList));
+      });
+  } else {
+    // всё есть - отдаем информацию
+    result.resolve(_.pick(self._json, _idList));
+  }
+
+  return result.promise();
+};
+
+/**
+ * Получение сохраненных товаров
+ */
+ISnew.ProductsStorage.prototype._loadJSON = function () {
+  var self = this;
+  var _json = self._storage.getItem(self._settings.json);
+
+  //console.log(JSON.parse(_json));
+  _json = JSON.parse(_json) || {};
+
+  return _json;
+};
+
+/**
+ * Сохранение товаров
+ */
+ISnew.ProductsStorage.prototype._saveJSON = function () {
+  var self = this;
+  var _json = JSON.stringify(self._json);
+
+  self._storage.setItem(self._settings.json, _json);
+
+  return;
+};
+
+/**
+ * Обновление базы )
+ */
+ISnew.ProductsStorage.prototype._updateJSON = function (_JSONs) {
+  var self = this;
+
+  // Добавляем записи
+  _.forEach(_JSONs, function (_json) {
+    self._json[_json.id] = _json;
+  });
+
+  // сохранаяем все добро
+  self._saveJSON();
+
+  return;
+};
+
 /**
  * Сравнение товаров
  */
