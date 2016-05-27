@@ -1,10 +1,10 @@
 /**
  * Класс для работы с валютой.
  */
-ISnew.Money = function (params) {
+ISnew.Money = function () {
   var self = this;
 
-  self._init(params);
+  self._init();
 };
 
 /**
@@ -12,7 +12,8 @@ ISnew.Money = function (params) {
  */
 ISnew.Money.prototype._init = function (params) {
   var self = this;
-  self.options = $.parseJSON(params);
+
+  //self.options = $.parseJSON(params);
   return;
 };
 

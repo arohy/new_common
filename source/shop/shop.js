@@ -5,6 +5,7 @@
 ISnew.Shop = function () {
   var self = this;
 
+  self.money = new ISnew.Money();
   self.client = new ISnew.Client(self);
 
   self._init();

@@ -18,7 +18,7 @@
     {% endif %}
   {% endfor %}
 
-  var money = new ISnew.Money('{{ money_with_currency_format }}');
+  Shop.money.set('{{ money_with_currency_format }}');
 
   Site.client_group = {
     id: '{{ client_group.id }}',
