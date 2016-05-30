@@ -22,15 +22,8 @@ ISnew.Product = function (product, settings) {
 
   self.product = product;
 
-  // статус рендера
-  if (!self.isRender) {
-    self.isRender = false;
-  };
-
   self._images = self._getImage(product.images);
-
   self.price_kinds = new ISnew.ProductPriceType(self);
-  self.variants = new ISnew.ProductVariants(self);
 
   self._init();
 };
@@ -41,7 +34,10 @@ ISnew.Product = function (product, settings) {
 ISnew.Product.prototype._init = function (){
   var self = this;
 
-  self.OptionSelector = new ISnew.OptionSelector(self);
+  // должен быть здесь, чтобы перезапустить при смене настроек.
+  // TODO: вынести в отдельный метод, прикруть методы к Классам
+  self.variants = new ISnew.ProductVariants(self);
+  self.ui = new ISnew.ProductDOM(self);
 }
 
 /**
@@ -58,7 +54,7 @@ ISnew.Product.prototype._updateStatus = function (status) {
   };
 
   // Трегирим нужное событие и сбрасываем состояние
-  EventBus.publish(status.action +':insales:product', status);
+  //EventBus.publish(status.action +':insales:product', status);
   return;
 };
 

@@ -38,10 +38,20 @@ ISnew.ProductVariants.prototype._init = function () {
   // проставляем выбранные опции
   self.options = self._selectedOptions(self.options);
 
+  /*
   if (self._owner.settings.initOption) {
     self._update();
   }
-}
+  */
+};
+
+ISnew.ProductVariants.prototype.setDomNode = function (_optiontSelector) {
+  var self = this;
+
+  self._optiontSelector = _optiontSelector;
+
+  return;
+};
 
 // ====================================================================================
 //                          Методы по работе с деревом вариантов
@@ -181,7 +191,7 @@ ISnew.ProductVariants.prototype._update = function () {
 
   status.action = 'update_variant';
 
-  self._owner._updateStatus(status);
+  self._optiontSelector._updateStatus(status);
 
   //  если есть id в урле обновляем вариант
   if (self.urlVariant) {
