@@ -8,14 +8,12 @@ ISnew.ProductsStorage = function (_owner) {
   self._settings = {
     maxProducts: 100,
     json: 'products',
-    liveTime: 30000
+    liveTime: 300000 // milisec
   };
 
   self._owner = _owner;
   self._storage = localStorage;
 
-  // массив с id-ками
-  self._idList = [];
   // объект для хранения json
   self._json = {};
 
@@ -30,6 +28,8 @@ ISnew.ProductsStorage.prototype._init = function () {
 
   // грузим сохраненные товары
   self._json = self._loadJSON();
+
+  self._checkAlive();
 };
 
 /**
@@ -41,10 +41,6 @@ ISnew.ProductsStorage.prototype.getProducts = function (_idList) {
 
   // проверим, про какие товары мы ничего не знаеи?
   var diffId = _.differenceBy(_idList, _.keys(self._json), _.toInteger);
-  /*
-  console.log('Storage: getProducts: diffId', _.keys(self._json));
-  console.log('Storage: getProducts: diffId', diffId);
-  */
 
   if (diffId.length) {
     // если про что-то не знаем - тащим всю портянку
@@ -71,7 +67,6 @@ ISnew.ProductsStorage.prototype._loadJSON = function () {
   var self = this;
   var _json = self._storage.getItem(self._settings.json);
 
-  //console.log(JSON.parse(_json));
   _json = JSON.parse(_json) || {};
 
   return _json;
@@ -97,6 +92,7 @@ ISnew.ProductsStorage.prototype._updateJSON = function (_JSONs) {
 
   // Добавляем записи
   _.forEach(_JSONs, function (_json) {
+    _json.updatedAt = _.now();
     self._json[_json.id] = _json;
   });
 
@@ -104,4 +100,19 @@ ISnew.ProductsStorage.prototype._updateJSON = function (_JSONs) {
   self._saveJSON();
 
   return;
+};
+
+/**
+ * Проверяем актуальность записей
+ */
+ISnew.ProductsStorage.prototype._checkAlive = function () {
+  var self = this;
+  var currentMoment = _.now();
+
+  _.forEach(self._json, function(_json, key) {
+    var _isValid = (currentMoment - _json.updatedAt) < self._settings.liveTime;
+    if (!_isValid) {
+      _.unset(self._json, key);
+    };
+  });
 };
