@@ -36,7 +36,7 @@ ISnew.Product = function (product, settings) {
 };
 
 /**
- * Настройки
+ * Инициализация
  */
 ISnew.Product.prototype._init = function (){
   var self = this;

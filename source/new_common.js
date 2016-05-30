@@ -7,6 +7,7 @@
 //= ./tools/
 //= ./json/
 //= ./cart/
+//= ./product.dom/
 //= ./product/
 //= ./products/
 //= ./compare/

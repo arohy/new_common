@@ -14,8 +14,6 @@ ISnew.ProductVariants.prototype._initOptions = function () {
   //  получаем параметры рендера опций
   var settingsOptions = self._owner.settings.options;
 
-  console.log(self);
-
   if (options.length) {
     // все хорошо, у нас есть опции
     _.forEach(options, function(option, index) {

@@ -17547,19 +17547,6 @@ ISnew.CartDOM.prototype._unlockButton = function (data, eventName) {
 ISnew.OptionSelector = function (_owner) {
   var self = this;
 
-  self._init(_owner);
-}
-
-/**
- * Инициализация
- *
- * @param {json} product json с информацией о товаре
- * @param {object} _owner ссылка на родительский класс ISnew.Products
- *
- */
-ISnew.OptionSelector.prototype._init = function (_owner) {
-  var self = this;
-
   self.selector = {
     //  селектор формы
     product: 'data-product-id',
@@ -17570,6 +17557,19 @@ ISnew.OptionSelector.prototype._init = function (_owner) {
   };
 
   self._owner = _owner;
+
+  self._init();
+}
+
+/**
+ * Инициализация
+ *
+ * @param {json} product json с информацией о товаре
+ * @param {object} _owner ссылка на родительский класс ISnew.Products
+ *
+ */
+ISnew.OptionSelector.prototype._init = function () {
+  var self = this;
 
   // находим опорный DOM-узел, который описывает товар
   self.$product = $('['+ self.selector.product +'="'+ self._owner.product.id +'"]');
@@ -17827,7 +17827,7 @@ ISnew.Product = function (product, settings) {
 };
 
 /**
- * Настройки
+ * Инициализация
  */
 ISnew.Product.prototype._init = function (){
   var self = this;
@@ -18246,8 +18246,6 @@ ISnew.ProductVariants.prototype._initOptions = function () {
   var options = self._owner.product.option_names;
   //  получаем параметры рендера опций
   var settingsOptions = self._owner.settings.options;
-
-  console.log(self);
 
   if (options.length) {
     // все хорошо, у нас есть опции
