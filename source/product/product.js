@@ -30,6 +30,7 @@ ISnew.Product = function (product, settings) {
   self._images = self._getImage(product.images);
 
   self.price_kinds = new ISnew.ProductPriceType(self);
+  self.variants = new ISnew.ProductVariants(self);
 
   self._init();
 };
@@ -40,13 +41,7 @@ ISnew.Product = function (product, settings) {
 ISnew.Product.prototype._init = function (){
   var self = this;
 
-  // Важно!!
-  // В товаре МОЖЕТ не быть ни одной опции, мы в таком варианте валимся
-  // TODO: залатать эту дыру в .variants - это поле ДОЛЖНО быть всегда
-  if (self._hasOption()) {
-    self.variants = new ISnew.ProductVariants(self);
-    self.OptionSelector = new ISnew.OptionSelector(self);
-  }
+  self.OptionSelector = new ISnew.OptionSelector(self);
 }
 
 /**
@@ -81,15 +76,6 @@ ISnew.Product.prototype.setQuantity = function (quantity) {
   return;
 };
 */
-
-/**
- * Проверка на наличие Опций модификаций
- */
-ISnew.Product.prototype._hasOption = function () {
-  var self = this;
-
-  return self.product.option_names.length > 0;
-};
 
 // ====================================================================================
 //                          Методы по работе с изображениями продукта

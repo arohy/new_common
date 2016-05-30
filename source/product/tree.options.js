@@ -5,26 +5,40 @@
 /**
  * Подготовка опций
  *
- * @param  {object} options коллекция опций продукта (product.option_names)
- *
  * @return {object} options модифицированный объект опций, добавляется renderType из параметров продукта, добавляется handle как название опции транслитом.
  */
-ISnew.ProductVariants.prototype._initOptions = function (options) {
+ISnew.ProductVariants.prototype._initOptions = function () {
   var self = this;
 
+  var options = self._owner.product.option_names;
   //  получаем параметры рендера опций
   var settingsOptions = self._owner.settings.options;
 
-  _.forEach(options, function(option, index) {
-    // название опции транслитом
-    option.handle = Site.Translit.replace(option.title);
+  console.log(self);
 
-    // Выставляем шаблон для опции, либо из настроек, либо дефолтный шаблон
-    option.renderType = settingsOptions[option.title] || settingsOptions.default;
+  if (options.length) {
+    // все хорошо, у нас есть опции
+    _.forEach(options, function(option, index) {
+      // название опции транслитом
+      option.handle = Site.Translit.replace(option.title);
 
-    // массив значений опции
-    option.values = {};
-  });
+      // Выставляем шаблон для опции, либо из настроек, либо дефолтный шаблон
+      option.renderType = settingsOptions[option.title] || settingsOptions.default;
+
+      // массив значений опции
+      option.values = {};
+    });
+  } else {
+    // всё плохо - у товара один вариант, свойств нет
+    options[0] = {
+      handle: '_empty',
+      title: '_empty',
+      values: {},
+      renderType: settingsOptions.default,
+      position: 0,
+      id: 0
+    };
+  }
 
   return options;
 }

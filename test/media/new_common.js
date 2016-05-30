@@ -17821,6 +17821,7 @@ ISnew.Product = function (product, settings) {
   self._images = self._getImage(product.images);
 
   self.price_kinds = new ISnew.ProductPriceType(self);
+  self.variants = new ISnew.ProductVariants(self);
 
   self._init();
 };
@@ -17831,13 +17832,7 @@ ISnew.Product = function (product, settings) {
 ISnew.Product.prototype._init = function (){
   var self = this;
 
-  // Важно!!
-  // В товаре МОЖЕТ не быть ни одной опции, мы в таком варианте валимся
-  // TODO: залатать эту дыру в .variants - это поле ДОЛЖНО быть всегда
-  if (self._hasOption()) {
-    self.variants = new ISnew.ProductVariants(self);
-    self.OptionSelector = new ISnew.OptionSelector(self);
-  }
+  self.OptionSelector = new ISnew.OptionSelector(self);
 }
 
 /**
@@ -17872,15 +17867,6 @@ ISnew.Product.prototype.setQuantity = function (quantity) {
   return;
 };
 */
-
-/**
- * Проверка на наличие Опций модификаций
- */
-ISnew.Product.prototype._hasOption = function () {
-  var self = this;
-
-  return self.product.option_names.length > 0;
-};
 
 // ====================================================================================
 //                          Методы по работе с изображениями продукта
@@ -17980,9 +17966,8 @@ ISnew.ProductSettings.prototype.set = function (settings) {
  * @name ISnew.ProductVariants
  *
  * @example
- * self.variants = new ISnew.ProductVariants(_product, self);
+ * self.variants = new ISnew.ProductVariants(_owner);
  *
- * @param  {object} product продукт
  * @param  {object} _owner родительский объект класса Product
  *
  * @property {array} variants массив модификаций продукта
@@ -17996,6 +17981,8 @@ ISnew.ProductVariants = function (_owner) {
   var self = this;
 
   self._owner = _owner;
+  self.variants = self._owner.product.variants;
+  self.urlVariant = Site.URL.getKeyValue('variant_id');
 
   self._init()
 };
@@ -18006,13 +17993,10 @@ ISnew.ProductVariants = function (_owner) {
 ISnew.ProductVariants.prototype._init = function () {
   var self = this;
 
-  self.variants = self._owner.product.variants;
-  self.urlVariant = Site.URL.getKeyValue('variant_id');
-
   // создаем опции
-  self.options = self._initOptions(self._owner.product.option_names);
+  self.options = self._initOptions();
   // создаем дерево
-  self.tree = self._initTree(self._owner.product.variants);
+  self.tree = self._initTree();
   // проставляем выбранные опции
   self.options = self._selectedOptions(self.options);
 
@@ -18028,48 +18012,35 @@ ISnew.ProductVariants.prototype._init = function () {
 /**
  * Строим дерево вариантов
  */
-ISnew.ProductVariants.prototype._initTree = function (variants) {
+ISnew.ProductVariants.prototype._initTree = function () {
   var self = this;
+  var variants = self._owner.product.variants
   var tree = {};
 
   // Проходимся по вариантам
   _.forEach(variants, function (variant) {
-    var variant_id = variant.id;
     var leaf = tree;
 
-    // Разбираем опции
-    _.forEach(variant.option_values, function(option, index) {
-      var id;
-      var isAvailable;
+    if (variant.option_values.length) {
+      // все хорошо, у нас много опций
+      // Разбираем опции
+      _.forEach(variant.option_values, function(option, index) {
+        // Добавляем новое значение в опцию
+        self._addValues(option, index);
 
-      // Добавляем новое значение в опцию
-      self._addValues(option, index);
+        self._parseVariantOption({
+          variant: variant,
+          option: option,
+          index: index,
+          leaf: leaf
+        });
 
-      // Если дошли до последней опции - выставляем вариант и доступность
-      if (index == (variant.option_values.length - 1)) {
-        id = variant_id;
-        isAvailable = variant.available;
-      }
-
-      // Если такую опцию мы еще не вносили - вбиваем все, что есть.
-      if (!leaf[option.position]) {
-        leaf[_.toInteger(option.position)] = {
-          id: _.toInteger(option.id),
-          tree: {},
-          title: option.title,
-          name: option.title.toLowerCase(),
-          variant_id: id,
-          position: _.toInteger(option.position)
-        };
-
-        // Выставляем доступность
-        if( isAvailable !== undefined ){
-          leaf[option.position].available = isAvailable;
-        };
-      }
-
-      leaf = leaf[option.position].tree;
-    });
+        leaf = leaf[option.position].tree;
+      });
+    } else {
+      // все плохо, у нас один вариант, нет опций
+      self._addLeaf({ id: 0, title: '_empty', position: 0 }, leaf, { id: variant.id, available: variant.available });
+    }
   });
 
   _.forEach(tree, function (leaf) {
@@ -18082,6 +18053,63 @@ ISnew.ProductVariants.prototype._initTree = function (variants) {
 // ====================================================================================
 //                          Методы по работе с вариантом
 // ====================================================================================
+
+/**
+ * Разбор Опций варианта
+ */
+ISnew.ProductVariants.prototype._parseVariantOption = function (data) {
+  var self = this;
+
+  var variant = data.variant;
+  var leaf = data.leaf;
+  var option = data.option;
+  var index = data.index;
+
+  var _variantSet = {
+    id: undefined,
+    available: undefined
+  }
+
+  // Если дошли до последней опции - выставляем вариант и доступность
+  var _isLast = (index == (variant.option_values.length - 1));
+
+  if (_isLast) {
+    _variantSet = {
+      id: variant.id,
+      available: variant.available
+    };
+  }
+
+  self._addLeaf(option, leaf, _variantSet);
+
+  return;
+};
+
+/**
+ * Добавляем узел дерева
+ */
+ISnew.ProductVariants.prototype._addLeaf = function (option, leaf, _variantSet) {
+  var self = this;
+
+  // Если такую опцию мы еще не вносили - вбиваем все, что есть.
+  if (!leaf[_.toInteger(option.position)]) {
+    leaf[_.toInteger(option.position)] = {
+      id: _.toInteger(option.id),
+      tree: {},
+      title: option.title,
+      name: option.title.toLowerCase(),
+      variant_id: _variantSet.id,
+      position: _.toInteger(option.position)
+    };
+  };
+
+  // Выставляем доступность
+  if (_variantSet.available !== undefined) {
+    leaf[_.toInteger(option.position)].available = _variantSet.available;
+  };
+
+  return;
+};
 
 /**
  * Установка доступности вариантов
@@ -18210,26 +18238,40 @@ ISnew.ProductVariants.prototype.setVariant = function (variant_id) {
 /**
  * Подготовка опций
  *
- * @param  {object} options коллекция опций продукта (product.option_names)
- *
  * @return {object} options модифицированный объект опций, добавляется renderType из параметров продукта, добавляется handle как название опции транслитом.
  */
-ISnew.ProductVariants.prototype._initOptions = function (options) {
+ISnew.ProductVariants.prototype._initOptions = function () {
   var self = this;
 
+  var options = self._owner.product.option_names;
   //  получаем параметры рендера опций
   var settingsOptions = self._owner.settings.options;
 
-  _.forEach(options, function(option, index) {
-    // название опции транслитом
-    option.handle = Site.Translit.replace(option.title);
+  console.log(self);
 
-    // Выставляем шаблон для опции, либо из настроек, либо дефолтный шаблон
-    option.renderType = settingsOptions[option.title] || settingsOptions.default;
+  if (options.length) {
+    // все хорошо, у нас есть опции
+    _.forEach(options, function(option, index) {
+      // название опции транслитом
+      option.handle = Site.Translit.replace(option.title);
 
-    // массив значений опции
-    option.values = {};
-  });
+      // Выставляем шаблон для опции, либо из настроек, либо дефолтный шаблон
+      option.renderType = settingsOptions[option.title] || settingsOptions.default;
+
+      // массив значений опции
+      option.values = {};
+    });
+  } else {
+    // всё плохо - у товара один вариант, свойств нет
+    options[0] = {
+      handle: '_empty',
+      title: '_empty',
+      values: {},
+      renderType: settingsOptions.default,
+      position: 0,
+      id: 0
+    };
+  }
 
   return options;
 }
