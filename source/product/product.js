@@ -16,6 +16,7 @@ ISnew.Product = function (product, settings) {
     throw new ISnew.tools.Error('ErrorProduct', 'ошибка в передаче продукта');
   }
 
+  _.merge(self, product);
   //  Валидация настроек
   self.settings = new ISnew.ProductSettings(settings, self);
 
@@ -26,9 +27,8 @@ ISnew.Product = function (product, settings) {
     self.isRender = false;
   };
 
-  self.images = self._getImage(product.images);
+  self._images = self._getImage(product.images);
 
-  self.quantity = 0;
   self.price_kinds = new ISnew.ProductPriceType(self);
 
   self._init();
@@ -43,7 +43,6 @@ ISnew.Product.prototype._init = function (){
   // Важно!!
   // В товаре МОЖЕТ не быть ни одной опции, мы в таком варианте валимся
   // TODO: залатать эту дыру в .variants - это поле ДОЛЖНО быть всегда
-  console.log(self);
   if (self._hasOption()) {
     self.variants = new ISnew.ProductVariants(self);
     self.OptionSelector = new ISnew.OptionSelector(self);
@@ -70,15 +69,18 @@ ISnew.Product.prototype._updateStatus = function (status) {
 
 /**
  * Установка кол-ва товара
+ * пока depricated
  */
+ /*
 ISnew.Product.prototype.setQuantity = function (quantity) {
   var self = this;
 
-  self.quantity = parseFloat(quantity);
+  self._quantity = parseFloat(quantity);
 
   self.price_kinds.setQuantity(self.quantity);
   return;
 };
+*/
 
 /**
  * Проверка на наличие Опций модификаций
@@ -86,11 +88,7 @@ ISnew.Product.prototype.setQuantity = function (quantity) {
 ISnew.Product.prototype._hasOption = function () {
   var self = this;
 
-  var _product = self.product;
-  console.log(self);
-  var optionCount = _product.option_names.length;
-
-  return optionCount > 0;
+  return self.product.option_names.length > 0;
 };
 
 // ====================================================================================
