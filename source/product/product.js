@@ -24,10 +24,10 @@ ISnew.Product = function (product, settings) {
   //  Валидация настроек
   self.settings = new ISnew.ProductSettings(settings, self);
 
-  self.product = product;
+  //self.product = product;
 
   self._images = self._getImage(product.images);
-  self.price_kinds = new ISnew.ProductPriceType(self);
+  //self.price_kinds = new ISnew.ProductPriceType(self);
 
   self._init();
 };
@@ -40,7 +40,7 @@ ISnew.Product.prototype._init = function (){
 
   // должен быть здесь, чтобы перезапустить при смене настроек.
   // TODO: вынести в отдельный метод, прикруть методы к Классам
-  self.variants = new ISnew.ProductVariants(self);
+  //self.variants = new ISnew.ProductVariants(self);
   self._ui = self._initDOM();
 }
 

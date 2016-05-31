@@ -12,10 +12,19 @@ ISnew.ProductPriceType = function (_owner) {
   var self = this;
   self._owner = _owner;
 
-  self.variant_id = self._owner.product.variants[0].id;
-  self.price_kinds = self._initPrices(self._owner.product);
+  self.variantId = 0;
+  self.price_kinds = {};
+
+  self._init();
 
   return self;
+};
+
+ISnew.ProductPriceType.prototype._init = function () {
+  var self = this;
+
+  self.variantId = self._owner.variants.getVariant();
+  self.price_kinds = self._initPrices(self._owner.product);
 };
 
 /**
@@ -51,9 +60,11 @@ ISnew.ProductPriceType.prototype._initPrices = function (product) {
 ISnew.ProductPriceType.prototype._update = function () {
   var self = this;
   var status = {
-    action: 'update_price',
+    action: {
+      method: 'update_price'
+    },
     price: self.getPrice(),
-    quantity: self._owner.quantity.get()
+    quantity: self.quantity
   };
 
   self._owner._updateStatus(status);
@@ -66,10 +77,9 @@ ISnew.ProductPriceType.prototype._update = function () {
 ISnew.ProductPriceType.prototype.getPrice = function () {
   var self = this;
   var price = 0;
-  console.log('ProductPriceType: ', self);
 
-  _.forEach(self.price_kinds[self.variant_id], function (price_type) {
-    if (self._owner.quantity < price_type.min_quantity) {
+  _.forEach(self.price_kinds[self.variantId], function (price_type) {
+    if (self.quantity < price_type.min_quantity) {
       return false;
     }
 
@@ -82,36 +92,41 @@ ISnew.ProductPriceType.prototype.getPrice = function () {
 /**
  * Задать актуальное кол-во товара
  */
-ISnew.ProductPriceType.prototype.setQuantity = function () {
+ISnew.ProductPriceType.prototype._setQuantity = function (quantity) {
   var self = this;
 
-  self.quantity = self._owner.quantity.get();
+  self.quantity = _.toInteger(quantity);
 
-  self._update();
   return;
 };
 
 /**
  * Выбираем модификацию товара
  */
-ISnew.ProductPriceType.prototype.setVariant = function (variant_id) {
+ISnew.ProductPriceType.prototype._setVariant = function (variantId) {
   var self = this;
 
-  console.log('ProductPriceType: setVariant:', variant_id);
-  variant_id = parseInt(variant_id);
+  variantId = parseInt(variantId);
 
-  if (self.variant_id == variant_id) {
+  if (self.variantId == variantId) {
     return false;
   }
 
-  self.variant_id = variant_id;
+  self.variantId = variantId;
 
-  self._update();
   return;
 };
 
-ISnew.ProductPriceType.prototype.setOwner = function (_owner) {
+ISnew.ProductPriceType.prototype.set = function (config) {
   var self = this;
 
-  self._owner = _owner;
+  if (config.quantity) {
+    self._setQuantity(config.quantity);
+  }
+
+  if (config.variantId) {
+    self._setVariant(config.variantId);
+  }
+
+  self._update();
 };

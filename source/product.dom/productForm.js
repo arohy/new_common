@@ -23,7 +23,6 @@ ISnew.ProductForm = function (_owner, form) {
   self.settings = self._owner.settings;
   self.product = self._owner;
   self.$form = $(form);
-  self.quantity = 0;
 
   // прибиваем экземпляр к узлу
   form.product = self;
@@ -37,15 +36,12 @@ ISnew.ProductForm = function (_owner, form) {
 ISnew.ProductForm.prototype._init = function () {
   var self = this;
 
-  // клонируем и привязываем нужные объекты
-  self.variants = _.cloneDeep(self._owner.variants);
-  self.variants.setOwner(self);
-
-  self.price_kinds = _.cloneDeep(self._owner.price_kinds);
-  self.price_kinds.setOwner(self);
+  // привязываем нужные объекты
+  self.variants = new ISnew.ProductVariants(self);
+  self.quantity = new ISnew.ProductQuantity(self);
+  self.price_kinds = new ISnew.ProductPriceType(self);
 
   self._initOptionSelectors(self);
-  self._initQuantity(self);
 
   // Дергаем вариант
   if (self.product.settings.initOption) {
@@ -58,7 +54,6 @@ ISnew.ProductForm.prototype._init = function () {
  */
 ISnew.ProductForm.prototype._initOptionSelectors = function (product) {
   var self = this;
-
   var _isActive = _.isObject(product.optionSelector);
 
   if (!_isActive) {
@@ -73,37 +68,21 @@ ISnew.ProductForm.prototype._initOptionSelectors = function (product) {
 };
 
 /**
- * Инициализация типа цен
- */
-ISnew.ProductForm.prototype._initPriceType = function () {
-  var self = this;
-};
-
-/**
- * Инициализация считалочки товаров
- */
-ISnew.ProductForm.prototype._initQuantity = function (product) {
-  var self = this;
-
-  self.quantity = new ISnew.ProductQuantity(product);
-};
-
-/**
  * Обновление состояния
  */
 ISnew.ProductForm.prototype._updateStatus = function (status) {
   var self = this;
 
   status.action.form = self.$form;
-  console.log('ProductForm: ', status);
+
   // выбираем, что нужно обновить
   switch (status.action.method) {
     case 'update_variant':
-      self.price_kinds.setVariant(status.id);
+      self.price_kinds.set({ variantId: status.id });
       self.quantity.setVariant(status);
       break;
     case 'change_quantity':
-      self.price_kinds.setQuantity(status);
+      self.price_kinds.set({ quantity: status.quantity.current });
       break;
   }
 

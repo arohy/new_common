@@ -18,7 +18,7 @@ ISnew.OptionSelector = function (_owner) {
 
   self._owner = _owner;
 
-  self.selector = self._owner.selectors;
+  self.selectors = self._owner.selectors;
   self.$product = _owner.$form;
 
   self._init();
@@ -41,21 +41,21 @@ ISnew.OptionSelector.prototype._init = function () {
   }
 
   // находим там нативный селект/точку для рендера
-  self.$nativeSelect = self.$product.find('['+ self.selector.nativeSelect +']');
+  self.$nativeSelect = self.$product.find('['+ self.selectors.nativeSelect +']');
 
   // если нативного селектора нет, выходим
   if (self.$nativeSelect.length == 0) {
     return;
   }
 
-  var $optionSelector = self.$product.find('['+ self.selector.optionSelector +']');
+  var $optionSelector = self.$product.find('['+ self.selectors.optionSelector +']');
 
   // создаем контейнер и сохраняем линк на него
   if (!$optionSelector.length) {
-    self.$nativeSelect.after('<div class="option-selector" '+ self.selector.optionSelector +'/>');
+    self.$nativeSelect.after('<div class="option-selector" '+ self.selectors.optionSelector +'/>');
   }
 
-  self.$optionSelector = self.$product.find('['+ self.selector.optionSelector +']');
+  self.$optionSelector = self.$product.find('['+ self.selectors.optionSelector +']');
 
   //  вызов рендера
   self._renderSelector();

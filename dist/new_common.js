@@ -17558,7 +17558,7 @@ ISnew.OptionSelector = function (_owner) {
 
   self._owner = _owner;
 
-  self.selector = self._owner.selectors;
+  self.selectors = self._owner.selectors;
   self.$product = _owner.$form;
 
   self._init();
@@ -17581,21 +17581,21 @@ ISnew.OptionSelector.prototype._init = function () {
   }
 
   // находим там нативный селект/точку для рендера
-  self.$nativeSelect = self.$product.find('['+ self.selector.nativeSelect +']');
+  self.$nativeSelect = self.$product.find('['+ self.selectors.nativeSelect +']');
 
   // если нативного селектора нет, выходим
   if (self.$nativeSelect.length == 0) {
     return;
   }
 
-  var $optionSelector = self.$product.find('['+ self.selector.optionSelector +']');
+  var $optionSelector = self.$product.find('['+ self.selectors.optionSelector +']');
 
   // создаем контейнер и сохраняем линк на него
   if (!$optionSelector.length) {
-    self.$nativeSelect.after('<div class="option-selector" '+ self.selector.optionSelector +'/>');
+    self.$nativeSelect.after('<div class="option-selector" '+ self.selectors.optionSelector +'/>');
   }
 
-  self.$optionSelector = self.$product.find('['+ self.selector.optionSelector +']');
+  self.$optionSelector = self.$product.find('['+ self.selectors.optionSelector +']');
 
   //  вызов рендера
   self._renderSelector();
@@ -17723,7 +17723,6 @@ ISnew.ProductForm = function (_owner, form) {
   self.settings = self._owner.settings;
   self.product = self._owner;
   self.$form = $(form);
-  self.quantity = 0;
 
   // прибиваем экземпляр к узлу
   form.product = self;
@@ -17737,15 +17736,12 @@ ISnew.ProductForm = function (_owner, form) {
 ISnew.ProductForm.prototype._init = function () {
   var self = this;
 
-  // клонируем и привязываем нужные объекты
-  self.variants = _.cloneDeep(self._owner.variants);
-  self.variants.setOwner(self);
-
-  self.price_kinds = _.cloneDeep(self._owner.price_kinds);
-  self.price_kinds.setOwner(self);
+  // привязываем нужные объекты
+  self.variants = new ISnew.ProductVariants(self);
+  self.quantity = new ISnew.ProductQuantity(self);
+  self.price_kinds = new ISnew.ProductPriceType(self);
 
   self._initOptionSelectors(self);
-  self._initQuantity(self);
 
   // Дергаем вариант
   if (self.product.settings.initOption) {
@@ -17758,7 +17754,6 @@ ISnew.ProductForm.prototype._init = function () {
  */
 ISnew.ProductForm.prototype._initOptionSelectors = function (product) {
   var self = this;
-
   var _isActive = _.isObject(product.optionSelector);
 
   if (!_isActive) {
@@ -17773,37 +17768,21 @@ ISnew.ProductForm.prototype._initOptionSelectors = function (product) {
 };
 
 /**
- * Инициализация типа цен
- */
-ISnew.ProductForm.prototype._initPriceType = function () {
-  var self = this;
-};
-
-/**
- * Инициализация считалочки товаров
- */
-ISnew.ProductForm.prototype._initQuantity = function (product) {
-  var self = this;
-
-  self.quantity = new ISnew.ProductQuantity(product);
-};
-
-/**
  * Обновление состояния
  */
 ISnew.ProductForm.prototype._updateStatus = function (status) {
   var self = this;
 
   status.action.form = self.$form;
-  console.log('ProductForm: ', status);
+
   // выбираем, что нужно обновить
   switch (status.action.method) {
     case 'update_variant':
-      self.price_kinds.setVariant(status.id);
+      self.price_kinds.set({ variantId: status.id });
       self.quantity.setVariant(status);
       break;
     case 'change_quantity':
-      self.price_kinds.setQuantity(status);
+      self.price_kinds.set({ quantity: status.quantity.current });
       break;
   }
 
@@ -17933,10 +17912,19 @@ ISnew.ProductPriceType = function (_owner) {
   var self = this;
   self._owner = _owner;
 
-  self.variant_id = self._owner.product.variants[0].id;
-  self.price_kinds = self._initPrices(self._owner.product);
+  self.variantId = 0;
+  self.price_kinds = {};
+
+  self._init();
 
   return self;
+};
+
+ISnew.ProductPriceType.prototype._init = function () {
+  var self = this;
+
+  self.variantId = self._owner.variants.getVariant();
+  self.price_kinds = self._initPrices(self._owner.product);
 };
 
 /**
@@ -17972,9 +17960,11 @@ ISnew.ProductPriceType.prototype._initPrices = function (product) {
 ISnew.ProductPriceType.prototype._update = function () {
   var self = this;
   var status = {
-    action: 'update_price',
+    action: {
+      method: 'update_price'
+    },
     price: self.getPrice(),
-    quantity: self._owner.quantity.get()
+    quantity: self.quantity
   };
 
   self._owner._updateStatus(status);
@@ -17987,10 +17977,9 @@ ISnew.ProductPriceType.prototype._update = function () {
 ISnew.ProductPriceType.prototype.getPrice = function () {
   var self = this;
   var price = 0;
-  console.log('ProductPriceType: ', self);
 
-  _.forEach(self.price_kinds[self.variant_id], function (price_type) {
-    if (self._owner.quantity < price_type.min_quantity) {
+  _.forEach(self.price_kinds[self.variantId], function (price_type) {
+    if (self.quantity < price_type.min_quantity) {
       return false;
     }
 
@@ -18003,38 +17992,43 @@ ISnew.ProductPriceType.prototype.getPrice = function () {
 /**
  * Задать актуальное кол-во товара
  */
-ISnew.ProductPriceType.prototype.setQuantity = function () {
+ISnew.ProductPriceType.prototype._setQuantity = function (quantity) {
   var self = this;
 
-  self.quantity = self._owner.quantity.get();
+  self.quantity = _.toInteger(quantity);
 
-  self._update();
   return;
 };
 
 /**
  * Выбираем модификацию товара
  */
-ISnew.ProductPriceType.prototype.setVariant = function (variant_id) {
+ISnew.ProductPriceType.prototype._setVariant = function (variantId) {
   var self = this;
 
-  console.log('ProductPriceType: setVariant:', variant_id);
-  variant_id = parseInt(variant_id);
+  variantId = parseInt(variantId);
 
-  if (self.variant_id == variant_id) {
+  if (self.variantId == variantId) {
     return false;
   }
 
-  self.variant_id = variant_id;
+  self.variantId = variantId;
 
-  self._update();
   return;
 };
 
-ISnew.ProductPriceType.prototype.setOwner = function (_owner) {
+ISnew.ProductPriceType.prototype.set = function (config) {
   var self = this;
 
-  self._owner = _owner;
+  if (config.quantity) {
+    self._setQuantity(config.quantity);
+  }
+
+  if (config.variantId) {
+    self._setVariant(config.variantId);
+  }
+
+  self._update();
 };
 /**
  * Главный объект продукта
@@ -18062,10 +18056,10 @@ ISnew.Product = function (product, settings) {
   //  Валидация настроек
   self.settings = new ISnew.ProductSettings(settings, self);
 
-  self.product = product;
+  //self.product = product;
 
   self._images = self._getImage(product.images);
-  self.price_kinds = new ISnew.ProductPriceType(self);
+  //self.price_kinds = new ISnew.ProductPriceType(self);
 
   self._init();
 };
@@ -18078,7 +18072,7 @@ ISnew.Product.prototype._init = function (){
 
   // должен быть здесь, чтобы перезапустить при смене настроек.
   // TODO: вынести в отдельный метод, прикруть методы к Классам
-  self.variants = new ISnew.ProductVariants(self);
+  //self.variants = new ISnew.ProductVariants(self);
   self._ui = self._initDOM();
 }
 
