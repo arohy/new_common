@@ -7,7 +7,15 @@ ISnew.ProductForm = function (_owner, form) {
   var self = this;
 
   self.selectors = {
+    //  селектор формы
     product: 'data-product-id',
+    // data атрибут нативного селекта
+    nativeSelect: 'data-product-variants',
+    // data атрибут блока в который происходит рендер модификаций
+    optionSelector: 'data-option-selector',
+
+    quantity: 'data-quantity',
+    quantityButton: 'data-quantity-change'
   }
 
   // настройки для экземпляра
@@ -15,6 +23,7 @@ ISnew.ProductForm = function (_owner, form) {
   self.settings = self._owner.settings;
   self.product = self._owner;
   self.$form = $(form);
+  self.quantity = 0;
 
   // прибиваем экземпляр к узлу
   form.product = self;
@@ -28,10 +37,15 @@ ISnew.ProductForm = function (_owner, form) {
 ISnew.ProductForm.prototype._init = function () {
   var self = this;
 
-  self.variants = _.cloneDeep(self.product.variants);
+  // клонируем и привязываем нужные объекты
+  self.variants = _.cloneDeep(self._owner.variants);
   self.variants.setOwner(self);
 
+  self.price_kinds = _.cloneDeep(self._owner.price_kinds);
+  self.price_kinds.setOwner(self);
+
   self._initOptionSelectors(self);
+  self._initQuantity(self);
 
   // Дергаем вариант
   if (self.product.settings.initOption) {
@@ -54,7 +68,7 @@ ISnew.ProductForm.prototype._initOptionSelectors = function (product) {
   } else {
     // данный селектор активен
     // наверное оти перезаписать настройки
-    product.optionSelector._init($(product), self._owner);
+    product.optionSelector._init();
   }
 };
 
@@ -68,8 +82,10 @@ ISnew.ProductForm.prototype._initPriceType = function () {
 /**
  * Инициализация считалочки товаров
  */
-ISnew.ProductForm.prototype._initQuantity = function () {
+ISnew.ProductForm.prototype._initQuantity = function (product) {
   var self = this;
+
+  self.quantity = new ISnew.ProductQuantity(product);
 };
 
 /**
@@ -79,6 +95,17 @@ ISnew.ProductForm.prototype._updateStatus = function (status) {
   var self = this;
 
   status.action.form = self.$form;
+  console.log('ProductForm: ', status);
+  // выбираем, что нужно обновить
+  switch (status.action.method) {
+    case 'update_variant':
+      self.price_kinds.setVariant(status.id);
+      self.quantity.setVariant(status);
+      break;
+    case 'change_quantity':
+      self.price_kinds.setQuantity(status);
+      break;
+  }
 
   EventBus.publish(status.action.method +':insales:product', status);
 };

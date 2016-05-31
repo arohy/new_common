@@ -16,16 +16,9 @@
 ISnew.OptionSelector = function (_owner) {
   var self = this;
 
-  self.selector = {
-    //  селектор формы
-    product: 'data-product-id',
-    // data атрибут нативного селекта
-    nativeSelect: 'data-product-variants',
-    // data атрибут блока в который происходит рендер модификаций
-    optionSelector: 'data-option-selector'
-  };
-
   self._owner = _owner;
+
+  self.selector = self._owner.selectors;
   self.$product = _owner.$form;
 
   self._init();

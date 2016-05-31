@@ -53,7 +53,7 @@ ISnew.ProductPriceType.prototype._update = function () {
   var status = {
     action: 'update_price',
     price: self.getPrice(),
-    quantity: self._owner.quantity
+    quantity: self._owner.quantity.get()
   };
 
   self._owner._updateStatus(status);
@@ -66,6 +66,7 @@ ISnew.ProductPriceType.prototype._update = function () {
 ISnew.ProductPriceType.prototype.getPrice = function () {
   var self = this;
   var price = 0;
+  console.log('ProductPriceType: ', self);
 
   _.forEach(self.price_kinds[self.variant_id], function (price_type) {
     if (self._owner.quantity < price_type.min_quantity) {
@@ -84,6 +85,8 @@ ISnew.ProductPriceType.prototype.getPrice = function () {
 ISnew.ProductPriceType.prototype.setQuantity = function () {
   var self = this;
 
+  self.quantity = self._owner.quantity.get();
+
   self._update();
   return;
 };
@@ -93,6 +96,8 @@ ISnew.ProductPriceType.prototype.setQuantity = function () {
  */
 ISnew.ProductPriceType.prototype.setVariant = function (variant_id) {
   var self = this;
+
+  console.log('ProductPriceType: setVariant:', variant_id);
   variant_id = parseInt(variant_id);
 
   if (self.variant_id == variant_id) {
@@ -103,4 +108,10 @@ ISnew.ProductPriceType.prototype.setVariant = function (variant_id) {
 
   self._update();
   return;
+};
+
+ISnew.ProductPriceType.prototype.setOwner = function (_owner) {
+  var self = this;
+
+  self._owner = _owner;
 };
