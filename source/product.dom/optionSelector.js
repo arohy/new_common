@@ -13,7 +13,7 @@
  * @property {object} $optionSelector контейнер куда происходит рендер селекторов опций
  *
  */
-ISnew.OptionSelector = function ($product, _product) {
+ISnew.OptionSelector = function (_owner) {
   var self = this;
 
   self.selector = {
@@ -25,11 +25,11 @@ ISnew.OptionSelector = function ($product, _product) {
     optionSelector: 'data-option-selector'
   };
 
-  self._product = _product;
-  self.$product = $product;
+  self._owner = _owner;
+  self.$product = _owner.$form;
 
   self._init();
-}
+};
 
 /**
  * Инициализация
@@ -40,16 +40,12 @@ ISnew.OptionSelector = function ($product, _product) {
  */
 ISnew.OptionSelector.prototype._init = function () {
   var self = this;
-  var product = self.$product[0];
+  var product = self._owner;
 
   // если DOM-узла нет, выходим
   if (self.$product.length == 0) {
     return;
   }
-
-  // делаем полноценный клон, привязывем к форме
-  self.variants = _.cloneDeep(self._product.variants);
-  self.variants.setDomNode(self);
 
   // находим там нативный селект/точку для рендера
   self.$nativeSelect = self.$product.find('['+ self.selector.nativeSelect +']');
@@ -59,24 +55,17 @@ ISnew.OptionSelector.prototype._init = function () {
     return;
   }
 
+  var $optionSelector = self.$product.find('['+ self.selector.optionSelector +']');
+
   // создаем контейнер и сохраняем линк на него
-  // проверка на рендер, если уже отрендерили то не добавляем новую обёртку
-  if (!_.isObject(product.optionSelector)) {
+  if (!$optionSelector.length) {
     self.$nativeSelect.after('<div class="option-selector" '+ self.selector.optionSelector +'/>');
-    self.$optionSelector = self.$product.find('['+ self.selector.optionSelector +']');
   }
 
-  // привязываем экземпляр Класса к товару
-  product.optionSelector = self;
+  self.$optionSelector = self.$product.find('['+ self.selector.optionSelector +']');
 
-
-  //  вызов рендера и слушателя
+  //  вызов рендера
   self._renderSelector();
-
-  // Дергаем вариант
-  if (self._product.settings.initOption) {
-    self.variants._update();
-  }
 
   return;
 };
@@ -87,12 +76,12 @@ ISnew.OptionSelector.prototype._init = function () {
 ISnew.OptionSelector.prototype._renderSelector = function () {
   var self = this;
 
-  var variants = self.variants;
-  var images = self._product._images;
-  var settings = self._product.settings;
+  var variants = self._owner.variants;
+  var images = self._owner.product._images;
+  var settings = self._owner.product.settings;
 
   // Если в настройках не отключили отображение селекторов
-  if (settings.showVariants) {
+  if (settings.showVariants && self.$optionSelector) {
     //  собираем отрендеренные селекторы
     var optionsHTML = _.reduce(variants.options, function (html, value, index) {
       return html += self._renderOption({
@@ -124,24 +113,11 @@ ISnew.OptionSelector.prototype._renderOption = function (option) {
 };
 
 /**
- * Обновление состояния
- */
-ISnew.OptionSelector.prototype._updateStatus = function (status) {
-  var self = this;
-
-  status.action = {
-    form: self.$product
-  };
-
-  EventBus.publish('update_variant:insales:product', status);
-};
-
-/**
  * Навешиваем свой дефолтный слушатель для обновления рендера
  */
 EventBus.subscribe('update_variant:insales:product', function (data) {
   var $product = data.action.form;
-  var OptionSelector = $product[0]['optionSelector'];
+  var OptionSelector = $product[0].product.optionSelector;
 
   if (OptionSelector) {
     OptionSelector.$nativeSelect.val(data.id);
@@ -157,14 +133,11 @@ $(document).on('change', '[data-product-variants]', function (event) {
   var $select = $(this);
 
   var variantId = _.toInteger($select.val());
-  var $product = $select.parents('form[data-product-id]:first');
-  var OptionSelector = $product[0]['optionSelector'];
+  var product = $select
+    .parents('[data-product-id]:first')[0]
+    .product;
 
-  if (!_.isObject(OptionSelector)) {
-    return;
-  }
-
-  OptionSelector.variants.setVariant(variantId);
+  product.variants.setVariant(variantId);
 });
 
 //  Слушаем изменения в селекторах модификаций
@@ -177,8 +150,9 @@ $(document).on('change click', '[data-option-bind]', function (event) {
     return false;
   }
 
-  var $product = $option.parents('form[data-product-id]:first');
-  var OptionSelector = $product[0]['optionSelector'];
+  var product = $option
+    .parents('[data-product-id]:first')[0]
+    .product;
 
   var option = {
     option_name_id: $option.data('option-bind'),
@@ -189,5 +163,5 @@ $(document).on('change click', '[data-option-bind]', function (event) {
     option.position = _.toInteger($option.val());
   }
 
-  OptionSelector.variants.setOption(option);
+  product.variants.setOption(option);
 });

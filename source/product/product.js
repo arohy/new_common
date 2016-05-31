@@ -16,6 +16,10 @@ ISnew.Product = function (product, settings) {
     throw new ISnew.tools.Error('ErrorProduct', 'ошибка в передаче продукта');
   }
 
+  self._selectors = {
+    product: 'data-product-id',
+  };
+
   _.merge(self, product);
   //  Валидация настроек
   self.settings = new ISnew.ProductSettings(settings, self);
@@ -37,7 +41,7 @@ ISnew.Product.prototype._init = function (){
   // должен быть здесь, чтобы перезапустить при смене настроек.
   // TODO: вынести в отдельный метод, прикруть методы к Классам
   self.variants = new ISnew.ProductVariants(self);
-  self.ui = new ISnew.ProductDOM(self);
+  self._ui = self._initDOM();
 }
 
 /**
@@ -108,3 +112,16 @@ ISnew.Product.prototype._getImage = function (images) {
 
   return _images;
 }
+
+/*
+ * Инициализация форм()
+ */
+ISnew.Product.prototype._initDOM = function () {
+  var self = this;
+
+  self.$forms = $('['+ self._selectors.product +'='+ self.id +']');
+
+  self.$forms.each(function () {
+    new ISnew.ProductForm(self, this);
+  });
+};

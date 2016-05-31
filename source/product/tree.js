@@ -37,18 +37,15 @@ ISnew.ProductVariants.prototype._init = function () {
   self.tree = self._initTree();
   // проставляем выбранные опции
   self.options = self._selectedOptions(self.options);
-
-  /*
-  if (self._owner.settings.initOption) {
-    self._update();
-  }
-  */
 };
 
-ISnew.ProductVariants.prototype.setDomNode = function (_optiontSelector) {
+/**
+ * Смена родителя
+ */
+ISnew.ProductVariants.prototype.setOwner = function (_owner) {
   var self = this;
 
-  self._optiontSelector = _optiontSelector;
+  self._owner = _owner;
 
   return;
 };
@@ -72,19 +69,7 @@ ISnew.ProductVariants.prototype._initTree = function () {
     if (variant.option_values.length) {
       // все хорошо, у нас много опций
       // Разбираем опции
-      _.forEach(variant.option_values, function(option, index) {
-        // Добавляем новое значение в опцию
-        self._addValues(option, index);
-
-        self._parseVariantOption({
-          variant: variant,
-          option: option,
-          index: index,
-          leaf: leaf
-        });
-
-        leaf = leaf[option.position].tree;
-      });
+      self._parseVariantOptions(variant, leaf);
     } else {
       // все плохо, у нас один вариант, нет опций
       self._addLeaf({ id: 0, title: '_empty', position: 0 }, leaf, { id: variant.id, available: variant.available });
@@ -105,32 +90,32 @@ ISnew.ProductVariants.prototype._initTree = function () {
 /**
  * Разбор Опций варианта
  */
-ISnew.ProductVariants.prototype._parseVariantOption = function (data) {
+ISnew.ProductVariants.prototype._parseVariantOptions = function (variant, leaf) {
   var self = this;
 
-  var variant = data.variant;
-  var leaf = data.leaf;
-  var option = data.option;
-  var index = data.index;
+  _.forEach(variant.option_values, function(option, index) {
+    // Добавляем новое значение в опцию
+    self._addValues(option, index);
 
-  var _variantSet = {
-    id: undefined,
-    available: undefined
-  }
+    var _variantSet = {
+      id: undefined,
+      available: undefined
+    }
 
-  // Если дошли до последней опции - выставляем вариант и доступность
-  var _isLast = (index == (variant.option_values.length - 1));
+    // Если дошли до последней опции - выставляем вариант и доступность
+    var _isLast = (index == (variant.option_values.length - 1));
 
-  if (_isLast) {
-    _variantSet = {
-      id: variant.id,
-      available: variant.available
-    };
-  }
+    if (_isLast) {
+      _variantSet = {
+        id: variant.id,
+        available: variant.available
+      };
+    }
 
-  self._addLeaf(option, leaf, _variantSet);
+    self._addLeaf(option, leaf, _variantSet);
 
-  return;
+    leaf = leaf[option.position].tree;
+  });
 };
 
 /**
@@ -189,9 +174,11 @@ ISnew.ProductVariants.prototype._update = function () {
   var self = this;
   var status = self.getVariant();
 
-  status.action = 'update_variant';
+  status.action = {
+    method: 'update_variant'
+  };
 
-  self._optiontSelector._updateStatus(status);
+  self._owner._updateStatus(status);
 
   //  если есть id в урле обновляем вариант
   if (self.urlVariant) {

@@ -17553,7 +17553,7 @@ ISnew.CartDOM.prototype._unlockButton = function (data, eventName) {
  * @property {object} $optionSelector контейнер куда происходит рендер селекторов опций
  *
  */
-ISnew.OptionSelector = function ($product, _product) {
+ISnew.OptionSelector = function (_owner) {
   var self = this;
 
   self.selector = {
@@ -17565,11 +17565,11 @@ ISnew.OptionSelector = function ($product, _product) {
     optionSelector: 'data-option-selector'
   };
 
-  self._product = _product;
-  self.$product = $product;
+  self._owner = _owner;
+  self.$product = _owner.$form;
 
   self._init();
-}
+};
 
 /**
  * Инициализация
@@ -17580,16 +17580,12 @@ ISnew.OptionSelector = function ($product, _product) {
  */
 ISnew.OptionSelector.prototype._init = function () {
   var self = this;
-  var product = self.$product[0];
+  var product = self._owner;
 
   // если DOM-узла нет, выходим
   if (self.$product.length == 0) {
     return;
   }
-
-  // делаем полноценный клон, привязывем к форме
-  self.variants = _.cloneDeep(self._product.variants);
-  self.variants.setDomNode(self);
 
   // находим там нативный селект/точку для рендера
   self.$nativeSelect = self.$product.find('['+ self.selector.nativeSelect +']');
@@ -17599,24 +17595,17 @@ ISnew.OptionSelector.prototype._init = function () {
     return;
   }
 
+  var $optionSelector = self.$product.find('['+ self.selector.optionSelector +']');
+
   // создаем контейнер и сохраняем линк на него
-  // проверка на рендер, если уже отрендерили то не добавляем новую обёртку
-  if (!_.isObject(product.optionSelector)) {
+  if (!$optionSelector.length) {
     self.$nativeSelect.after('<div class="option-selector" '+ self.selector.optionSelector +'/>');
-    self.$optionSelector = self.$product.find('['+ self.selector.optionSelector +']');
   }
 
-  // привязываем экземпляр Класса к товару
-  product.optionSelector = self;
+  self.$optionSelector = self.$product.find('['+ self.selector.optionSelector +']');
 
-
-  //  вызов рендера и слушателя
+  //  вызов рендера
   self._renderSelector();
-
-  // Дергаем вариант
-  if (self._product.settings.initOption) {
-    self.variants._update();
-  }
 
   return;
 };
@@ -17632,7 +17621,7 @@ ISnew.OptionSelector.prototype._renderSelector = function () {
   var settings = self._product.settings;
 
   // Если в настройках не отключили отображение селекторов
-  if (settings.showVariants) {
+  if (settings.showVariants && self.$optionSelector) {
     //  собираем отрендеренные селекторы
     var optionsHTML = _.reduce(variants.options, function (html, value, index) {
       return html += self._renderOption({
@@ -17664,24 +17653,11 @@ ISnew.OptionSelector.prototype._renderOption = function (option) {
 };
 
 /**
- * Обновление состояния
- */
-ISnew.OptionSelector.prototype._updateStatus = function (status) {
-  var self = this;
-
-  status.action = {
-    form: self.$product
-  };
-
-  EventBus.publish('update_variant:insales:product', status);
-};
-
-/**
  * Навешиваем свой дефолтный слушатель для обновления рендера
  */
 EventBus.subscribe('update_variant:insales:product', function (data) {
   var $product = data.action.form;
-  var OptionSelector = $product[0]['optionSelector'];
+  var OptionSelector = $product[0].product.optionSelector;
 
   if (OptionSelector) {
     OptionSelector.$nativeSelect.val(data.id);
@@ -17697,14 +17673,11 @@ $(document).on('change', '[data-product-variants]', function (event) {
   var $select = $(this);
 
   var variantId = _.toInteger($select.val());
-  var $product = $select.parents('form[data-product-id]:first');
-  var OptionSelector = $product[0]['optionSelector'];
+  var product = $select
+    .parents('[data-product-id]:first')[0]
+    .product;
 
-  if (!_.isObject(OptionSelector)) {
-    return;
-  }
-
-  OptionSelector.variants.setVariant(variantId);
+  product.variants.setVariant(variantId);
 });
 
 //  Слушаем изменения в селекторах модификаций
@@ -17717,8 +17690,9 @@ $(document).on('change click', '[data-option-bind]', function (event) {
     return false;
   }
 
-  var $product = $option.parents('form[data-product-id]:first');
-  var OptionSelector = $product[0]['optionSelector'];
+  var product = $option
+    .parents('[data-product-id]:first')[0]
+    .product;
 
   var option = {
     option_name_id: $option.data('option-bind'),
@@ -17729,21 +17703,28 @@ $(document).on('change click', '[data-option-bind]', function (event) {
     option.position = _.toInteger($option.val());
   }
 
-  OptionSelector.variants.setOption(option);
+  product.variants.setOption(option);
 });
 /**
  * Класс отвечает за взаимодействие верскти с конкретным
  * экземпляром Product()
  */
 
-ISnew.ProductDOM = function (_owner) {
+ISnew.ProductForm = function (_owner, form) {
   var self = this;
-
-  self._owner = _owner;
 
   self.selectors = {
     product: 'data-product-id',
   }
+
+  // настройки для экземпляра
+  self._owner = _owner;
+  self.settings = self._owner.settings;
+  self.product = self._owner;
+  self.$form = $(form);
+
+  // прибиваем экземпляр к узлу
+  form.product = self;
 
   self._init ();
 };
@@ -17751,22 +17732,24 @@ ISnew.ProductDOM = function (_owner) {
 /**
  * Инициализация связки
  */
-ISnew.ProductDOM.prototype._init = function () {
+ISnew.ProductForm.prototype._init = function () {
   var self = this;
 
-  $('['+ self.selectors.product +'='+ self._owner.id +']').each(function () {
-    var $product = $(this);
+  self.variants = _.cloneDeep(self.product.variants);
+  self.variants.setOwner(self);
 
-    self._initOptionSelectors(this);
-  });
+  self._initOptionSelectors(self);
 
-  //self._bindSelectEvents();
+  // Дергаем вариант
+  if (self.product.settings.initOption) {
+    self.variants._update();
+  }
 };
 
 /**
  * Инициализация селектора
  */
-ISnew.ProductDOM.prototype._initOptionSelectors = function (product) {
+ISnew.ProductForm.prototype._initOptionSelectors = function (product) {
   var self = this;
 
   var _isActive = _.isObject(product.optionSelector);
@@ -17774,7 +17757,7 @@ ISnew.ProductDOM.prototype._initOptionSelectors = function (product) {
   if (!_isActive) {
     // У нас нет активных селекторов
     // заряжаем
-    product.optionSelector = new ISnew.OptionSelector($(product), self._owner);
+    product.optionSelector = new ISnew.OptionSelector(product);
   } else {
     // данный селектор активен
     // наверное оти перезаписать настройки
@@ -17785,15 +17768,26 @@ ISnew.ProductDOM.prototype._initOptionSelectors = function (product) {
 /**
  * Инициализация типа цен
  */
-ISnew.ProductDOM.prototype._initPriceType = function () {
+ISnew.ProductForm.prototype._initPriceType = function () {
   var self = this;
 };
 
 /**
  * Инициализация считалочки товаров
  */
-ISnew.ProductDOM.prototype._initQuantity = function () {
+ISnew.ProductForm.prototype._initQuantity = function () {
   var self = this;
+};
+
+/**
+ * Обновление состояния
+ */
+ISnew.ProductForm.prototype._updateStatus = function (status) {
+  var self = this;
+
+  status.action.form = self.$form;
+
+  EventBus.publish(status.action.method +':insales:product', status);
 };
 /**
  * Типы цен
@@ -17919,6 +17913,10 @@ ISnew.Product = function (product, settings) {
     throw new ISnew.tools.Error('ErrorProduct', 'ошибка в передаче продукта');
   }
 
+  self._selectors = {
+    product: 'data-product-id',
+  };
+
   _.merge(self, product);
   //  Валидация настроек
   self.settings = new ISnew.ProductSettings(settings, self);
@@ -17940,7 +17938,7 @@ ISnew.Product.prototype._init = function (){
   // должен быть здесь, чтобы перезапустить при смене настроек.
   // TODO: вынести в отдельный метод, прикруть методы к Классам
   self.variants = new ISnew.ProductVariants(self);
-  self.ui = new ISnew.ProductDOM(self);
+  self._ui = self._initDOM();
 }
 
 /**
@@ -18011,6 +18009,19 @@ ISnew.Product.prototype._getImage = function (images) {
 
   return _images;
 }
+
+/*
+ * Инициализация форм()
+ */
+ISnew.Product.prototype._initDOM = function () {
+  var self = this;
+
+  self.$forms = $('['+ self._selectors.product +'='+ self.id +']');
+
+  self.$forms.each(function () {
+    new ISnew.ProductForm(self, this);
+  });
+};
 /**
  * Класс для работы с настройками Продукта
  */
@@ -18107,18 +18118,15 @@ ISnew.ProductVariants.prototype._init = function () {
   self.tree = self._initTree();
   // проставляем выбранные опции
   self.options = self._selectedOptions(self.options);
-
-  /*
-  if (self._owner.settings.initOption) {
-    self._update();
-  }
-  */
 };
 
-ISnew.ProductVariants.prototype.setDomNode = function (_optiontSelector) {
+/**
+ * Смена родителя
+ */
+ISnew.ProductVariants.prototype.setOwner = function (_owner) {
   var self = this;
 
-  self._optiontSelector = _optiontSelector;
+  self._owner = _owner;
 
   return;
 };
@@ -18142,19 +18150,7 @@ ISnew.ProductVariants.prototype._initTree = function () {
     if (variant.option_values.length) {
       // все хорошо, у нас много опций
       // Разбираем опции
-      _.forEach(variant.option_values, function(option, index) {
-        // Добавляем новое значение в опцию
-        self._addValues(option, index);
-
-        self._parseVariantOption({
-          variant: variant,
-          option: option,
-          index: index,
-          leaf: leaf
-        });
-
-        leaf = leaf[option.position].tree;
-      });
+      self._parseVariantOptions(variant, leaf);
     } else {
       // все плохо, у нас один вариант, нет опций
       self._addLeaf({ id: 0, title: '_empty', position: 0 }, leaf, { id: variant.id, available: variant.available });
@@ -18175,32 +18171,32 @@ ISnew.ProductVariants.prototype._initTree = function () {
 /**
  * Разбор Опций варианта
  */
-ISnew.ProductVariants.prototype._parseVariantOption = function (data) {
+ISnew.ProductVariants.prototype._parseVariantOptions = function (variant, leaf) {
   var self = this;
 
-  var variant = data.variant;
-  var leaf = data.leaf;
-  var option = data.option;
-  var index = data.index;
+  _.forEach(variant.option_values, function(option, index) {
+    // Добавляем новое значение в опцию
+    self._addValues(option, index);
 
-  var _variantSet = {
-    id: undefined,
-    available: undefined
-  }
+    var _variantSet = {
+      id: undefined,
+      available: undefined
+    }
 
-  // Если дошли до последней опции - выставляем вариант и доступность
-  var _isLast = (index == (variant.option_values.length - 1));
+    // Если дошли до последней опции - выставляем вариант и доступность
+    var _isLast = (index == (variant.option_values.length - 1));
 
-  if (_isLast) {
-    _variantSet = {
-      id: variant.id,
-      available: variant.available
-    };
-  }
+    if (_isLast) {
+      _variantSet = {
+        id: variant.id,
+        available: variant.available
+      };
+    }
 
-  self._addLeaf(option, leaf, _variantSet);
+    self._addLeaf(option, leaf, _variantSet);
 
-  return;
+    leaf = leaf[option.position].tree;
+  });
 };
 
 /**
@@ -18259,9 +18255,11 @@ ISnew.ProductVariants.prototype._update = function () {
   var self = this;
   var status = self.getVariant();
 
-  status.action = 'update_variant';
+  status.action = {
+    method: 'update_variant'
+  };
 
-  self._optiontSelector._updateStatus(status);
+  self._owner._updateStatus(status);
 
   //  если есть id в урле обновляем вариант
   if (self.urlVariant) {
@@ -18444,7 +18442,7 @@ ISnew.ProductVariants.prototype.setOption = function (option) {
   });
 
   // Если не опцию не меняли - на выход
-  if (self.options[index].selected == option.position & self._owner.settings.initOption) {
+  if (self.options[index].selected == option.position && self._owner.settings.initOption) {
     return;
   }
 

@@ -93,7 +93,7 @@ ISnew.ProductVariants.prototype.setOption = function (option) {
   });
 
   // Если не опцию не меняли - на выход
-  if (self.options[index].selected == option.position & self._owner.settings.initOption) {
+  if (self.options[index].selected == option.position && self._owner.settings.initOption) {
     return;
   }
 
