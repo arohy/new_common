@@ -17738,8 +17738,8 @@ ISnew.ProductForm.prototype._init = function () {
 
   // привязываем нужные объекты
   self.variants = new ISnew.ProductVariants(self);
-  self.quantity = new ISnew.ProductQuantity(self);
   self.price_kinds = new ISnew.ProductPriceType(self);
+  self.quantity = new ISnew.ProductQuantity(self);
 
   self._initOptionSelectors(self);
 
@@ -17774,6 +17774,7 @@ ISnew.ProductForm.prototype._updateStatus = function (status) {
   var self = this;
 
   status.action.form = self.$form;
+  //console.log(status);
 
   // выбираем, что нужно обновить
   switch (status.action.method) {
@@ -17792,6 +17793,7 @@ ISnew.ProductQuantity = function (_owner) {
   var self = this;
 
   self._owner = _owner;
+  self.settings = _owner.settings;
   self.selectors = self._owner.selectors;
   self.variant = self._owner.variants.getVariant();
 
@@ -17812,45 +17814,66 @@ ISnew.ProductQuantity.prototype._init = function () {
 
   self.$input = self._owner.$form.find('['+ self.selectors.quantity +']');
 
-  if (self.variant.quantity) {
+  if (self.variant.quantity && self.settings.max) {
     self.quantity.max = self.variant.quantity;
   };
 
-  self.quantity.current = _.toInteger(self.$input.val());
+  if (self.settings.quantity == 'int') {
+    self.quantity.min = 1;
+  }
+
+  self.quantity.toCheck = self._getQuantity();
+
   self.unit = self.variant.unit;
 
+  self._check();
   self._bindEvents();
 };
 
-ISnew.ProductQuantity.prototype._setQuantity = function () {
+ISnew.ProductQuantity.prototype._getQuantity = function () {
   var self = this;
 
-  self.$input.val(self.quantity.current);
-  self._update();
-};
-
-ISnew.ProductQuantity.prototype._check = function () {
-  var self = this;
-
-  self.quantity.current = self.quantity.toCheck;
-
-  self._setQuantity();
+  return parseFloat(self.$input.val());
 };
 
 ISnew.ProductQuantity.prototype._changeQuantity = function (value) {
   var self = this;
 
-  self.quantity.toCheck += _.toInteger(value);
+  self.quantity.toCheck += parseFloat(value);
 
   self._check();
 };
 
 ISnew.ProductQuantity.prototype.setVariant = function (variant) {
   var self = this;
-  console.log('set');
 
   self.variant = variant;
   self._check();
+};
+
+ISnew.ProductQuantity.prototype._setQuantity = function () {
+  var self = this;
+
+  self.quantity.toCheck = self._getQuantity();
+
+  self._check();
+};
+
+ISnew.ProductQuantity.prototype._check = function () {
+  var self = this;
+
+  if (self.settings.max && self.quantity.toCheck > self.quantity.max) {
+    self.quantity.toCheck = self.quantity.max;
+  }
+
+  if (self.quantity.toCheck < self.quantity.min) {
+    self.quantity.toCheck = self.quantity.min;
+  }
+
+  self.quantity.current = self.quantity.toCheck;
+  self.$input.val(self.quantity.current);
+
+  self._update();
 };
 
 ISnew.ProductQuantity.prototype._update = function () {
@@ -17870,11 +17893,13 @@ ISnew.ProductQuantity.prototype._update = function () {
 ISnew.ProductQuantity.prototype._bindEvents = function () {
   var self = this;
 
+  // очередной костыль в мой гроб
   if (document.ProductQuantity) {
     return false;
   };
 
   self._bindQuantityButtons();
+  self._bindQuantityInput();
 
   document.ProductQuantity = true;
 };
@@ -17897,6 +17922,20 @@ ISnew.ProductQuantity.prototype.get = function () {
   var self = this;
 
   return self.quantity.current;
+};
+
+ISnew.ProductQuantity.prototype._bindQuantityInput = function () {
+  var self = this;
+
+  $(document).on('change blur', '['+ self.selectors.quantity +']', function (event) {
+    event.preventDefault();
+    console.log('blur');
+
+    var $quantity = $(this);
+    var product = $quantity.parents('['+ self.selectors.product+']')[0].product;
+
+    product.quantity._setQuantity($quantity.val());
+  });
 };
 /**
  * Типы цен
@@ -18076,39 +18115,6 @@ ISnew.Product.prototype._init = function (){
   self._ui = self._initDOM();
 }
 
-/**
- * Обновления состояний товара
- */
-ISnew.Product.prototype._updateStatus = function (status) {
-  var self = this;
-
-  status.product_id = self.product.id;
-
-  // Если у нас переключался вариант - обновляем тип цен
-  if (status.action == 'update_variant') {
-    self.price_kinds.setVariant(status.id);
-  };
-
-  // Трегирим нужное событие и сбрасываем состояние
-  //EventBus.publish(status.action +':insales:product', status);
-  return;
-};
-
-/**
- * Установка кол-ва товара
- * пока depricated
- */
- /*
-ISnew.Product.prototype.setQuantity = function (quantity) {
-  var self = this;
-
-  self._quantity = parseFloat(quantity);
-
-  self.price_kinds.setQuantity(self.quantity);
-  return;
-};
-*/
-
 // ====================================================================================
 //                          Методы по работе с изображениями продукта
 // ====================================================================================
@@ -18170,7 +18176,10 @@ ISnew.ProductSettings = function (settings, _owner) {
     showVariants: true,
     initOption: true,
     fileUrl: {},
-    filtered: true
+    filtered: true,
+
+    quantity: 'int',
+    max: false
   };
 
   self._owner = _owner;

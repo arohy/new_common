@@ -11,7 +11,10 @@ ISnew.ProductSettings = function (settings, _owner) {
     showVariants: true,
     initOption: true,
     fileUrl: {},
-    filtered: true
+    filtered: true,
+
+    quantity: 'int',
+    max: false
   };
 
   self._owner = _owner;

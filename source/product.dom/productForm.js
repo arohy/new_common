@@ -38,8 +38,8 @@ ISnew.ProductForm.prototype._init = function () {
 
   // привязываем нужные объекты
   self.variants = new ISnew.ProductVariants(self);
-  self.quantity = new ISnew.ProductQuantity(self);
   self.price_kinds = new ISnew.ProductPriceType(self);
+  self.quantity = new ISnew.ProductQuantity(self);
 
   self._initOptionSelectors(self);
 
@@ -74,6 +74,7 @@ ISnew.ProductForm.prototype._updateStatus = function (status) {
   var self = this;
 
   status.action.form = self.$form;
+  //console.log(status);
 
   // выбираем, что нужно обновить
   switch (status.action.method) {

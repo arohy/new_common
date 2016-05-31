@@ -44,39 +44,6 @@ ISnew.Product.prototype._init = function (){
   self._ui = self._initDOM();
 }
 
-/**
- * Обновления состояний товара
- */
-ISnew.Product.prototype._updateStatus = function (status) {
-  var self = this;
-
-  status.product_id = self.product.id;
-
-  // Если у нас переключался вариант - обновляем тип цен
-  if (status.action == 'update_variant') {
-    self.price_kinds.setVariant(status.id);
-  };
-
-  // Трегирим нужное событие и сбрасываем состояние
-  //EventBus.publish(status.action +':insales:product', status);
-  return;
-};
-
-/**
- * Установка кол-ва товара
- * пока depricated
- */
- /*
-ISnew.Product.prototype.setQuantity = function (quantity) {
-  var self = this;
-
-  self._quantity = parseFloat(quantity);
-
-  self.price_kinds.setQuantity(self.quantity);
-  return;
-};
-*/
-
 // ====================================================================================
 //                          Методы по работе с изображениями продукта
 // ====================================================================================
