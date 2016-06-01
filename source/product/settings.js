@@ -13,8 +13,11 @@ ISnew.ProductSettings = function (settings, _owner) {
     fileUrl: {},
     filtered: true,
 
-    quantity: 'int',
-    max: false
+    max: false,
+    decimal: {
+      kgm: 1,
+      dmt: 1
+    }
   };
 
   self._owner = _owner;

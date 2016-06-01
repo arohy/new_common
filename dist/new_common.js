@@ -17789,6 +17789,9 @@ ISnew.ProductForm.prototype._updateStatus = function (status) {
 
   EventBus.publish(status.action.method +':insales:product', status);
 };
+/**
+ * Класс для работы с полем кол-во товара
+ */
 ISnew.ProductQuantity = function (_owner) {
   var self = this;
 
@@ -17805,37 +17808,90 @@ ISnew.ProductQuantity = function (_owner) {
   };
 
   self.unit = 'pce';
+  self.decimal = 0;
 
   self._init();
 };
 
+/**
+ * Инициализаций
+ */
 ISnew.ProductQuantity.prototype._init = function () {
   var self = this;
+  var _settings;
 
+  // находим опорный элемент
   self.$input = self._owner.$form.find('['+ self.selectors.quantity +']');
 
-  if (self.variant.quantity && self.settings.max) {
-    self.quantity.max = self.variant.quantity;
-  };
-
-  if (self.settings.quantity == 'int') {
-    self.quantity.min = 1;
-  }
-
+  // снимаем с него конфиги
+  _settings = self._getConfig();
   self.quantity.toCheck = self._getQuantity();
 
-  self.unit = self.variant.unit;
+  // уточняем из товара единицу измерения
+  self.unit = self._owner.product.unit;
+
+  // определяем максимум
+  if (self.variant.quantity && self.settings.max) {
+    self.quantity.max = self.variant.quantity;
+  }
+
+  // определяем точность
+  self.decimal = self.settings.decimal[self.unit] || 0;
+  // шаг
+  self.step = _settings.step || Math.pow(10, -1 * self.decimal);
+  // определяем минимальное кол-во
+  self.quantity.min = _settings.min || self.step;
 
   self._check();
+
   self._bindEvents();
 };
 
+/**
+ * Забираем data- из поля ввода
+ * data-step - шаг
+ * data-min - минимальное
+ */
+ISnew.ProductQuantity.prototype._getConfig = function () {
+  var self = this;
+
+  return self.$input.data();
+};
+
+/**
+ * Забираем текущее значение
+ */
 ISnew.ProductQuantity.prototype._getQuantity = function () {
   var self = this;
 
-  return parseFloat(self.$input.val());
+  var _value = self.$input.val();
+  _value = _value.replace(',', '.').replace(/[^0-9.]/g, '');
+
+  return parseFloat(_value);
 };
 
+/**
+ * Указываем вариант, с которым работаем
+ */
+ISnew.ProductQuantity.prototype.setVariant = function (variant) {
+  var self = this;
+
+  self.variant = variant;
+  self._check();
+};
+
+/**
+ *
+ */
+ISnew.ProductQuantity.prototype.get = function () {
+  var self = this;
+
+  return self.quantity.current;
+};
+
+/**
+* Добавляем значение по клику на кнопку
+*/
 ISnew.ProductQuantity.prototype._changeQuantity = function (value) {
   var self = this;
 
@@ -17844,13 +17900,9 @@ ISnew.ProductQuantity.prototype._changeQuantity = function (value) {
   self._check();
 };
 
-ISnew.ProductQuantity.prototype.setVariant = function (variant) {
-  var self = this;
-
-  self.variant = variant;
-  self._check();
-};
-
+/**
+ * Устанвливаем новое значение при изменении поля
+ */
 ISnew.ProductQuantity.prototype._setQuantity = function () {
   var self = this;
 
@@ -17859,27 +17911,37 @@ ISnew.ProductQuantity.prototype._setQuantity = function () {
   self._check();
 };
 
+/**
+ * Проверка
+ */
 ISnew.ProductQuantity.prototype._check = function () {
   var self = this;
 
+  // если больше
   if (self.settings.max && self.quantity.toCheck > self.quantity.max) {
     self.quantity.toCheck = self.quantity.max;
   }
 
-  if (self.quantity.toCheck < self.quantity.min) {
+  // ушли меньше возможного минимума
+  if (isNaN(self.quantity.toCheck) || self.quantity.toCheck < self.quantity.min) {
     self.quantity.toCheck = self.quantity.min;
   }
 
+  // все ок
   self.quantity.current = self.quantity.toCheck;
-  self.$input.val(self.quantity.current);
-
+  // дергаем статусы
   self._update();
 };
 
+/**
+ * Обновляем мир
+ */
 ISnew.ProductQuantity.prototype._update = function () {
   var self = this;
-
   var status = _.cloneDeep(self);
+
+  // выводим актуальное значение в поле
+  self.$input.val(self.quantity.current.toFixed(self.decimal));
 
   status.action = {
     method: 'change_quantity',
@@ -17890,6 +17952,9 @@ ISnew.ProductQuantity.prototype._update = function () {
   self._owner._updateStatus(status);
 };
 
+/**
+ * Биндим события
+ */
 ISnew.ProductQuantity.prototype._bindEvents = function () {
   var self = this;
 
@@ -17904,10 +17969,12 @@ ISnew.ProductQuantity.prototype._bindEvents = function () {
   document.ProductQuantity = true;
 };
 
+/**
+ * Слушаем нажатия на кнопки +-
+ */
 ISnew.ProductQuantity.prototype._bindQuantityButtons = function () {
   var self = this;
 
-  // слушаем клики на +-
   $(document).on('click', '['+ self.selectors.quantityButton +']', function (event) {
     event.preventDefault();
 
@@ -17918,23 +17985,23 @@ ISnew.ProductQuantity.prototype._bindQuantityButtons = function () {
   });
 };
 
-ISnew.ProductQuantity.prototype.get = function () {
-  var self = this;
-
-  return self.quantity.current;
-};
-
+/**
+ * Слушаем поле.
+ * Для простоты мы слушаем потерю фокуса
+ */
 ISnew.ProductQuantity.prototype._bindQuantityInput = function () {
   var self = this;
 
-  $(document).on('change blur', '['+ self.selectors.quantity +']', function (event) {
+  $(document).on('blur', '[data-quantity]', function (event) {
     event.preventDefault();
     console.log('blur');
 
     var $quantity = $(this);
-    var product = $quantity.parents('['+ self.selectors.product+']')[0].product;
+    var product = $quantity.parents('[data-product-id]:first')[0].product;
 
-    product.quantity._setQuantity($quantity.val());
+    if (product) {
+      product.quantity._setQuantity();
+    }
   });
 };
 /**
@@ -18178,8 +18245,11 @@ ISnew.ProductSettings = function (settings, _owner) {
     fileUrl: {},
     filtered: true,
 
-    quantity: 'int',
-    max: false
+    max: false,
+    decimal: {
+      kgm: 1,
+      dmt: 1
+    }
   };
 
   self._owner = _owner;
