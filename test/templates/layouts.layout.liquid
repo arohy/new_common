@@ -218,7 +218,7 @@
           <a href="<%- product.url %>" class="ajax_search-link">
             <%= product.markedTitle %>
             <span class="ajax_search-prices">
-              <%= money.format( product.fields.price_min ) %>
+              <%= Shop.money.format( product.fields.price_min ) %>
             </span>
           </a>
         </li>

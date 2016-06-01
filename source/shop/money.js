@@ -10,16 +10,24 @@ ISnew.Money = function () {
 /**
  * Разбиралка настроек
  */
-ISnew.Money.prototype._init = function (params) {
+ISnew.Money.prototype._init = function () {
   var self = this;
 
-  //self.options = $.parseJSON(params);
+  return;
+};
+
+ISnew.Money.prototype._set = function (params) {
+  var self = this;
+
+  self.options = $.parseJSON(params);
+
   return;
 };
 
 ISnew.Money.prototype.set = function (params) {
   var self = this;
-  self._init(params);
+
+  self._set(params);
 };
 
 ISnew.Money.prototype.format = function (amount) {
@@ -42,5 +50,7 @@ ISnew.Money.prototype.format = function (amount) {
     value = value.join(self.options.separator);
   }
 
-  return self.options.format.replace('%n', value).replace('%u', self.options.unit);
+  value = self.options.format.replace('%n', value).replace('%u', self.options.unit);
+
+  return value;
 };
