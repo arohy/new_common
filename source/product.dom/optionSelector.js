@@ -109,12 +109,15 @@ ISnew.OptionSelector.prototype._renderOption = function (option) {
  * Навешиваем свой дефолтный слушатель для обновления рендера
  */
 EventBus.subscribe('update_variant:insales:product', function (data) {
-  var $product = data.action.form;
-  var OptionSelector = $product[0].product.optionSelector;
+  if (data.action.method == 'change') {
+    var $product = data.action.form;
+    var OptionSelector = $product[0].product.optionSelector;
+    console.log('update_variant');
 
-  if (OptionSelector) {
-    OptionSelector.$nativeSelect.val(data.id);
-    OptionSelector._renderSelector();
+    if (OptionSelector) {
+      OptionSelector.$nativeSelect.val(data.id);
+      OptionSelector._renderSelector();
+    }
   }
 });
 

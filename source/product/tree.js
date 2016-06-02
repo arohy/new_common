@@ -173,7 +173,10 @@ ISnew.ProductVariants.prototype._nodeAvailable = function (leaf) {
 ISnew.ProductVariants.prototype._update = function () {
   var self = this;
 
-  self._owner._updateStatus('update_variant');
+  self._owner._updateStatus({
+    event: 'update_variant',
+    method: 'change'
+  });
 
   //  если есть id в урле обновляем вариант
   if (self.urlVariant) {

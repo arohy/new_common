@@ -73,7 +73,7 @@ ISnew.ProductForm.prototype._initOptionSelectors = function (product) {
  * максимум - получить линк на quantity, откуда брать актуальную инфу
  * о кол-ве
  */
-ISnew.ProductForm.prototype._updateStatus = function (_method) {
+ISnew.ProductForm.prototype._updateStatus = function (status) {
   var self = this;
 
   // получаем текущее кол-во
@@ -88,12 +88,16 @@ ISnew.ProductForm.prototype._updateStatus = function (_method) {
 
   // формируем действие
   variant.action = {
-    method: _method || 'update_variant',
+    method: status.method,
     form: self.$form,
     price: _price,
     quantity: _quantity,
     input: self.quantity.$input
   };
 
-  EventBus.publish(variant.action.method +':insales:product', variant);
+  if (status.event != 'update_variant') {
+    EventBus.publish(status.event +':insales:product', variant);
+  }
+
+  EventBus.publish('update_variant:insales:product', variant);
 };

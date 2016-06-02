@@ -110,6 +110,8 @@ ISnew.ProductQuantity.prototype._changeQuantity = function (value) {
   var self = this;
 
   self.quantity.toCheck += parseFloat(value);
+  console.log(value);
+  console.log(_.cloneDeep(self.quantity));
 
   self._check();
 };
@@ -153,12 +155,17 @@ ISnew.ProductQuantity.prototype._check = function () {
 ISnew.ProductQuantity.prototype._update = function () {
   var self = this;
 
+  self.$input.val(self.quantity.current);
+
   if (self._onInit) {
     self._onInit = false;
     return false;
   }
 
-  self._owner._updateStatus('change_quantity');
+  self._owner._updateStatus({
+    event: 'change_quantity',
+    method: 'update'
+  });
 };
 
 /**

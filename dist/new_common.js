@@ -17609,9 +17609,9 @@ ISnew.OptionSelector.prototype._init = function () {
 ISnew.OptionSelector.prototype._renderSelector = function () {
   var self = this;
 
-  var variants = self.variants;
-  var images = self._product._images;
-  var settings = self._product.settings;
+  var variants = self._owner.variants;
+  var images = self._owner.product._images;
+  var settings = self._owner.product.settings;
 
   // Если в настройках не отключили отображение селекторов
   if (settings.showVariants && self.$optionSelector) {
@@ -17649,12 +17649,15 @@ ISnew.OptionSelector.prototype._renderOption = function (option) {
  * Навешиваем свой дефолтный слушатель для обновления рендера
  */
 EventBus.subscribe('update_variant:insales:product', function (data) {
-  var $product = data.action.form;
-  var OptionSelector = $product[0].product.optionSelector;
+  if (data.action.method == 'change') {
+    var $product = data.action.form;
+    var OptionSelector = $product[0].product.optionSelector;
+    console.log('update_variant');
 
-  if (OptionSelector) {
-    OptionSelector.$nativeSelect.val(data.id);
-    OptionSelector._renderSelector();
+    if (OptionSelector) {
+      OptionSelector.$nativeSelect.val(data.id);
+      OptionSelector._renderSelector();
+    }
   }
 });
 
@@ -17778,7 +17781,7 @@ ISnew.ProductForm.prototype._initOptionSelectors = function (product) {
  * максимум - получить линк на quantity, откуда брать актуальную инфу
  * о кол-ве
  */
-ISnew.ProductForm.prototype._updateStatus = function (_method) {
+ISnew.ProductForm.prototype._updateStatus = function (status) {
   var self = this;
 
   // получаем текущее кол-во
@@ -17793,14 +17796,18 @@ ISnew.ProductForm.prototype._updateStatus = function (_method) {
 
   // формируем действие
   variant.action = {
-    method: _method || 'update_variant',
+    method: status.method,
     form: self.$form,
     price: _price,
     quantity: _quantity,
     input: self.quantity.$input
   };
 
-  EventBus.publish(variant.action.method +':insales:product', variant);
+  if (status.event != 'update_variant') {
+    EventBus.publish(status.event +':insales:product', variant);
+  }
+
+  EventBus.publish('update_variant:insales:product', variant);
 };
 /**
  * Класс для работы с полем кол-во товара
@@ -17914,6 +17921,8 @@ ISnew.ProductQuantity.prototype._changeQuantity = function (value) {
   var self = this;
 
   self.quantity.toCheck += parseFloat(value);
+  console.log(value);
+  console.log(_.cloneDeep(self.quantity));
 
   self._check();
 };
@@ -17957,12 +17966,17 @@ ISnew.ProductQuantity.prototype._check = function () {
 ISnew.ProductQuantity.prototype._update = function () {
   var self = this;
 
+  self.$input.val(self.quantity.current);
+
   if (self._onInit) {
     self._onInit = false;
     return false;
   }
 
-  self._owner._updateStatus('change_quantity');
+  self._owner._updateStatus({
+    event: 'change_quantity',
+    method: 'update'
+  });
 };
 
 /**
@@ -18419,7 +18433,10 @@ ISnew.ProductVariants.prototype._nodeAvailable = function (leaf) {
 ISnew.ProductVariants.prototype._update = function () {
   var self = this;
 
-  self._owner._updateStatus('update_variant');
+  self._owner._updateStatus({
+    event: 'update_variant',
+    method: 'change'
+  });
 
   //  если есть id в урле обновляем вариант
   if (self.urlVariant) {
