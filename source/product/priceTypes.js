@@ -12,7 +12,6 @@ ISnew.ProductPriceType = function (_owner) {
   var self = this;
   self._owner = _owner;
 
-  self.variantId = 0;
   self.price_kinds = {};
 
   self._init();
@@ -23,7 +22,6 @@ ISnew.ProductPriceType = function (_owner) {
 ISnew.ProductPriceType.prototype._init = function () {
   var self = this;
 
-  self.variantId = self._owner.variants.getVariant();
   self.price_kinds = self._initPrices(self._owner.product);
 };
 
@@ -55,31 +53,14 @@ ISnew.ProductPriceType.prototype._initPrices = function (product) {
 };
 
 /**
- * Обновление после любых действий
- */
-ISnew.ProductPriceType.prototype._update = function () {
-  var self = this;
-  var status = {
-    action: {
-      method: 'update_price'
-    },
-    price: self.getPrice(),
-    quantity: self.quantity
-  };
-
-  self._owner._updateStatus(status);
-  return;
-};
-
-/**
  * Получение актуальной цены за штуку
  */
-ISnew.ProductPriceType.prototype.getPrice = function () {
+ISnew.ProductPriceType.prototype.getPrice = function (options) {
   var self = this;
   var price = 0;
 
-  _.forEach(self.price_kinds[self.variantId], function (price_type) {
-    if (self.quantity < price_type.min_quantity) {
+  _.forEach(self.price_kinds[options.variantId], function (price_type) {
+    if (options.quantity < price_type.min_quantity) {
       return false;
     }
 
@@ -87,46 +68,4 @@ ISnew.ProductPriceType.prototype.getPrice = function () {
   });
 
   return price;
-};
-
-/**
- * Задать актуальное кол-во товара
- */
-ISnew.ProductPriceType.prototype._setQuantity = function (quantity) {
-  var self = this;
-
-  self.quantity = _.toInteger(quantity);
-
-  return;
-};
-
-/**
- * Выбираем модификацию товара
- */
-ISnew.ProductPriceType.prototype._setVariant = function (variantId) {
-  var self = this;
-
-  variantId = parseInt(variantId);
-
-  if (self.variantId == variantId) {
-    return false;
-  }
-
-  self.variantId = variantId;
-
-  return;
-};
-
-ISnew.ProductPriceType.prototype.set = function (config) {
-  var self = this;
-
-  if (config.quantity) {
-    self._setQuantity(config.quantity);
-  }
-
-  if (config.variantId) {
-    self._setVariant(config.variantId);
-  }
-
-  self._update();
 };

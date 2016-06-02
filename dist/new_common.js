@@ -17666,9 +17666,14 @@ $(document).on('change', '[data-product-variants]', function (event) {
   var $select = $(this);
 
   var variantId = _.toInteger($select.val());
-  var product = $select
-    .parents('[data-product-id]:first')[0]
-    .product;
+  var $product = $select
+    .parents('[data-product-id]:first')[0];
+
+  if (!$product) {
+    return false;
+  }
+
+  var product = $product.product;
 
   product.variants.setVariant(variantId);
 });
@@ -17738,8 +17743,8 @@ ISnew.ProductForm.prototype._init = function () {
 
   // привязываем нужные объекты
   self.variants = new ISnew.ProductVariants(self);
-  self.price_kinds = new ISnew.ProductPriceType(self);
   self.quantity = new ISnew.ProductQuantity(self);
+  self.price_kinds = new ISnew.ProductPriceType(self);
 
   self._initOptionSelectors(self);
 
@@ -17769,25 +17774,33 @@ ISnew.ProductForm.prototype._initOptionSelectors = function (product) {
 
 /**
  * Обновление состояния
+ * Должна сама забирать всю информацию из компонентов и обновлять
+ * максимум - получить линк на quantity, откуда брать актуальную инфу
+ * о кол-ве
  */
-ISnew.ProductForm.prototype._updateStatus = function (status) {
+ISnew.ProductForm.prototype._updateStatus = function (_method) {
   var self = this;
 
-  status.action.form = self.$form;
-  //console.log(status);
+  // получаем текущее кол-во
+  var _quantity = self.quantity.get();
+  var variant = self.variants.getVariant();
 
-  // выбираем, что нужно обновить
-  switch (status.action.method) {
-    case 'update_variant':
-      self.price_kinds.set({ variantId: status.id });
-      self.quantity.setVariant(status);
-      break;
-    case 'change_quantity':
-      self.price_kinds.set({ quantity: status.quantity.current });
-      break;
-  }
+  // получаем тип цены
+  var _price = self.price_kinds.getPrice({
+    variantId: variant.id,
+    quantity: _quantity
+  });
 
-  EventBus.publish(status.action.method +':insales:product', status);
+  // формируем действие
+  variant.action = {
+    method: _method || 'update_variant',
+    form: self.$form,
+    price: _price,
+    quantity: _quantity,
+    input: self.quantity.$input
+  };
+
+  EventBus.publish(variant.action.method +':insales:product', variant);
 };
 /**
  * Класс для работы с полем кол-во товара
@@ -17810,6 +17823,8 @@ ISnew.ProductQuantity = function (_owner) {
   self.unit = 'pce';
   self.decimal = 0;
 
+  self._onInit = true;
+
   self._init();
 };
 
@@ -17825,6 +17840,7 @@ ISnew.ProductQuantity.prototype._init = function () {
 
   // снимаем с него конфиги
   _settings = self._getConfig();
+
   self.quantity.toCheck = self._getQuantity();
 
   // уточняем из товара единицу измерения
@@ -17849,13 +17865,14 @@ ISnew.ProductQuantity.prototype._init = function () {
 
 /**
  * Забираем data- из поля ввода
+ * data-quantity - '' или id variant
  * data-step - шаг
  * data-min - минимальное
  */
 ISnew.ProductQuantity.prototype._getConfig = function () {
   var self = this;
 
-  return self.$input.data();
+  return self.$input.data() || {};
 };
 
 /**
@@ -17865,7 +17882,8 @@ ISnew.ProductQuantity.prototype._getQuantity = function () {
   var self = this;
 
   var _value = self.$input.val();
-  _value = _value.replace(',', '.').replace(/[^0-9.]/g, '');
+  // TODO: исправить! у нас может быть форма без инпутов???
+  _value = _value ? _value.replace(',', '.').replace(/[^0-9.]/g, '') : 1;
 
   return parseFloat(_value);
 };
@@ -17938,18 +17956,13 @@ ISnew.ProductQuantity.prototype._check = function () {
  */
 ISnew.ProductQuantity.prototype._update = function () {
   var self = this;
-  var status = _.cloneDeep(self);
 
-  // выводим актуальное значение в поле
-  self.$input.val(self.quantity.current.toFixed(self.decimal));
+  if (self._onInit) {
+    self._onInit = false;
+    return false;
+  }
 
-  status.action = {
-    method: 'change_quantity',
-    quantity: self.quantity,
-    input: self.$input
-  };
-
-  self._owner._updateStatus(status);
+  self._owner._updateStatus('change_quantity');
 };
 
 /**
@@ -17994,7 +18007,6 @@ ISnew.ProductQuantity.prototype._bindQuantityInput = function () {
 
   $(document).on('blur', '[data-quantity]', function (event) {
     event.preventDefault();
-    console.log('blur');
 
     var $quantity = $(this);
     var product = $quantity.parents('[data-product-id]:first')[0].product;
@@ -18018,7 +18030,6 @@ ISnew.ProductPriceType = function (_owner) {
   var self = this;
   self._owner = _owner;
 
-  self.variantId = 0;
   self.price_kinds = {};
 
   self._init();
@@ -18029,7 +18040,6 @@ ISnew.ProductPriceType = function (_owner) {
 ISnew.ProductPriceType.prototype._init = function () {
   var self = this;
 
-  self.variantId = self._owner.variants.getVariant();
   self.price_kinds = self._initPrices(self._owner.product);
 };
 
@@ -18061,31 +18071,14 @@ ISnew.ProductPriceType.prototype._initPrices = function (product) {
 };
 
 /**
- * Обновление после любых действий
- */
-ISnew.ProductPriceType.prototype._update = function () {
-  var self = this;
-  var status = {
-    action: {
-      method: 'update_price'
-    },
-    price: self.getPrice(),
-    quantity: self.quantity
-  };
-
-  self._owner._updateStatus(status);
-  return;
-};
-
-/**
  * Получение актуальной цены за штуку
  */
-ISnew.ProductPriceType.prototype.getPrice = function () {
+ISnew.ProductPriceType.prototype.getPrice = function (options) {
   var self = this;
   var price = 0;
 
-  _.forEach(self.price_kinds[self.variantId], function (price_type) {
-    if (self.quantity < price_type.min_quantity) {
+  _.forEach(self.price_kinds[options.variantId], function (price_type) {
+    if (options.quantity < price_type.min_quantity) {
       return false;
     }
 
@@ -18093,48 +18086,6 @@ ISnew.ProductPriceType.prototype.getPrice = function () {
   });
 
   return price;
-};
-
-/**
- * Задать актуальное кол-во товара
- */
-ISnew.ProductPriceType.prototype._setQuantity = function (quantity) {
-  var self = this;
-
-  self.quantity = _.toInteger(quantity);
-
-  return;
-};
-
-/**
- * Выбираем модификацию товара
- */
-ISnew.ProductPriceType.prototype._setVariant = function (variantId) {
-  var self = this;
-
-  variantId = parseInt(variantId);
-
-  if (self.variantId == variantId) {
-    return false;
-  }
-
-  self.variantId = variantId;
-
-  return;
-};
-
-ISnew.ProductPriceType.prototype.set = function (config) {
-  var self = this;
-
-  if (config.quantity) {
-    self._setQuantity(config.quantity);
-  }
-
-  if (config.variantId) {
-    self._setVariant(config.variantId);
-  }
-
-  self._update();
 };
 /**
  * Главный объект продукта
@@ -18467,13 +18418,8 @@ ISnew.ProductVariants.prototype._nodeAvailable = function (leaf) {
  */
 ISnew.ProductVariants.prototype._update = function () {
   var self = this;
-  var status = self.getVariant();
 
-  status.action = {
-    method: 'update_variant'
-  };
-
-  self._owner._updateStatus(status);
+  self._owner._updateStatus('update_variant');
 
   //  если есть id в урле обновляем вариант
   if (self.urlVariant) {

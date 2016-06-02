@@ -126,9 +126,14 @@ $(document).on('change', '[data-product-variants]', function (event) {
   var $select = $(this);
 
   var variantId = _.toInteger($select.val());
-  var product = $select
-    .parents('[data-product-id]:first')[0]
-    .product;
+  var $product = $select
+    .parents('[data-product-id]:first')[0];
+
+  if (!$product) {
+    return false;
+  }
+
+  var product = $product.product;
 
   product.variants.setVariant(variantId);
 });

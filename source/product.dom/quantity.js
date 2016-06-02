@@ -19,6 +19,8 @@ ISnew.ProductQuantity = function (_owner) {
   self.unit = 'pce';
   self.decimal = 0;
 
+  self._onInit = true;
+
   self._init();
 };
 
@@ -34,6 +36,7 @@ ISnew.ProductQuantity.prototype._init = function () {
 
   // снимаем с него конфиги
   _settings = self._getConfig();
+
   self.quantity.toCheck = self._getQuantity();
 
   // уточняем из товара единицу измерения
@@ -58,13 +61,14 @@ ISnew.ProductQuantity.prototype._init = function () {
 
 /**
  * Забираем data- из поля ввода
+ * data-quantity - '' или id variant
  * data-step - шаг
  * data-min - минимальное
  */
 ISnew.ProductQuantity.prototype._getConfig = function () {
   var self = this;
 
-  return self.$input.data();
+  return self.$input.data() || {};
 };
 
 /**
@@ -74,7 +78,8 @@ ISnew.ProductQuantity.prototype._getQuantity = function () {
   var self = this;
 
   var _value = self.$input.val();
-  _value = _value.replace(',', '.').replace(/[^0-9.]/g, '');
+  // TODO: исправить! у нас может быть форма без инпутов???
+  _value = _value ? _value.replace(',', '.').replace(/[^0-9.]/g, '') : 1;
 
   return parseFloat(_value);
 };
@@ -147,18 +152,13 @@ ISnew.ProductQuantity.prototype._check = function () {
  */
 ISnew.ProductQuantity.prototype._update = function () {
   var self = this;
-  var status = _.cloneDeep(self);
 
-  // выводим актуальное значение в поле
-  self.$input.val(self.quantity.current.toFixed(self.decimal));
+  if (self._onInit) {
+    self._onInit = false;
+    return false;
+  }
 
-  status.action = {
-    method: 'change_quantity',
-    quantity: self.quantity,
-    input: self.$input
-  };
-
-  self._owner._updateStatus(status);
+  self._owner._updateStatus('change_quantity');
 };
 
 /**
@@ -203,7 +203,6 @@ ISnew.ProductQuantity.prototype._bindQuantityInput = function () {
 
   $(document).on('blur', '[data-quantity]', function (event) {
     event.preventDefault();
-    console.log('blur');
 
     var $quantity = $(this);
     var product = $quantity.parents('[data-product-id]:first')[0].product;

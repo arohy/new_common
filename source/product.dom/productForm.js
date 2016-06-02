@@ -38,8 +38,8 @@ ISnew.ProductForm.prototype._init = function () {
 
   // привязываем нужные объекты
   self.variants = new ISnew.ProductVariants(self);
-  self.price_kinds = new ISnew.ProductPriceType(self);
   self.quantity = new ISnew.ProductQuantity(self);
+  self.price_kinds = new ISnew.ProductPriceType(self);
 
   self._initOptionSelectors(self);
 
@@ -69,23 +69,31 @@ ISnew.ProductForm.prototype._initOptionSelectors = function (product) {
 
 /**
  * Обновление состояния
+ * Должна сама забирать всю информацию из компонентов и обновлять
+ * максимум - получить линк на quantity, откуда брать актуальную инфу
+ * о кол-ве
  */
-ISnew.ProductForm.prototype._updateStatus = function (status) {
+ISnew.ProductForm.prototype._updateStatus = function (_method) {
   var self = this;
 
-  status.action.form = self.$form;
-  //console.log(status);
+  // получаем текущее кол-во
+  var _quantity = self.quantity.get();
+  var variant = self.variants.getVariant();
 
-  // выбираем, что нужно обновить
-  switch (status.action.method) {
-    case 'update_variant':
-      self.price_kinds.set({ variantId: status.id });
-      self.quantity.setVariant(status);
-      break;
-    case 'change_quantity':
-      self.price_kinds.set({ quantity: status.quantity.current });
-      break;
-  }
+  // получаем тип цены
+  var _price = self.price_kinds.getPrice({
+    variantId: variant.id,
+    quantity: _quantity
+  });
 
-  EventBus.publish(status.action.method +':insales:product', status);
+  // формируем действие
+  variant.action = {
+    method: _method || 'update_variant',
+    form: self.$form,
+    price: _price,
+    quantity: _quantity,
+    input: self.quantity.$input
+  };
+
+  EventBus.publish(variant.action.method +':insales:product', variant);
 };
