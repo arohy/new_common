@@ -86,7 +86,7 @@ ISnew.OptionSelector.prototype._renderSelector = function () {
   var self = this;
 
   var variants = self._owner.variants;
-  var images = self._owner.images;
+  var images = self._owner._images;
 
   // Если в настройках не отключили отображение селекторов
   if (self._owner.settings.showVariants) {
