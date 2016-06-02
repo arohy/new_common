@@ -114,7 +114,7 @@ ISnew.Search.prototype._patch = function (options) {
   return _.reduce(options.suggestions, function (result, product) {
     var temp = {
       id: product.data,
-      url: '/product_by_id/'+ product.id,
+      url: '/product_by_id/'+ product.data,
       title: product.value,
       markedTitle: product.value.replace(new RegExp('('+ options.query +')', 'gi'), self.settings.replacment)
     };

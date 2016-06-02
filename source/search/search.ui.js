@@ -39,7 +39,7 @@ ISnew.SearchDOM.prototype._setConfig = function () {
 /**
  * Обработчик ввода символов
  */
-ISnew.SearchDOM.prototype._keyUp = function () {
+ISnew.SearchDOM.prototype._keyUp = function (event) {
   var self = this;
 
   $(document).on('keyup', self._owner.settings.searchSelector, function () {
