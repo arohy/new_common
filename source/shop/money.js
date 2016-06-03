@@ -13,6 +13,8 @@ ISnew.Money = function () {
 ISnew.Money.prototype._init = function () {
   var self = this;
 
+  self._set(cv_money);
+
   return;
 };
 

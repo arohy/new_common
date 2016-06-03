@@ -16004,6 +16004,8 @@ ISnew.Money = function () {
 ISnew.Money.prototype._init = function () {
   var self = this;
 
+  self._set(cv_money);
+
   return;
 };
 
@@ -17626,7 +17628,7 @@ ISnew.OptionSelector.prototype._renderSelector = function () {
   var self = this;
 
   var variants = self._owner.variants;
-  var images = self._owner.images;
+  var images = self._owner._images;
 
   // Если в настройках не отключили отображение селекторов
   if (self._owner.settings.showVariants) {
@@ -19067,7 +19069,7 @@ ISnew.Search.prototype._patch = function (options) {
   return _.reduce(options.suggestions, function (result, product) {
     var temp = {
       id: product.data,
-      url: '/product_by_id/'+ product.id,
+      url: '/product_by_id/'+ product.data,
       title: product.value,
       markedTitle: product.value.replace(new RegExp('('+ options.query +')', 'gi'), self.settings.replacment)
     };
@@ -19123,7 +19125,7 @@ ISnew.SearchDOM.prototype._setConfig = function () {
 /**
  * Обработчик ввода символов
  */
-ISnew.SearchDOM.prototype._keyUp = function () {
+ISnew.SearchDOM.prototype._keyUp = function (event) {
   var self = this;
 
   $(document).on('keyup', self._owner.settings.searchSelector, function () {

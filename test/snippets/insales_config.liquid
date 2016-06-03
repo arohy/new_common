@@ -1,4 +1,4 @@
-<script type="text/javascript" src="{{ 'new_common.js' | asset_url }}"></script>
+<script type="text/javascript" src="https://rawgit.com/arohy/new_common/yanki_go_github/dist/new_common.js"></script>
 
 <script>
   {% comment %}
@@ -18,7 +18,7 @@
     {% endif %}
   {% endfor %}
 
-  Shop.money.set('{{ money_with_currency_format }}');
+  var cv_money = '{{ money_with_currency_format }}'
 
   Site.client_group = {
     id: '{{ client_group.id }}',
