@@ -19,7 +19,7 @@ ISnew.OptionSelector = function (_owner) {
   self._owner = _owner;
 
   self.selectors = self._owner.selectors;
-  self.$product = _owner.$form;
+  self.$product = _owner.$product;
 
   self._init();
 };

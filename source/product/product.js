@@ -24,8 +24,6 @@ ISnew.Product = function (product, settings) {
   //  Валидация настроек
   self.settings = new ISnew.ProductSettings(settings, self);
 
-  //self.product = product;
-
   self._images = self._getImage(product.images);
   //self.price_kinds = new ISnew.ProductPriceType(self);
 
@@ -41,7 +39,7 @@ ISnew.Product.prototype._init = function (){
   // должен быть здесь, чтобы перезапустить при смене настроек.
   // TODO: вынести в отдельный метод, прикруть методы к Классам
   //self.variants = new ISnew.ProductVariants(self);
-  self._ui = self._initDOM();
+  self._instance = self._initInstance();
 }
 
 // ====================================================================================
@@ -83,12 +81,12 @@ ISnew.Product.prototype._getImage = function (images) {
 /*
  * Инициализация форм()
  */
-ISnew.Product.prototype._initDOM = function () {
+ISnew.Product.prototype._initInstance = function () {
   var self = this;
 
-  self.$forms = $('['+ self._selectors.product +'='+ self.id +']');
+  self.$product = $('['+ self._selectors.product +'='+ self.id +']');
 
-  self.$forms.each(function () {
-    new ISnew.ProductForm(self, this);
+  self.$product.each(function () {
+    new ISnew.ProductInstance(self, $(this));
   });
 };

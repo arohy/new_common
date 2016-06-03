@@ -13,7 +13,7 @@ ISnew.ProductSettings = function (settings, _owner) {
     fileUrl: {},
     filtered: true,
 
-    max: false,
+    useMax: false,
     decimal: {
       kgm: 1,
       dmt: 1

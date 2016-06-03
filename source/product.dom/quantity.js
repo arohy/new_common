@@ -119,8 +119,13 @@ ISnew.ProductQuantity.prototype.setVariant = function (variant) {
  */
 ISnew.ProductQuantity.prototype.get = function () {
   var self = this;
+  var _quantity = _.clone(self.quantity);
+  _.unset(_quantity, 'toCheck');
+  if (!self.settings.useMax) {
+    _.unset(_quantity, 'max');
+  }
 
-  return self.quantity.current;
+  return _quantity;
 };
 
 /**

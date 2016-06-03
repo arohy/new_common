@@ -17559,7 +17559,7 @@ ISnew.OptionSelector = function (_owner) {
   self._owner = _owner;
 
   self.selectors = self._owner.selectors;
-  self.$product = _owner.$form;
+  self.$product = _owner.$product;
 
   self._init();
 };
@@ -17710,7 +17710,7 @@ $(document).on('change click', '[data-option-bind]', function (event) {
  * Класс отвечает за взаимодействие верскти с конкретным
  * экземпляром Product()
  */
-ISnew.ProductForm = function (_owner, form) {
+ISnew.ProductInstance = function (_owner, $product) {
   var self = this;
 
   self.selectors = {
@@ -17727,13 +17727,15 @@ ISnew.ProductForm = function (_owner, form) {
 
   // настройки для экземпляра
   self._owner = _owner;
+
   self.settings = self._owner.settings;
   self.product = self._owner;
-  self.$form = $(form);
   self.quantity = {};
 
+  self.$product = $product;
+
   // прибиваем экземпляр к узлу
-  form.product = self;
+  $product[0].Product = self;
 
   self._init ();
 };
@@ -17741,7 +17743,7 @@ ISnew.ProductForm = function (_owner, form) {
 /**
  * Инициализация связки
  */
-ISnew.ProductForm.prototype._init = function () {
+ISnew.ProductInstance.prototype._init = function () {
   var self = this;
 
   // привязываем нужные объекты
@@ -17755,11 +17757,11 @@ ISnew.ProductForm.prototype._init = function () {
 /**
  * Инициализация селектора
  */
-ISnew.ProductForm.prototype._initOptionSelectors = function () {
+ISnew.ProductInstance.prototype._initOptionSelectors = function () {
   var self = this;
   var _isActive = _.isObject(self.optionSelector);
 
-  self._hasSelector = self.$form.find('['+ self.selectors.nativeSelect +']').length;
+  self._hasSelector = self.$product.find('['+ self.selectors.nativeSelect +']').length;
 
   if (!self._hasSelector) {
     return false;
@@ -17784,9 +17786,9 @@ ISnew.ProductForm.prototype._initOptionSelectors = function () {
 /**
  * Инициализация счетчиков
  */
-ISnew.ProductForm.prototype._initQuantity = function () {
+ISnew.ProductInstance.prototype._initQuantity = function () {
   var self = this;
-  var $quantity = self.$form.find('['+ self.selectors.quantity +']');
+  var $quantity = self.$product.find('['+ self.selectors.quantity +']');
 
   $quantity.each(function (index) {
     self.quantity[index] = new ISnew.ProductQuantity(self, this);
@@ -17799,7 +17801,7 @@ ISnew.ProductForm.prototype._initQuantity = function () {
  * максимум - получить линк на quantity, откуда брать актуальную инфу
  * о кол-ве
  */
-ISnew.ProductForm.prototype._updateStatus = function (status) {
+ISnew.ProductInstance.prototype._updateStatus = function (status) {
   var self = this;
   var _variant;
   var _quantity;
@@ -17821,7 +17823,7 @@ ISnew.ProductForm.prototype._updateStatus = function (status) {
   } else {
     // если у нас куча считалок
     _variant = status.instance.variant;
-    _quantity = status.instance.quantity;
+    _quantity = status.instance.get();
     _$input = status.instance.$input;
   }
 
@@ -17834,10 +17836,10 @@ ISnew.ProductForm.prototype._updateStatus = function (status) {
   // формируем действие
   _variant.action = {
     method: status.method,
-    form: self.$form,
+    product: self.$product,
     price: _price,
     quantity: _quantity,
-    input: _$input
+    quantityInput: _$input
   };
 
   if (status.event != 'update_variant') {
@@ -17967,8 +17969,13 @@ ISnew.ProductQuantity.prototype.setVariant = function (variant) {
  */
 ISnew.ProductQuantity.prototype.get = function () {
   var self = this;
+  var _quantity = _.clone(self.quantity);
+  _.unset(_quantity, 'toCheck');
+  if (!self.settings.useMax) {
+    _.unset(_quantity, 'max');
+  }
 
-  return self.quantity.current;
+  return _quantity;
 };
 
 /**
@@ -18193,8 +18200,6 @@ ISnew.Product = function (product, settings) {
   //  Валидация настроек
   self.settings = new ISnew.ProductSettings(settings, self);
 
-  //self.product = product;
-
   self._images = self._getImage(product.images);
   //self.price_kinds = new ISnew.ProductPriceType(self);
 
@@ -18210,7 +18215,7 @@ ISnew.Product.prototype._init = function (){
   // должен быть здесь, чтобы перезапустить при смене настроек.
   // TODO: вынести в отдельный метод, прикруть методы к Классам
   //self.variants = new ISnew.ProductVariants(self);
-  self._ui = self._initDOM();
+  self._instance = self._initInstance();
 }
 
 // ====================================================================================
@@ -18252,13 +18257,13 @@ ISnew.Product.prototype._getImage = function (images) {
 /*
  * Инициализация форм()
  */
-ISnew.Product.prototype._initDOM = function () {
+ISnew.Product.prototype._initInstance = function () {
   var self = this;
 
-  self.$forms = $('['+ self._selectors.product +'='+ self.id +']');
+  self.$product = $('['+ self._selectors.product +'='+ self.id +']');
 
-  self.$forms.each(function () {
-    new ISnew.ProductForm(self, this);
+  self.$product.each(function () {
+    new ISnew.ProductInstance(self, $(this));
   });
 };
 /**
@@ -18276,7 +18281,7 @@ ISnew.ProductSettings = function (settings, _owner) {
     fileUrl: {},
     filtered: true,
 
-    max: false,
+    useMax: false,
     decimal: {
       kgm: 1,
       dmt: 1
