@@ -17538,6 +17538,7 @@ ISnew.CartDOM.prototype._unlockButton = function (data, eventName) {
 
   return;
 };
+
 /**
  * Объект отвечающий за работу опшн селектора
  *
@@ -17706,6 +17707,169 @@ $(document).on('change click', '[data-option-bind]', function (event) {
 
   product.variants.setOption(option);
 });
+/**
+ * Типы цен
+ *
+ * @class
+ * @name ISnew.ProductPriceType
+ *
+ * @param {json} product json с информацией о товаре
+ * @param {object} _owner ссылка на родительский класс ISnew.Products
+ *
+ */
+ISnew.ProductPriceType = function (_owner) {
+  var self = this;
+  self._owner = _owner;
+
+  self.price_kinds = {};
+
+  self._init();
+
+  return self;
+};
+
+ISnew.ProductPriceType.prototype._init = function () {
+  var self = this;
+
+  self.price_kinds = self._initPrices(self._owner.product);
+};
+
+/**
+ * Инициализация
+ */
+ISnew.ProductPriceType.prototype._initPrices = function (product) {
+  var self = this;
+  var price_kinds = product.price_kinds;
+  var price_types = {};
+
+  _.forEach(product.variants, function (variant) {
+    price_types[variant.id] = [];
+
+    price_types[variant.id].push({
+      min_quantity: 0,
+      price: parseFloat(variant.price)
+    });
+
+    _.forEach(variant.prices, function (price, index) {
+      price_types[variant.id].push({
+        min_quantity: price_kinds[index].value,
+        price: parseFloat(variant.prices[index])
+      });
+    })
+  });
+
+  return price_types;
+};
+
+/**
+ * Получение актуальной цены за штуку
+ */
+ISnew.ProductPriceType.prototype.getPrice = function (options) {
+  var self = this;
+  var price = 0;
+
+  _.forEach(self.price_kinds[options.variantId], function (price_type) {
+    if (options.quantity < price_type.min_quantity) {
+      return false;
+    }
+
+    price = price_type.price;
+  });
+
+  return price;
+};
+/**
+ * Главный объект продукта
+ *
+ * @class
+ * @name ISnew.Product
+ *
+ * @param {json} product json с информацией о товаре
+ * @param {object} settings конфиг для рендера optionSelector
+ *
+ */
+ISnew.Product = function (product, settings) {
+  var self = this;
+
+  // Банхамер должен быть на входе
+  if (!product) {
+    throw new ISnew.tools.Error('ErrorProduct', 'ошибка в передаче продукта');
+  }
+
+  self._selectors = {
+    product: 'data-product-id',
+  };
+
+  _.merge(self, product);
+  //  Валидация настроек
+  self.settings = new ISnew.ProductSettings(settings, self);
+
+  self._images = self._getImage(product.images);
+  //self.price_kinds = new ISnew.ProductPriceType(self);
+
+  self._init();
+};
+
+/**
+ * Инициализация
+ */
+ISnew.Product.prototype._init = function (){
+  var self = this;
+
+  // должен быть здесь, чтобы перезапустить при смене настроек.
+  // TODO: вынести в отдельный метод, прикруть методы к Классам
+  //self.variants = new ISnew.ProductVariants(self);
+  self._instance = self._initInstance();
+}
+
+// ====================================================================================
+//                          Методы по работе с изображениями продукта
+// ====================================================================================
+
+/**
+ * Получаем объект с изображениями где ключом является название изображения
+ *
+ * @param  {array} images массив изображений продукта (product.images)
+ *
+ * @return {object} _images объект с изображениями в виде {'image.title': {small_url: 'http//'}}
+ */
+ISnew.Product.prototype._getImage = function (images) {
+  var self = this;
+
+  var _images = {};
+
+  //  если у продукта есть изображения
+  if (_.size(images) > 0) {
+    _.forEach(images, function (image) {
+      //  если у изображения есть title
+      if (image['title']) {
+        var imageName = image['title'].toLowerCase();
+        _images[imageName] = {
+          thumb_url: image['thumb_url'],
+          small_url: image['small_url'],
+          medium_url: image['medium_url'],
+          large_url: image['large_url'],
+          original_url: image['original_url']
+        };
+      }
+    });
+  }
+
+  return _images;
+}
+
+/*
+ * Инициализация форм()
+ */
+ISnew.Product.prototype._initInstance = function () {
+  var self = this;
+
+  self.$product = $('['+ self._selectors.product +'='+ self.id +']');
+
+  self.$product.each(function () {
+    new ISnew.ProductInstance(self, $(this));
+  });
+};
 /**
  * Класс отвечает за взаимодействие верскти с конкретным
  * экземпляром Product()
@@ -18103,169 +18267,6 @@ ISnew.ProductQuantity.prototype._bindQuantityInput = function () {
 };
 
 console.log('ready');
-/**
- * Типы цен
- *
- * @class
- * @name ISnew.ProductPriceType
- *
- * @param {json} product json с информацией о товаре
- * @param {object} _owner ссылка на родительский класс ISnew.Products
- *
- */
-ISnew.ProductPriceType = function (_owner) {
-  var self = this;
-  self._owner = _owner;
-
-  self.price_kinds = {};
-
-  self._init();
-
-  return self;
-};
-
-ISnew.ProductPriceType.prototype._init = function () {
-  var self = this;
-
-  self.price_kinds = self._initPrices(self._owner.product);
-};
-
-/**
- * Инициализация
- */
-ISnew.ProductPriceType.prototype._initPrices = function (product) {
-  var self = this;
-  var price_kinds = product.price_kinds;
-  var price_types = {};
-
-  _.forEach(product.variants, function (variant) {
-    price_types[variant.id] = [];
-
-    price_types[variant.id].push({
-      min_quantity: 0,
-      price: parseFloat(variant.price)
-    });
-
-    _.forEach(variant.prices, function (price, index) {
-      price_types[variant.id].push({
-        min_quantity: price_kinds[index].value,
-        price: parseFloat(variant.prices[index])
-      });
-    })
-  });
-
-  return price_types;
-};
-
-/**
- * Получение актуальной цены за штуку
- */
-ISnew.ProductPriceType.prototype.getPrice = function (options) {
-  var self = this;
-  var price = 0;
-
-  _.forEach(self.price_kinds[options.variantId], function (price_type) {
-    if (options.quantity < price_type.min_quantity) {
-      return false;
-    }
-
-    price = price_type.price;
-  });
-
-  return price;
-};
-/**
- * Главный объект продукта
- *
- * @class
- * @name ISnew.Product
- *
- * @param {json} product json с информацией о товаре
- * @param {object} settings конфиг для рендера optionSelector
- *
- */
-ISnew.Product = function (product, settings) {
-  var self = this;
-
-  // Банхамер должен быть на входе
-  if (!product) {
-    throw new ISnew.tools.Error('ErrorProduct', 'ошибка в передаче продукта');
-  }
-
-  self._selectors = {
-    product: 'data-product-id',
-  };
-
-  _.merge(self, product);
-  //  Валидация настроек
-  self.settings = new ISnew.ProductSettings(settings, self);
-
-  self._images = self._getImage(product.images);
-  //self.price_kinds = new ISnew.ProductPriceType(self);
-
-  self._init();
-};
-
-/**
- * Инициализация
- */
-ISnew.Product.prototype._init = function (){
-  var self = this;
-
-  // должен быть здесь, чтобы перезапустить при смене настроек.
-  // TODO: вынести в отдельный метод, прикруть методы к Классам
-  //self.variants = new ISnew.ProductVariants(self);
-  self._instance = self._initInstance();
-}
-
-// ====================================================================================
-//                          Методы по работе с изображениями продукта
-// ====================================================================================
-
-/**
- * Получаем объект с изображениями где ключом является название изображения
- *
- * @param  {array} images массив изображений продукта (product.images)
- *
- * @return {object} _images объект с изображениями в виде {'image.title': {small_url: 'http//'}}
- */
-ISnew.Product.prototype._getImage = function (images) {
-  var self = this;
-
-  var _images = {};
-
-  //  если у продукта есть изображения
-  if (_.size(images) > 0) {
-    _.forEach(images, function (image) {
-      //  если у изображения есть title
-      if (image['title']) {
-        var imageName = image['title'].toLowerCase();
-        _images[imageName] = {
-          thumb_url: image['thumb_url'],
-          small_url: image['small_url'],
-          medium_url: image['medium_url'],
-          large_url: image['large_url'],
-          original_url: image['original_url']
-        };
-      }
-    });
-  }
-
-  return _images;
-}
-
-/*
- * Инициализация форм()
- */
-ISnew.Product.prototype._initInstance = function () {
-  var self = this;
-
-  self.$product = $('['+ self._selectors.product +'='+ self.id +']');
-
-  self.$product.each(function () {
-    new ISnew.ProductInstance(self, $(this));
-  });
-};
 /**
  * Класс для работы с настройками Продукта
  */
