@@ -11,6 +11,7 @@ var Shop = new ISnew.Shop();
 Site.URL = new ISnew.tools.URL();
 Site.Translit = new ISnew.tools.Translit();
 
+console.log('ready!!!');
 // =======================================================================================
 //                                      OptionSelector
 // =======================================================================================
