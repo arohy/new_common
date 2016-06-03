@@ -19,6 +19,7 @@ ISnew.ProductVariants = function (_owner) {
   var self = this;
 
   self._owner = _owner;
+  self._variants = {};
   self.variants = self._owner.product.variants;
   self.urlVariant = Site.URL.getKeyValue('variant_id');
 
@@ -65,6 +66,8 @@ ISnew.ProductVariants.prototype._initTree = function () {
   // Проходимся по вариантам
   _.forEach(variants, function (variant) {
     var leaf = tree;
+
+    self._variants[variant.id] = variant;
 
     if (variant.option_values.length) {
       // все хорошо, у нас много опций
@@ -244,6 +247,15 @@ ISnew.ProductVariants.prototype.getVariant = function () {
   }
 
   return self.variants[id];
+};
+
+/**
+ * Получаем выбранный вариант
+ */
+ISnew.ProductVariants.prototype.getVariantById = function (_id) {
+  var self = this;
+
+  return self._variants[_id];
 };
 
 /**

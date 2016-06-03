@@ -2,7 +2,6 @@
  * Класс отвечает за взаимодействие верскти с конкретным
  * экземпляром Product()
  */
-
 ISnew.ProductForm = function (_owner, form) {
   var self = this;
 
@@ -23,6 +22,7 @@ ISnew.ProductForm = function (_owner, form) {
   self.settings = self._owner.settings;
   self.product = self._owner;
   self.$form = $(form);
+  self.quantity = {};
 
   // прибиваем экземпляр к узлу
   form.product = self;
@@ -38,10 +38,34 @@ ISnew.ProductForm.prototype._init = function () {
 
   // привязываем нужные объекты
   self.variants = new ISnew.ProductVariants(self);
-  self.quantity = new ISnew.ProductQuantity(self);
+  self._initQuantity();
   self.price_kinds = new ISnew.ProductPriceType(self);
 
-  self._initOptionSelectors(self);
+  self._initOptionSelectors();
+};
+
+/**
+ * Инициализация селектора
+ */
+ISnew.ProductForm.prototype._initOptionSelectors = function () {
+  var self = this;
+  var _isActive = _.isObject(self.optionSelector);
+
+  self._hasSelector = self.$form.find('['+ self.selectors.nativeSelect +']').length;
+
+  if (!self._hasSelector) {
+    return false;
+  }
+
+  if (!_isActive) {
+    // У нас нет активных селекторов
+    // заряжаем
+    self.optionSelector = new ISnew.OptionSelector(self);
+  } else {
+    // данный селектор активен
+    // наверное оти перезаписать настройки
+    self.optionSelector._init();
+  }
 
   // Дергаем вариант
   if (self.product.settings.initOption) {
@@ -50,21 +74,15 @@ ISnew.ProductForm.prototype._init = function () {
 };
 
 /**
- * Инициализация селектора
+ * Инициализация счетчиков
  */
-ISnew.ProductForm.prototype._initOptionSelectors = function (product) {
+ISnew.ProductForm.prototype._initQuantity = function () {
   var self = this;
-  var _isActive = _.isObject(product.optionSelector);
+  var $quantity = self.$form.find('['+ self.selectors.quantity +']');
 
-  if (!_isActive) {
-    // У нас нет активных селекторов
-    // заряжаем
-    product.optionSelector = new ISnew.OptionSelector(product);
-  } else {
-    // данный селектор активен
-    // наверное оти перезаписать настройки
-    product.optionSelector._init();
-  }
+  $quantity.each(function (index) {
+    self.quantity[index] = new ISnew.ProductQuantity(self, this);
+  });
 };
 
 /**
@@ -75,29 +93,48 @@ ISnew.ProductForm.prototype._initOptionSelectors = function (product) {
  */
 ISnew.ProductForm.prototype._updateStatus = function (status) {
   var self = this;
+  var _variant;
+  var _quantity;
+  var _$input;
 
-  // получаем текущее кол-во
-  var _quantity = self.quantity.get();
-  var variant = self.variants.getVariant();
+  // если обновление вызвала смена варианта, то обновляем чиселку
+  // и убиваем поток
+  if (status.event == 'update_variant') {
+    self.quantity[0].setVariant(self.variants.getVariant());
+    return false;
+  };
+
+  // немного магии
+  if (self._hasSelector) {
+    // если в инстансе есть селектор
+    _variant = self.variants.getVariant();
+    _quantity = self.quantity[0].get();
+    _$input = self.quantity[0].$input;
+  } else {
+    // если у нас куча считалок
+    _variant = status.instance.variant;
+    _quantity = status.instance.quantity;
+    _$input = status.instance.$input;
+  }
 
   // получаем тип цены
   var _price = self.price_kinds.getPrice({
-    variantId: variant.id,
+    variantId: _variant.id,
     quantity: _quantity
   });
 
   // формируем действие
-  variant.action = {
+  _variant.action = {
     method: status.method,
     form: self.$form,
     price: _price,
     quantity: _quantity,
-    input: self.quantity.$input
+    input: _$input
   };
 
   if (status.event != 'update_variant') {
-    EventBus.publish(status.event +':insales:product', variant);
+    EventBus.publish(status.event +':insales:product', _variant);
   }
 
-  EventBus.publish('update_variant:insales:product', variant);
+  EventBus.publish('update_variant:insales:product', _variant);
 };

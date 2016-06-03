@@ -17710,7 +17710,6 @@ $(document).on('change click', '[data-option-bind]', function (event) {
  * Класс отвечает за взаимодействие верскти с конкретным
  * экземпляром Product()
  */
-
 ISnew.ProductForm = function (_owner, form) {
   var self = this;
 
@@ -17731,6 +17730,7 @@ ISnew.ProductForm = function (_owner, form) {
   self.settings = self._owner.settings;
   self.product = self._owner;
   self.$form = $(form);
+  self.quantity = {};
 
   // прибиваем экземпляр к узлу
   form.product = self;
@@ -17746,10 +17746,34 @@ ISnew.ProductForm.prototype._init = function () {
 
   // привязываем нужные объекты
   self.variants = new ISnew.ProductVariants(self);
-  self.quantity = new ISnew.ProductQuantity(self);
+  self._initQuantity();
   self.price_kinds = new ISnew.ProductPriceType(self);
 
-  self._initOptionSelectors(self);
+  self._initOptionSelectors();
+};
+
+/**
+ * Инициализация селектора
+ */
+ISnew.ProductForm.prototype._initOptionSelectors = function () {
+  var self = this;
+  var _isActive = _.isObject(self.optionSelector);
+
+  self._hasSelector = self.$form.find('['+ self.selectors.nativeSelect +']').length;
+
+  if (!self._hasSelector) {
+    return false;
+  }
+
+  if (!_isActive) {
+    // У нас нет активных селекторов
+    // заряжаем
+    self.optionSelector = new ISnew.OptionSelector(self);
+  } else {
+    // данный селектор активен
+    // наверное оти перезаписать настройки
+    self.optionSelector._init();
+  }
 
   // Дергаем вариант
   if (self.product.settings.initOption) {
@@ -17758,21 +17782,15 @@ ISnew.ProductForm.prototype._init = function () {
 };
 
 /**
- * Инициализация селектора
+ * Инициализация счетчиков
  */
-ISnew.ProductForm.prototype._initOptionSelectors = function (product) {
+ISnew.ProductForm.prototype._initQuantity = function () {
   var self = this;
-  var _isActive = _.isObject(product.optionSelector);
+  var $quantity = self.$form.find('['+ self.selectors.quantity +']');
 
-  if (!_isActive) {
-    // У нас нет активных селекторов
-    // заряжаем
-    product.optionSelector = new ISnew.OptionSelector(product);
-  } else {
-    // данный селектор активен
-    // наверное оти перезаписать настройки
-    product.optionSelector._init();
-  }
+  $quantity.each(function (index) {
+    self.quantity[index] = new ISnew.ProductQuantity(self, this);
+  });
 };
 
 /**
@@ -17783,42 +17801,62 @@ ISnew.ProductForm.prototype._initOptionSelectors = function (product) {
  */
 ISnew.ProductForm.prototype._updateStatus = function (status) {
   var self = this;
+  var _variant;
+  var _quantity;
+  var _$input;
 
-  // получаем текущее кол-во
-  var _quantity = self.quantity.get();
-  var variant = self.variants.getVariant();
+  // если обновление вызвала смена варианта, то обновляем чиселку
+  // и убиваем поток
+  if (status.event == 'update_variant') {
+    self.quantity[0].setVariant(self.variants.getVariant());
+    return false;
+  };
+
+  // немного магии
+  if (self._hasSelector) {
+    // если в инстансе есть селектор
+    _variant = self.variants.getVariant();
+    _quantity = self.quantity[0].get();
+    _$input = self.quantity[0].$input;
+  } else {
+    // если у нас куча считалок
+    _variant = status.instance.variant;
+    _quantity = status.instance.quantity;
+    _$input = status.instance.$input;
+  }
 
   // получаем тип цены
   var _price = self.price_kinds.getPrice({
-    variantId: variant.id,
+    variantId: _variant.id,
     quantity: _quantity
   });
 
   // формируем действие
-  variant.action = {
+  _variant.action = {
     method: status.method,
     form: self.$form,
     price: _price,
     quantity: _quantity,
-    input: self.quantity.$input
+    input: _$input
   };
 
   if (status.event != 'update_variant') {
-    EventBus.publish(status.event +':insales:product', variant);
+    EventBus.publish(status.event +':insales:product', _variant);
   }
 
-  EventBus.publish('update_variant:insales:product', variant);
+  EventBus.publish('update_variant:insales:product', _variant);
 };
 /**
  * Класс для работы с полем кол-во товара
  */
-ISnew.ProductQuantity = function (_owner) {
+ISnew.ProductQuantity = function (_owner, _quantityNode) {
   var self = this;
 
+  // задаем базывае
   self._owner = _owner;
-  self.settings = _owner.settings;
+  self.settings = self._owner.settings;
   self.selectors = self._owner.selectors;
-  self.variant = self._owner.variants.getVariant();
+  self.variant = {};
 
   self.quantity = {
     current: 0,
@@ -17826,9 +17864,17 @@ ISnew.ProductQuantity = function (_owner) {
     max: 10000000,
     min: 0
   };
-
   self.unit = 'pce';
   self.decimal = 0;
+
+  // привязываем узел
+  self.node = _quantityNode;
+  self.$node = $(_quantityNode);
+  // сохраняем линк на наше поле ввода
+  self.$input = self.$node.find('input[name]');
+
+  // привязываем экземпляр к узлу
+  _quantityNode.Quantity = self;
 
   self._onInit = true;
 
@@ -17841,11 +17887,9 @@ ISnew.ProductQuantity = function (_owner) {
 ISnew.ProductQuantity.prototype._init = function () {
   var self = this;
   var _settings;
+  var _variant;
 
-  // находим опорный элемент
-  self.$input = self._owner.$form.find('['+ self.selectors.quantity +']');
-
-  // снимаем с него конфиги
+  // снимаем с конфиги
   _settings = self._getConfig();
 
   self.quantity.toCheck = self._getQuantity();
@@ -17853,8 +17897,15 @@ ISnew.ProductQuantity.prototype._init = function () {
   // уточняем из товара единицу измерения
   self.unit = self._owner.product.unit;
 
+  // определяем, с каким вариантом мы работаем
+  if (_settings.variantId) {
+    self.variant = self._owner.variants.getVariantById(_settings.variantId);
+  } else {
+    self.variant = self._owner.variants.getVariant();
+  }
+
   // определяем максимум
-  if (self.variant.quantity && self.settings.max) {
+  if (self.variant.quantity && self.settings.useMax) {
     self.quantity.max = self.variant.quantity;
   }
 
@@ -17866,7 +17917,6 @@ ISnew.ProductQuantity.prototype._init = function () {
   self.quantity.min = _settings.min || self.step;
 
   self._check();
-
   self._bindEvents();
 };
 
@@ -17878,8 +17928,15 @@ ISnew.ProductQuantity.prototype._init = function () {
  */
 ISnew.ProductQuantity.prototype._getConfig = function () {
   var self = this;
+  var _config = self.$node.data() || {};
+  var _name = _.words(self.$input.attr('name'));
+  var _variant;
 
-  return self.$input.data() || {};
+  if (_name[0] == 'variant' || _name[0] == 'cart') {
+    _config.variantId = _.toInteger(_name[2]);
+  }
+
+  return _config;
 };
 
 /**
@@ -17896,7 +17953,7 @@ ISnew.ProductQuantity.prototype._getQuantity = function () {
 };
 
 /**
- * Указываем вариант, с которым работаем
+ * Указываем вариант, с которым работаем ???
  */
 ISnew.ProductQuantity.prototype.setVariant = function (variant) {
   var self = this;
@@ -17921,8 +17978,6 @@ ISnew.ProductQuantity.prototype._changeQuantity = function (value) {
   var self = this;
 
   self.quantity.toCheck += parseFloat(value);
-  console.log(value);
-  console.log(_.cloneDeep(self.quantity));
 
   self._check();
 };
@@ -17975,8 +18030,18 @@ ISnew.ProductQuantity.prototype._update = function () {
 
   self._owner._updateStatus({
     event: 'change_quantity',
-    method: 'update'
+    method: 'update',
+    instance: self,
   });
+};
+
+/**
+ * Вытаскиваем эекземпляр класса
+ */
+ISnew.ProductQuantity.prototype._getInstance = function ($selector) {
+  var self = this;
+
+  return $selector.parents('['+ self.selectors.quantity+']')[0].Quantity;
 };
 
 /**
@@ -18006,9 +18071,9 @@ ISnew.ProductQuantity.prototype._bindQuantityButtons = function () {
     event.preventDefault();
 
     var $quantityButton = $(this);
-    var product = $quantityButton.parents('['+ self.selectors.product+']')[0].product;
+    var quantity = self._getInstance($quantityButton);
 
-    product.quantity._changeQuantity($quantityButton.data('quantity-change'));
+    quantity._changeQuantity($quantityButton.data('quantity-change'));
   });
 };
 
@@ -18019,17 +18084,18 @@ ISnew.ProductQuantity.prototype._bindQuantityButtons = function () {
 ISnew.ProductQuantity.prototype._bindQuantityInput = function () {
   var self = this;
 
-  $(document).on('blur', '[data-quantity]', function (event) {
+  $(document).on('blur', '[data-quantity] input[name]', function (event) {
+    console.log('yaaaap!!!');
     event.preventDefault();
 
-    var $quantity = $(this);
-    var product = $quantity.parents('[data-product-id]:first')[0].product;
+    var $input = $(this);
+    var quantity = self._getInstance($input);
 
-    if (product) {
-      product.quantity._setQuantity();
-    }
+    quantity._setQuantity();
   });
 };
+
+console.log('ready');
 /**
  * Типы цен
  *
@@ -18279,6 +18345,7 @@ ISnew.ProductVariants = function (_owner) {
   var self = this;
 
   self._owner = _owner;
+  self._variants = {};
   self.variants = self._owner.product.variants;
   self.urlVariant = Site.URL.getKeyValue('variant_id');
 
@@ -18325,6 +18392,8 @@ ISnew.ProductVariants.prototype._initTree = function () {
   // Проходимся по вариантам
   _.forEach(variants, function (variant) {
     var leaf = tree;
+
+    self._variants[variant.id] = variant;
 
     if (variant.option_values.length) {
       // все хорошо, у нас много опций
@@ -18504,6 +18573,15 @@ ISnew.ProductVariants.prototype.getVariant = function () {
   }
 
   return self.variants[id];
+};
+
+/**
+ * Получаем выбранный вариант
+ */
+ISnew.ProductVariants.prototype.getVariantById = function (_id) {
+  var self = this;
+
+  return self._variants[_id];
 };
 
 /**

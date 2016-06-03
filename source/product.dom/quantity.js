@@ -1,13 +1,14 @@
 /**
  * Класс для работы с полем кол-во товара
  */
-ISnew.ProductQuantity = function (_owner) {
+ISnew.ProductQuantity = function (_owner, _quantityNode) {
   var self = this;
 
+  // задаем базывае
   self._owner = _owner;
-  self.settings = _owner.settings;
+  self.settings = self._owner.settings;
   self.selectors = self._owner.selectors;
-  self.variant = self._owner.variants.getVariant();
+  self.variant = {};
 
   self.quantity = {
     current: 0,
@@ -15,9 +16,17 @@ ISnew.ProductQuantity = function (_owner) {
     max: 10000000,
     min: 0
   };
-
   self.unit = 'pce';
   self.decimal = 0;
+
+  // привязываем узел
+  self.node = _quantityNode;
+  self.$node = $(_quantityNode);
+  // сохраняем линк на наше поле ввода
+  self.$input = self.$node.find('input[name]');
+
+  // привязываем экземпляр к узлу
+  _quantityNode.Quantity = self;
 
   self._onInit = true;
 
@@ -30,11 +39,9 @@ ISnew.ProductQuantity = function (_owner) {
 ISnew.ProductQuantity.prototype._init = function () {
   var self = this;
   var _settings;
+  var _variant;
 
-  // находим опорный элемент
-  self.$input = self._owner.$form.find('['+ self.selectors.quantity +']');
-
-  // снимаем с него конфиги
+  // снимаем с конфиги
   _settings = self._getConfig();
 
   self.quantity.toCheck = self._getQuantity();
@@ -42,8 +49,15 @@ ISnew.ProductQuantity.prototype._init = function () {
   // уточняем из товара единицу измерения
   self.unit = self._owner.product.unit;
 
+  // определяем, с каким вариантом мы работаем
+  if (_settings.variantId) {
+    self.variant = self._owner.variants.getVariantById(_settings.variantId);
+  } else {
+    self.variant = self._owner.variants.getVariant();
+  }
+
   // определяем максимум
-  if (self.variant.quantity && self.settings.max) {
+  if (self.variant.quantity && self.settings.useMax) {
     self.quantity.max = self.variant.quantity;
   }
 
@@ -55,7 +69,6 @@ ISnew.ProductQuantity.prototype._init = function () {
   self.quantity.min = _settings.min || self.step;
 
   self._check();
-
   self._bindEvents();
 };
 
@@ -67,8 +80,15 @@ ISnew.ProductQuantity.prototype._init = function () {
  */
 ISnew.ProductQuantity.prototype._getConfig = function () {
   var self = this;
+  var _config = self.$node.data() || {};
+  var _name = _.words(self.$input.attr('name'));
+  var _variant;
 
-  return self.$input.data() || {};
+  if (_name[0] == 'variant' || _name[0] == 'cart') {
+    _config.variantId = _.toInteger(_name[2]);
+  }
+
+  return _config;
 };
 
 /**
@@ -85,7 +105,7 @@ ISnew.ProductQuantity.prototype._getQuantity = function () {
 };
 
 /**
- * Указываем вариант, с которым работаем
+ * Указываем вариант, с которым работаем ???
  */
 ISnew.ProductQuantity.prototype.setVariant = function (variant) {
   var self = this;
@@ -110,8 +130,6 @@ ISnew.ProductQuantity.prototype._changeQuantity = function (value) {
   var self = this;
 
   self.quantity.toCheck += parseFloat(value);
-  console.log(value);
-  console.log(_.cloneDeep(self.quantity));
 
   self._check();
 };
@@ -164,8 +182,18 @@ ISnew.ProductQuantity.prototype._update = function () {
 
   self._owner._updateStatus({
     event: 'change_quantity',
-    method: 'update'
+    method: 'update',
+    instance: self,
   });
+};
+
+/**
+ * Вытаскиваем эекземпляр класса
+ */
+ISnew.ProductQuantity.prototype._getInstance = function ($selector) {
+  var self = this;
+
+  return $selector.parents('['+ self.selectors.quantity+']')[0].Quantity;
 };
 
 /**
@@ -195,9 +223,9 @@ ISnew.ProductQuantity.prototype._bindQuantityButtons = function () {
     event.preventDefault();
 
     var $quantityButton = $(this);
-    var product = $quantityButton.parents('['+ self.selectors.product+']')[0].product;
+    var quantity = self._getInstance($quantityButton);
 
-    product.quantity._changeQuantity($quantityButton.data('quantity-change'));
+    quantity._changeQuantity($quantityButton.data('quantity-change'));
   });
 };
 
@@ -208,14 +236,15 @@ ISnew.ProductQuantity.prototype._bindQuantityButtons = function () {
 ISnew.ProductQuantity.prototype._bindQuantityInput = function () {
   var self = this;
 
-  $(document).on('blur', '[data-quantity]', function (event) {
+  $(document).on('blur', '[data-quantity] input[name]', function (event) {
+    console.log('yaaaap!!!');
     event.preventDefault();
 
-    var $quantity = $(this);
-    var product = $quantity.parents('[data-product-id]:first')[0].product;
+    var $input = $(this);
+    var quantity = self._getInstance($input);
 
-    if (product) {
-      product.quantity._setQuantity();
-    }
+    quantity._setQuantity();
   });
 };
+
+console.log('ready');
