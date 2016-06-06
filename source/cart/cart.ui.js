@@ -17,13 +17,13 @@ ISnew.CartDOM.prototype._init = function (options) {
     inProcess: 'inProcess',
     disabled: 'disabled',
 
-    form: 'cart-form',
-    add: 'cart-item-add',
-    delete: 'cart-item-delete',
-    update: 'cart-itme-update',
-    submit: 'cart-form-submit',
-    clear: 'cart-form-clear',
-    coupon: 'cart-coupon-submit'
+    form: 'data-cart-form',
+    add: 'data-item-add',
+    delete: 'data-item-delete',
+    update: 'data-cart-update',
+    submit: 'data-cart-submit',
+    clear: 'data-cart-clear',
+    coupon: 'data-coupon-submit'
   };
 
   _.assign(self.options, options);
@@ -187,7 +187,7 @@ ISnew.CartDOM.prototype._bindUpdateCart = function () {
     var $button = $(this);
     if (!$button.prop(self.options.inProcess)) {
       $button.prop(self.options.inProcess, true);
-      self.updateOrder();
+      self.updateOrder($button);
     }
   });
 
