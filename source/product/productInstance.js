@@ -88,6 +88,29 @@ ISnew.ProductInstance.prototype._initQuantity = function () {
 };
 
 /**
+ * Получаем конкретный экземпляр.
+ * Возвращет экземпляр, либо false
+ */
+ISnew.ProductInstance.prototype.getInstance = function ($object) {
+  var self = this;
+  var instance;
+
+  if (_.isObject($object[0].Product)) {
+    instance = $object[0];
+  } else {
+    instance = $object.parents('['+ self.selectors.product +']:first')[0];
+  }
+
+  if (!instance) {
+    instance = false;
+  } else {
+    instance = instance.Product
+  }
+
+  return instance;
+};
+
+/**
  * Обновление состояния
  * Должна сама забирать всю информацию из компонентов и обновлять
  * максимум - получить линк на quantity, откуда брать актуальную инфу

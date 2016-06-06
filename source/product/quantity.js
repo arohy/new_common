@@ -242,7 +242,6 @@ ISnew.ProductQuantity.prototype._bindQuantityInput = function () {
   var self = this;
 
   $(document).on('blur', '[data-quantity] input[name]', function (event) {
-    console.log('yaaaap!!!');
     event.preventDefault();
 
     var $input = $(this);
@@ -251,5 +250,3 @@ ISnew.ProductQuantity.prototype._bindQuantityInput = function () {
     quantity._setQuantity();
   });
 };
-
-console.log('ready');

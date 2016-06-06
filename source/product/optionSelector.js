@@ -57,6 +57,7 @@ ISnew.OptionSelector.prototype._init = function () {
 
   self.$optionSelector = self.$product.find('['+ self.selectors.optionSelector +']');
 
+  self._bindEvents();
   //  вызов рендера
   self._renderSelector();
 
@@ -106,63 +107,99 @@ ISnew.OptionSelector.prototype._renderOption = function (option) {
 };
 
 /**
+ * инитим события
+ */
+ISnew.OptionSelector.prototype._bindEvents = function () {
+  var self = this;
+
+  if (document._optionSelectors) {
+    return false;
+  }
+
+  document._optionSelectors = true;
+
+  self._bindSetVariant();
+  self._bindOptionTriggers();
+  self._bindEvents();
+  self._bindUpdateVariant();
+};
+
+/**
  * Навешиваем свой дефолтный слушатель для обновления рендера
  */
-EventBus.subscribe('update_variant:insales:product', function (data) {
-  if (data.action.method == 'change') {
-    var $product = data.action.form;
-    var OptionSelector = $product[0].product.optionSelector;
-    console.log('update_variant');
+ISnew.OptionSelector.prototype._bindUpdateVariant = function () {
+  var self = this;
 
-    if (OptionSelector) {
-      OptionSelector.$nativeSelect.val(data.id);
-      OptionSelector._renderSelector();
+  EventBus.subscribe('update_variant:insales:product', function (data) {
+    if (data.action.method == 'update') {
+      var product = self._owner.getInstance(data.action.product);
+      var OptionSelector;
+
+      if (!product) {
+        return false;
+      }
+
+      OptionSelector = product.optionSelector;
+
+      if (OptionSelector) {
+        OptionSelector.$nativeSelect.val(data.id);
+        OptionSelector._renderSelector();
+      }
     }
-  }
-});
+  });
+};
 
 /**
  * Слушаем изменения в нативном селекте
  */
-$(document).on('change', '[data-product-variants]', function (event) {
-  event.preventDefault();
-  var $select = $(this);
+ISnew.OptionSelector.prototype._bindSetVariant = function () {
+  var self = this;
 
-  var variantId = _.toInteger($select.val());
-  var $product = $select
-    .parents('[data-product-id]:first')[0];
+  $(document).on('change', '['+ self.selectors.nativeSelect +']', function (event) {
+    event.preventDefault();
+    var $select = $(this);
 
-  if (!$product) {
-    return false;
-  }
+    var variantId = _.toInteger($select.val());
+    var $product = $select
+      .parents('[data-product-id]:first')[0];
 
-  var product = $product.product;
+    var product = self._owner.getInstance($select);
+    if (!product) {
+      return false;
+    }
 
-  product.variants.setVariant(variantId);
-});
+    product.variants.setVariant(variantId);
+  });
+};
 
 //  Слушаем изменения в селекторах модификаций
-$(document).on('change click', '[data-option-bind]', function (event) {
-  event.preventDefault();
+ISnew.OptionSelector.prototype._bindOptionTriggers = function () {
+  var self = this;
 
-  var $option = $(this);
+  $(document).on('change click', '[data-option-bind]', function (event) {
+    event.preventDefault();
 
-  if ($option.is('select') && event.type === 'click') {
-    return false;
-  }
+    var $option = $(this);
+    var product = self._owner.getInstance($option);
+    var option;
 
-  var product = $option
-    .parents('[data-product-id]:first')[0]
-    .product;
+    if ($option.is('select') && event.type === 'click') {
+      return false;
+    }
 
-  var option = {
-    option_name_id: $option.data('option-bind'),
-    position: $option.data('value-position')
-  };
+    if (!product) {
+      return false;
+    }
 
-  if ($option.is('select')) {
-    option.position = _.toInteger($option.val());
-  }
+    option = {
+      option_name_id: $option.data('option-bind'),
+      position: $option.data('value-position')
+    };
 
-  product.variants.setOption(option);
-});
+    if ($option.is('select')) {
+      option.position = _.toInteger($option.val());
+    }
+
+    product.variants.setOption(option);
+  });
+};

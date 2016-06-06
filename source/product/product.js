@@ -25,7 +25,6 @@ ISnew.Product = function (product, settings) {
   self.settings = new ISnew.ProductSettings(settings, self);
 
   self._images = self._getImage(product.images);
-  //self.price_kinds = new ISnew.ProductPriceType(self);
 
   self._init();
 };
@@ -84,7 +83,7 @@ ISnew.Product.prototype._getImage = function (images) {
 ISnew.Product.prototype._initInstance = function () {
   var self = this;
 
-  self.$product = $('['+ self._selectors.product +'='+ self.id +']');
+  self.$product = $('['+ self._selectors.product +'="'+ self.id +'"]');
 
   self.$product.each(function () {
     new ISnew.ProductInstance(self, $(this));
