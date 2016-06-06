@@ -21,12 +21,12 @@ ISnew.SearchDOM.prototype._init = function () {
 ISnew.SearchDOM.prototype._setConfig = function () {
   var self = this;
 
-  $(function() {
+  $(function () {
     self._owner._setData({
       data: {
         account_id: Site.account.id,
         locale: Site.language.locale,
-        fields: [ 'price_min', 'price_min_available' ],
+        fields: ['price_min', 'price_min_available'],
         hide_items_out_of_stock: Site.account.hide_items
       }
     });
@@ -39,7 +39,7 @@ ISnew.SearchDOM.prototype._setConfig = function () {
 /**
  * Обработчик ввода символов
  */
-ISnew.SearchDOM.prototype._keyUp = function (event) {
+ISnew.SearchDOM.prototype._keyUp = function () {
   var self = this;
 
   $(document).on('keyup', self._owner.settings.searchSelector, function () {
@@ -56,22 +56,6 @@ ISnew.SearchDOM.prototype._keyUp = function (event) {
 };
 
 /**
- * Перехват клика за пределами поиска
- */
-ISnew.SearchDOM.prototype._outClick = function () {
-  var self = AjaxSearch._ui;
-
-  if ($(event.target).closest(self.$searchForm).length) {
-    return
-  };
-
-  self._owner._update({});
-
-  event.stopPropagation();
-  $(document).off('click', 'body', self._outClick);
-};
-
-/**
  * Вешаем слушателя на обновление данных из поиска
  */
 ISnew.SearchDOM.prototype._events = function () {
@@ -83,15 +67,6 @@ ISnew.SearchDOM.prototype._events = function () {
       data.action.form
         .find('[data-search-result]')
           .html(Template.render(data, self._owner.settings.template));
-    }
-  });
-
-  // вешаем клик за пределами формы
-  EventBus.subscribe('update:insales:search', function (data) {
-    if (data.action.method == 'close') {
-      $(document).off('click', 'body', self._outClick);
-    } else {
-      $(document).on('click', 'body', self._outClick);
     }
   });
 };

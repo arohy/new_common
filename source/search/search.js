@@ -13,12 +13,13 @@ ISnew.Search = function () {
       searchSelector: '[data-search-field]',
       markerClass: 'ajax_search-marked',
       letters: 3,
-      template: 'search-default'
+      template: 'search-default',
+      delay: 300
     }
   };
 
   //
-  self.path = '/search_suggestions'
+  self.path = '/search_suggestions';
   self.keyupTimeoutID = '';
 
   self._init();
@@ -47,19 +48,27 @@ ISnew.Search.prototype._init = function () {
 ISnew.Search.prototype._get = function (options) {
   var self = this;
 
+  EventBus.publish('before:insales:search');
+
   clearTimeout(self.keyupTimeoutID);
 
   if (self._isValid(options.query)) {
-    self.data.query = options.query
+    self.data.query = options.query;
     self.keyupTimeoutID = setTimeout(function () {
       $.getJSON(self.path, self.data,
         function (response) {
-          var data = _.merge(options, response, { method: 'update' });
+          var methodName
+          if (response.suggestions.length == 0) {
+            methodName = 'empty';
+          } else {
+            methodName = 'update';
+          }
+          var data = _.merge(options, response, { method: methodName });
           self._update(data);
         });
-    }, 300);
+    }, self.settings.delay);
   } else {
-    var data = _.merge(options, { method: 'close' });
+    var data = _.merge(options, { method: 'invalid' });
     self._update(data);
   }
 };
@@ -71,10 +80,6 @@ ISnew.Search.prototype._update = function (options) {
     suggestions: self._patch(options),
     action: options
   };
-
-  if (data.suggestions.length == 0) {
-    data.action.method = 'close';
-  }
 
   EventBus.publish('update:insales:search', data);
 };
