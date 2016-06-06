@@ -17237,13 +17237,13 @@ ISnew.CartDOM.prototype._init = function (options) {
     inProcess: 'inProcess',
     disabled: 'disabled',
 
-    form: 'cart-form',
-    add: 'cart-item-add',
-    delete: 'cart-item-delete',
-    update: 'cart-itme-update',
-    submit: 'cart-form-submit',
-    clear: 'cart-form-clear',
-    coupon: 'cart-coupon-submit'
+    form: 'data-cart-form',
+    add: 'data-item-add',
+    delete: 'data-item-delete',
+    update: 'data-cart-update',
+    submit: 'data-cart-submit',
+    clear: 'data-cart-clear',
+    coupon: 'data-coupon-submit'
   };
 
   _.assign(self.options, options);
@@ -17407,7 +17407,7 @@ ISnew.CartDOM.prototype._bindUpdateCart = function () {
     var $button = $(this);
     if (!$button.prop(self.options.inProcess)) {
       $button.prop(self.options.inProcess, true);
-      self.updateOrder();
+      self.updateOrder($button);
     }
   });
 
@@ -17597,6 +17597,7 @@ ISnew.OptionSelector.prototype._init = function () {
 
   self.$optionSelector = self.$product.find('['+ self.selectors.optionSelector +']');
 
+  self._bindEvents();
   //  вызов рендера
   self._renderSelector();
 
@@ -17646,66 +17647,102 @@ ISnew.OptionSelector.prototype._renderOption = function (option) {
 };
 
 /**
+ * инитим события
+ */
+ISnew.OptionSelector.prototype._bindEvents = function () {
+  var self = this;
+
+  if (document._optionSelectors) {
+    return false;
+  }
+
+  document._optionSelectors = true;
+
+  self._bindSetVariant();
+  self._bindOptionTriggers();
+  self._bindEvents();
+  self._bindUpdateVariant();
+};
+
+/**
  * Навешиваем свой дефолтный слушатель для обновления рендера
  */
-EventBus.subscribe('update_variant:insales:product', function (data) {
-  if (data.action.method == 'change') {
-    var $product = data.action.form;
-    var OptionSelector = $product[0].product.optionSelector;
-    console.log('update_variant');
+ISnew.OptionSelector.prototype._bindUpdateVariant = function () {
+  var self = this;
 
-    if (OptionSelector) {
-      OptionSelector.$nativeSelect.val(data.id);
-      OptionSelector._renderSelector();
+  EventBus.subscribe('update_variant:insales:product', function (data) {
+    if (data.action.method == 'update') {
+      var product = self._owner.getInstance(data.action.product);
+      var OptionSelector;
+
+      if (!product) {
+        return false;
+      }
+
+      OptionSelector = product.optionSelector;
+
+      if (OptionSelector) {
+        OptionSelector.$nativeSelect.val(data.id);
+        OptionSelector._renderSelector();
+      }
     }
-  }
-});
+  });
+};
 
 /**
  * Слушаем изменения в нативном селекте
  */
-$(document).on('change', '[data-product-variants]', function (event) {
-  event.preventDefault();
-  var $select = $(this);
+ISnew.OptionSelector.prototype._bindSetVariant = function () {
+  var self = this;
 
-  var variantId = _.toInteger($select.val());
-  var $product = $select
-    .parents('[data-product-id]:first')[0];
+  $(document).on('change', '['+ self.selectors.nativeSelect +']', function (event) {
+    event.preventDefault();
+    var $select = $(this);
 
-  if (!$product) {
-    return false;
-  }
+    var variantId = _.toInteger($select.val());
+    var $product = $select
+      .parents('[data-product-id]:first')[0];
 
-  var product = $product.product;
+    var product = self._owner.getInstance($select);
+    if (!product) {
+      return false;
+    }
 
-  product.variants.setVariant(variantId);
-});
+    product.variants.setVariant(variantId);
+  });
+};
 
 //  Слушаем изменения в селекторах модификаций
-$(document).on('change click', '[data-option-bind]', function (event) {
-  event.preventDefault();
+ISnew.OptionSelector.prototype._bindOptionTriggers = function () {
+  var self = this;
 
-  var $option = $(this);
+  $(document).on('change click', '[data-option-bind]', function (event) {
+    event.preventDefault();
 
-  if ($option.is('select') && event.type === 'click') {
-    return false;
-  }
+    var $option = $(this);
+    var product = self._owner.getInstance($option);
+    var option;
 
-  var product = $option
-    .parents('[data-product-id]:first')[0]
-    .product;
+    if ($option.is('select') && event.type === 'click') {
+      return false;
+    }
 
-  var option = {
-    option_name_id: $option.data('option-bind'),
-    position: $option.data('value-position')
-  };
+    if (!product) {
+      return false;
+    }
 
-  if ($option.is('select')) {
-    option.position = _.toInteger($option.val());
-  }
+    option = {
+      option_name_id: $option.data('option-bind'),
+      position: $option.data('value-position')
+    };
 
-  product.variants.setOption(option);
-});
+    if ($option.is('select')) {
+      option.position = _.toInteger($option.val());
+    }
+
+    product.variants.setOption(option);
+  });
+};
 /**
  * Типы цен
  *
@@ -17804,7 +17841,6 @@ ISnew.Product = function (product, settings) {
   self.settings = new ISnew.ProductSettings(settings, self);
 
   self._images = self._getImage(product.images);
-  //self.price_kinds = new ISnew.ProductPriceType(self);
 
   self._init();
 };
@@ -17863,7 +17899,7 @@ ISnew.Product.prototype._getImage = function (images) {
 ISnew.Product.prototype._initInstance = function () {
   var self = this;
 
-  self.$product = $('['+ self._selectors.product +'='+ self.id +']');
+  self.$product = $('['+ self._selectors.product +'="'+ self.id +'"]');
 
   self.$product.each(function () {
     new ISnew.ProductInstance(self, $(this));
@@ -17956,6 +17992,29 @@ ISnew.ProductInstance.prototype._initQuantity = function () {
   $quantity.each(function (index) {
     self.quantity[index] = new ISnew.ProductQuantity(self, this);
   });
+};
+
+/**
+ * Получаем конкретный экземпляр.
+ * Возвращет экземпляр, либо false
+ */
+ISnew.ProductInstance.prototype.getInstance = function ($object) {
+  var self = this;
+  var instance;
+
+  if (_.isObject($object[0].Product)) {
+    instance = $object[0];
+  } else {
+    instance = $object.parents('['+ self.selectors.product +']:first')[0];
+  }
+
+  if (!instance) {
+    instance = false;
+  } else {
+    instance = instance.Product
+  }
+
+  return instance;
 };
 
 /**
@@ -18255,7 +18314,6 @@ ISnew.ProductQuantity.prototype._bindQuantityInput = function () {
   var self = this;
 
   $(document).on('blur', '[data-quantity] input[name]', function (event) {
-    console.log('yaaaap!!!');
     event.preventDefault();
 
     var $input = $(this);
@@ -18264,8 +18322,6 @@ ISnew.ProductQuantity.prototype._bindQuantityInput = function () {
     quantity._setQuantity();
   });
 };
-
-console.log('ready');
 /**
  * Класс для работы с настройками Продукта
  */
