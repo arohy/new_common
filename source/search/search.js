@@ -10,15 +10,17 @@ ISnew.Search = function () {
   // настройки по-умолчанию
   self._default = {
     settings: {
-      searchSelector: '[data-search-field]',
+      searchSelector: 'data-search-field',
+      resultPlaceholder: 'data-search-result',
       markerClass: 'ajax_search-marked',
       letters: 3,
-      template: 'search-default'
+      template: 'search-default',
+      delay: 300
     }
   };
 
   //
-  self.path = '/search_suggestions'
+  self.path = '/search_suggestions';
   self.keyupTimeoutID = '';
 
   self._init();
@@ -47,20 +49,19 @@ ISnew.Search.prototype._init = function () {
 ISnew.Search.prototype._get = function (options) {
   var self = this;
 
+  EventBus.publish('before:insales:search');
+
   clearTimeout(self.keyupTimeoutID);
 
   if (self._isValid(options.query)) {
-    self.data.query = options.query
+    self.data.query = options.query;
     self.keyupTimeoutID = setTimeout(function () {
-      $.getJSON(self.path, self.data,
-        function (response) {
-          var data = _.merge(options, response, { method: 'update' });
-          self._update(data);
-        });
-    }, 300);
+      $.getJSON(self.path, self.data, function (response) {
+        self._update(_.merge(options, response));
+      });
+    }, self.settings.delay);
   } else {
-    var data = _.merge(options, { method: 'close' });
-    self._update(data);
+    self._update(options);
   }
 };
 
@@ -72,9 +73,11 @@ ISnew.Search.prototype._update = function (options) {
     action: options
   };
 
-  if (data.suggestions.length == 0) {
-    data.action.method = 'close';
-  }
+  data.valid = self._isValid(options.query);
+  data.empty = !(_.size(options.suggestions) || _.size(options.query));
+  data.letters = self.settings.letters;
+
+  _.unset(data.action, 'suggestions');
 
   EventBus.publish('update:insales:search', data);
 };
@@ -99,10 +102,10 @@ ISnew.Search.prototype.setConfig = function (settings) {
  * fields: [ 'price_min', 'price_min_available' ],
  * hide_items_out_of_stock: Site.account.hide_items
  */
-ISnew.Search.prototype._setData = function (data) {
+ISnew.Search.prototype._setData = function (_data) {
   var self = this;
 
-  _.merge(self, data);
+  _.merge(self, { data: _data });
 };
 
 /**
@@ -116,7 +119,7 @@ ISnew.Search.prototype._patch = function (options) {
       id: product.data,
       url: '/product_by_id/'+ product.data,
       title: product.value,
-      markedTitle: product.value.replace(new RegExp('('+ options.query +')', 'gi'), self.settings.replacment)
+      markedTitle: product.value
     };
 
     result.push(_.merge(product, temp));

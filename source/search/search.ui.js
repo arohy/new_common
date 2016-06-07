@@ -4,6 +4,8 @@ ISnew.SearchDOM = function (_owner) {
   self._owner = _owner;
   self.settings = self._owner.settings;
 
+  self.settings.inProcess = 'inProcess';
+
   self._init();
 }
 
@@ -13,6 +15,7 @@ ISnew.SearchDOM.prototype._init = function () {
   self._setConfig();
   self._keyUp();
   self._events();
+  self._outFocus();
 };
 
 /**
@@ -21,54 +24,65 @@ ISnew.SearchDOM.prototype._init = function () {
 ISnew.SearchDOM.prototype._setConfig = function () {
   var self = this;
 
-  $(function() {
+  $(function () {
     self._owner._setData({
-      data: {
-        account_id: Site.account.id,
-        locale: Site.language.locale,
-        fields: [ 'price_min', 'price_min_available' ],
-        hide_items_out_of_stock: Site.account.hide_items
-      }
+      account_id: Site.account.id,
+      locale: Site.language.locale,
+      fields: ['price_min', 'price_min_available'],
+      hide_items_out_of_stock: Site.account.hide_items
     });
 
-    self.$searchField = $(self._owner.settings.searchSelector);
+    self.$searchField = $('['+ self.settings.searchSelector +']');
     self.$searchForm = self.$searchField.parents('form:first');
+
+    self.$searchField.attr(self.settings.inProcess, false);
   });
+};
+
+ISnew.SearchDOM.prototype._getInstance = function ($object) {
+  var self = this;
+  var $search;
+  var _target = $object.data('target');
+
+  if (_target) {
+    $search = $(_target);
+  } else {
+    $search = $object.parents('form:first');
+  }
+
+  return $search;
 };
 
 /**
  * Обработчик ввода символов
  */
-ISnew.SearchDOM.prototype._keyUp = function (event) {
+ISnew.SearchDOM.prototype._keyUp = function () {
   var self = this;
 
-  $(document).on('keyup', self._owner.settings.searchSelector, function () {
-    var data = {};
+  $(document).on('keyup', '['+ self.settings.searchSelector +']', function () {
     var $input = $(this);
-    var $form = $input.parents('form:first');
+    var $form = self._getInstance($input);
+    var _query = $input.val();
+    var _inProcess = $input.prop(self.settings.inProcess);
+
+    // блокировка ввода
+    if (_inProcess) {
+      return;
+    }
+
+    if ($input[0]._queryLength == _query.length) {
+      return
+    }
+
+    $input[0]._queryLength = _query.length;
+    $input.prop(self.settings.inProcess, true);
 
     self._owner._get({
-      query: $input.val(),
+      query: _query,
       input: $input,
       form: $form
     });
   });
-};
-
-/**
- * Перехват клика за пределами поиска
- */
-ISnew.SearchDOM.prototype._outClick = function () {
-  var self = AjaxSearch._ui;
-
-  if ($(event.target).closest(self.$searchForm).length) {
-    return
-  };
-
-  self._owner._update({});
-
-  event.stopPropagation();
-  $(document).off('click', 'body', self._outClick);
 };
 
 /**
@@ -81,17 +95,27 @@ ISnew.SearchDOM.prototype._events = function () {
     //  срабатывает на события внутри формы
     if (data.action.form) {
       data.action.form
-        .find('[data-search-result]')
-          .html(Template.render(data, self._owner.settings.template));
+        .find('['+ self.settings.resultPlaceholder +']')
+          .html(Template.render(data, self.settings.template));
     }
-  });
 
-  // вешаем клик за пределами формы
-  EventBus.subscribe('update:insales:search', function (data) {
-    if (data.action.method == 'close') {
-      $(document).off('click', 'body', self._outClick);
-    } else {
-      $(document).on('click', 'body', self._outClick);
-    }
+    data.action.input
+      .prop(self.settings.inProcess, false)
+      .trigger('keyup');
+  });
+};
+
+ISnew.SearchDOM.prototype._outFocus = function () {
+  var self = this;
+
+  $(document).on('blur', '['+ self.settings.searchSelector +']', function (event) {
+    var $input = $(this);
+    var $form = self._getInstance($input);
+
+    self._owner._get({
+      query: '',
+      input: $input,
+      form: $form,
+    });
   });
 };
