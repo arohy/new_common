@@ -57,17 +57,11 @@ ISnew.Search.prototype._get = function (options) {
     self.data.query = options.query;
     self.keyupTimeoutID = setTimeout(function () {
       $.getJSON(self.path, self.data, function (response) {
-        var status= 'update';
-        if (response.suggestions.length == 0) {
-          status = 'empty';
-        }
-        var data = _.merge(options, response, { status: status });
-        self._update(data);
+        self._update(_.merge(options, response));
       });
     }, self.settings.delay);
   } else {
-    var data = _.merge(options, { status: 'invalid' });
-    self._update(data);
+    self._update(options);
   }
 };
 
@@ -78,6 +72,10 @@ ISnew.Search.prototype._update = function (options) {
     suggestions: self._patch(options),
     action: options
   };
+
+  data.valid = self._isValid(options.query);
+  data.empty = !(_.size(options.suggestions) || _.size(options.query));
+  data.letters = self.settings.letters;
 
   _.unset(data.action, 'suggestions');
 
