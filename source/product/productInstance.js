@@ -124,8 +124,16 @@ ISnew.ProductInstance.prototype._updateStatus = function (status) {
 
   // если обновление вызвала смена варианта, то обновляем чиселку
   // и убиваем поток
+  _$input = self.quantity[0];
+
+  // если в верстке не указан контейнеры со счетчиками - отваливаемся 
+  if (_$input === undefined) {
+    console.warn('Product: Quantity', 'Не указан блок "Количество товаров" для ', self.$product);
+    return false;
+  }
+
   if (status.event == 'update_variant') {
-    self.quantity[0].setVariant(self.variants.getVariant());
+    _$input.setVariant(self.variants.getVariant());
     return false;
   };
 
@@ -133,8 +141,8 @@ ISnew.ProductInstance.prototype._updateStatus = function (status) {
   if (self._hasSelector) {
     // если в инстансе есть селектор
     _variant = self.variants.getVariant();
-    _quantity = self.quantity[0].get();
-    _$input = self.quantity[0].$input;
+    _quantity = _$input.get();
+    _$input = _$input.$input;
   } else {
     // если у нас куча считалок
     _variant = status.instance.variant;

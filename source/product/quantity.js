@@ -197,8 +197,17 @@ ISnew.ProductQuantity.prototype._update = function () {
  */
 ISnew.ProductQuantity.prototype._getInstance = function ($selector) {
   var self = this;
+  var _instance = $selector.parents('['+ self.selectors.quantity+']')[0];
 
-  return $selector.parents('['+ self.selectors.quantity+']')[0].Quantity;
+  if (_instance !== undefined) {
+    _instance = _instance.Quantity
+  } else {
+    // если не нашли экземпляр - говорим, что продолбалось, отваливаемся
+    console.warn('Product: Quantity', 'Не указан блок "Количество товаров" для', $selector);
+    return false;
+  }
+
+  return _instance;
 };
 
 /**
