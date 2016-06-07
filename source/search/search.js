@@ -80,8 +80,6 @@ ISnew.Search.prototype._update = function (options) {
   _.unset(data.action, 'suggestions');
 
   EventBus.publish('update:insales:search', data);
-
-  EventBus.publish('always:insales:search', data);
 };
 
 /**
