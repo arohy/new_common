@@ -10,7 +10,8 @@ ISnew.Search = function () {
   // настройки по-умолчанию
   self._default = {
     settings: {
-      searchSelector: '[data-search-field]',
+      searchSelector: 'data-search-field',
+      resultPlaceholder: 'data-search-result',
       markerClass: 'ajax_search-marked',
       letters: 3,
       template: 'search-default',
@@ -55,20 +56,17 @@ ISnew.Search.prototype._get = function (options) {
   if (self._isValid(options.query)) {
     self.data.query = options.query;
     self.keyupTimeoutID = setTimeout(function () {
-      $.getJSON(self.path, self.data,
-        function (response) {
-          var methodName
-          if (response.suggestions.length == 0) {
-            methodName = 'empty';
-          } else {
-            methodName = 'update';
-          }
-          var data = _.merge(options, response, { method: methodName });
-          self._update(data);
-        });
+      $.getJSON(self.path, self.data, function (response) {
+        var status= 'update';
+        if (response.suggestions.length == 0) {
+          status = 'empty';
+        }
+        var data = _.merge(options, response, { status: status });
+        self._update(data);
+      });
     }, self.settings.delay);
   } else {
-    var data = _.merge(options, { method: 'invalid' });
+    var data = _.merge(options, { status: 'invalid' });
     self._update(data);
   }
 };
@@ -81,7 +79,11 @@ ISnew.Search.prototype._update = function (options) {
     action: options
   };
 
+  _.unset(data.action, 'suggestions');
+
   EventBus.publish('update:insales:search', data);
+
+  EventBus.publish('always:insales:search', data);
 };
 
 /**
@@ -104,10 +106,10 @@ ISnew.Search.prototype.setConfig = function (settings) {
  * fields: [ 'price_min', 'price_min_available' ],
  * hide_items_out_of_stock: Site.account.hide_items
  */
-ISnew.Search.prototype._setData = function (data) {
+ISnew.Search.prototype._setData = function (_data) {
   var self = this;
 
-  _.merge(self, data);
+  _.merge(self, { data: _data });
 };
 
 /**
@@ -121,7 +123,7 @@ ISnew.Search.prototype._patch = function (options) {
       id: product.data,
       url: '/product_by_id/'+ product.data,
       title: product.value,
-      markedTitle: product.value.replace(new RegExp('('+ options.query +')', 'gi'), self.settings.replacment)
+      markedTitle: product.value
     };
 
     result.push(_.merge(product, temp));
