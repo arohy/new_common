@@ -12,8 +12,8 @@ ISnew.CompareDOM.prototype._init = function (options) {
   var self = this;
 
   self.options = {
-    add: 'compare-item-add',
-    delete: 'compare-item-delete',
+    add: 'data-compare-add',
+    delete: 'data-compare-delete',
 
     disabled: 'disabled',
     inProcess: 'inProcess'
