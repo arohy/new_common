@@ -195,6 +195,24 @@ ISnew.CartDOM.prototype._bindUpdateCart = function () {
   EventBus.subscribe('always:insales:cart', function (data) {
     self._unlockButton(data, 'set_items');
   });
+
+  // Слушаем изменение кол-ва товара в корзине
+  $(function () {
+    // находим форму
+    var $form = $(form);
+
+    // есть ли она?
+    if ($form.length) {
+      // подписываемся на событие
+      EventBus.subscribe('change_quantity:insales:product', function (data) {
+        // а оно было в форме?
+        if (data.action.product.closest($form).length) {
+          // все ок, пинаем
+          self.updateOrder();
+        }
+      });
+    }
+  });
 };
 
 /**
