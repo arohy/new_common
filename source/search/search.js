@@ -113,13 +113,14 @@ ISnew.Search.prototype._setData = function (_data) {
  */
 ISnew.Search.prototype._patch = function (options) {
   var self = this;
+  var _regExp = new RegExp('('+ Site.RegExp.escape(options.query) +')', 'gi');
 
   return _.reduce(options.suggestions, function (result, product) {
     var temp = {
       id: product.data,
       url: '/product_by_id/'+ product.data,
       title: product.value,
-      markedTitle: product.value
+      markedTitle: product.value.replace(_regExp, self.settings.replacment)
     };
 
     result.push(_.merge(product, temp));
