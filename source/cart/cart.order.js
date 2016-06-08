@@ -42,11 +42,19 @@ ISnew.CartOrder.prototype.getItems = function () {
   return items;
 };
 
+ISnew.CartOrder.prototype.getComments = function () {
+  var self = this;
+
+  return self.order_line_comments;
+};
+
 /**
  * Фиксим инфу по корзине
  */
 ISnew.CartOrder.prototype._patch = function (current_order) {
   var self = this;
+
+  console.log(current_order);
 
   self.order_lines = current_order.order_lines || current_order.items;
   self.order_line_comments = current_order.order_line_comments || current_order.order.order_line_comments;

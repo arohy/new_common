@@ -4,15 +4,6 @@
 ISnew.CartDOM = function (options) {
   var self = this;
 
-  self._init(options);
-};
-
-/**
- * Инициализация
- */
-ISnew.CartDOM.prototype._init = function (options) {
-  var self = this;
-
   self.options = {
     inProcess: 'inProcess',
     disabled: 'disabled',
@@ -25,6 +16,15 @@ ISnew.CartDOM.prototype._init = function (options) {
     clear: 'data-cart-clear',
     coupon: 'data-coupon-submit'
   };
+
+  self._init(options);
+};
+
+/**
+ * Инициализация
+ */
+ISnew.CartDOM.prototype._init = function (options) {
+  var self = this;
 
   _.assign(self.options, options);
 
@@ -48,9 +48,11 @@ ISnew.CartDOM.prototype._addItem = function ($button) {
   var $fields = $form.find('[name*="variant_ids"]');
   var $one_variant = $form.find('[name="variant_id"]');
   var $quantity = $form.find('input[name="quantity"]');
+  var $comment = $form.find('[name="comment"]');
 
   var task = {
     items: {},
+    comments: {},
     button: $button,
     form: $form,
     coupon: self._getCoupon($form)
@@ -59,10 +61,14 @@ ISnew.CartDOM.prototype._addItem = function ($button) {
   // складываем данные в объект
   // если в форме был стандартный селектор модификаций, кладем отдельно
   if ($one_variant.length == 1) {
-    task.items[parseInt($one_variant.val())] = parseFloat($quantity.val());
+    task.items[_.toInteger($one_variant.val())] = parseFloat($quantity.val());
+    task.comments[_.toInteger($one_variant.val())] = $comment.val();
   }
   _.assign(task.items, self._getItems($fields));
 
+  _.assign(task.comments, self._getComments($form));
+
+  console.log('_addItem:', task);
   // посылаем данные в корзину
   Cart.add(task);
   return;
@@ -302,7 +308,7 @@ ISnew.CartDOM.prototype._bindCoupon = function () {
  * Вытаскиваем id из строки
  */
 ISnew.CartDOM.prototype._getId = function (string) {
-  return parseInt(string.replace(/\D+/g, ''));
+  return _.toInteger(string.replace(/\D+/g, ''));
 };
 
 /**
@@ -335,4 +341,17 @@ ISnew.CartDOM.prototype._unlockButton = function (data, eventName) {
   }
 
   return;
+};
+
+ISnew.CartDOM.prototype._getComments = function ($form) {
+  var self = this;
+  var comments = {};
+  var $comments = $form.find('[name*="cart[order_line_comments]"]');
+
+  $comments.each(function () {
+    var $comment = $(this);
+    comments[self._getId($comment.attr('name'))] = $comment.val();
+  });
+
+  return comments;
 };

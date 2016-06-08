@@ -52,7 +52,9 @@ ISnew.CartTasks.prototype._push = function () {
   var self = this;
   var tasks = self._taskToWork;
   var items_set = self._owner.order.getItems();
-  var result_task = {};
+  var result_task = {
+    comments: self._owner.order.getComments()
+  };
 
   // если залокано запросом - посылаем в утиль
   if (self._lock || tasks.length == 0) {
@@ -76,6 +78,7 @@ ISnew.CartTasks.prototype._push = function () {
     result_task.coupon = task.coupon;
   }, items_set);
 
+  console.log('CartTasks: _push: ', items_set, result_task);
   self._send(items_set, result_task);
   return;
 };
