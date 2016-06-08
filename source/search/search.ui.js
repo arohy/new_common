@@ -92,30 +92,41 @@ ISnew.SearchDOM.prototype._events = function () {
   var self = this;
 
   EventBus.subscribe('update:insales:search', function (data) {
-    //  срабатывает на события внутри формы
+    var $node;
     if (data.action.form) {
-      data.action.form
-        .find('['+ self.settings.resultPlaceholder +']')
-          .html(Template.render(data, self.settings.template));
+      // срабатывает на события внутри формы
+      $node = data.action.form
+        .find('['+ self.settings.resultPlaceholder +']');
+    } else {
+      // убиваем потраха во всех формах
+      $node = $('['+ self.settings.resultPlaceholder +']')
     }
 
-    data.action.input
-      .prop(self.settings.inProcess, false)
-      .trigger('keyup');
+    $node.html(Template.render(data, self.settings.template));
+
+    // если указан инпут, который надо разлочить
+    if (data.action.input) {
+      data.action.input
+        .prop(self.settings.inProcess, false)
+        .trigger('keyup');
+    }
   });
 };
 
+/**
+ * Перехватываем клик вне поиска
+ */
 ISnew.SearchDOM.prototype._outFocus = function () {
   var self = this;
 
-  $(document).on('blur', '['+ self.settings.searchSelector +']', function (event) {
-    var $input = $(this);
-    var $form = self._getInstance($input);
+  $(document).on('click', function (event) {
+    var $input = $('['+ self.settings.searchSelector +']');
+    var $form = $input.parents('form:first');
 
-    self._owner._get({
-      query: '',
-      input: $input,
-      form: $form,
-    });
+    if (!$(event.target).closest($form).length) {
+      self._owner._get({
+        query: ''
+      });
+    }
   });
 };
