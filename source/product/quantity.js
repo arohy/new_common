@@ -121,6 +121,7 @@ ISnew.ProductQuantity.prototype.get = function () {
   var self = this;
   var _quantity = _.clone(self.quantity);
   _.unset(_quantity, 'toCheck');
+
   if (!self.settings.useMax) {
     _.unset(_quantity, 'max');
   }
@@ -134,7 +135,7 @@ ISnew.ProductQuantity.prototype.get = function () {
 ISnew.ProductQuantity.prototype._changeQuantity = function (value) {
   var self = this;
 
-  self.quantity.toCheck += parseFloat(value);
+  self.quantity.toCheck += parseFloat(value.toFixed(self.decimal));
 
   self._check();
 };
@@ -167,7 +168,7 @@ ISnew.ProductQuantity.prototype._check = function () {
   }
 
   // все ок
-  self.quantity.current = self.quantity.toCheck;
+  self.quantity.current = parseFloat(self.quantity.toCheck.toFixed(self.decimal));
   // дергаем статусы
   self._update();
 };
@@ -178,7 +179,7 @@ ISnew.ProductQuantity.prototype._check = function () {
 ISnew.ProductQuantity.prototype._update = function () {
   var self = this;
 
-  self.$input.val(self.quantity.current);
+  self.$input.val(self.quantity.current.toFixed(self.decimal));
 
   if (self._onInit) {
     self._onInit = false;
