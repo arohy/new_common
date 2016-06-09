@@ -73,8 +73,8 @@ ISnew.Search.prototype._update = function (options) {
     action: options
   };
 
-  data.valid = self._isValid(options.query);
-  data.empty = !(_.size(options.suggestions) || _.size(options.query));
+  data.invalid = !self._isValid(options.query);
+  data.empty = !_.size(options.suggestions);
   data.letters = self.settings.letters;
 
   _.unset(data.action, 'suggestions');

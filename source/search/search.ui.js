@@ -65,6 +65,8 @@ ISnew.SearchDOM.prototype._keyUp = function () {
     var _query = $input.val();
     var _inProcess = $input.prop(self.settings.inProcess);
 
+    document._searchActive = true;
+
     // блокировка ввода
     if (_inProcess) {
       return;
@@ -93,6 +95,7 @@ ISnew.SearchDOM.prototype._events = function () {
 
   EventBus.subscribe('update:insales:search', function (data) {
     var $node;
+
     if (data.action.form) {
       // срабатывает на события внутри формы
       $node = data.action.form
@@ -103,6 +106,8 @@ ISnew.SearchDOM.prototype._events = function () {
     }
 
     $node.html(Template.render(data, self.settings.template));
+
+    document._searchActive = false;
 
     // если указан инпут, который надо разлочить
     if (data.action.input) {
@@ -123,9 +128,9 @@ ISnew.SearchDOM.prototype._outFocus = function () {
     var $input = $('['+ self.settings.searchSelector +']');
     var $form = $input.parents('form:first');
 
-    if (!$(event.target).closest($form).length) {
+    if (document._searchActive && !$(event.target).closest($form).length) {
       self._owner._get({
-        query: ''
+        query: '',
       });
     }
   });
