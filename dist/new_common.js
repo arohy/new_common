@@ -16349,6 +16349,22 @@ ISnew.tools.Error = function (name, message) {
 
   return self;
 };
+ISnew.tools.RegExp = function () {
+  var self = this;
+
+  self._toEscape = /[|\\{}()[\]^$+*?.]/g;
+}
+
+ISnew.tools.RegExp.prototype.escape = function (string) {
+  var self = this;
+
+  if (!_.isString(string)) {
+    console.warn('not string: ', string);
+    return false;
+  }
+
+  return string.replace(self._toEscape, '\\$&');
+};
 /**
  * производим транслитерацию строки
  */
@@ -16701,6 +16717,7 @@ ISnew.json.updateCartItems = function (items, options) {
   var fields = {
     '_method': 'put'
   };
+
   options = options || {};
 
   _.forIn(items, function(quantity, variant_id) {
@@ -16964,6 +16981,12 @@ ISnew.CartOrder.prototype.getItems = function () {
   return items;
 };
 
+ISnew.CartOrder.prototype.getComments = function () {
+  var self = this;
+
+  return self.order_line_comments;
+};
+
 /**
  * Фиксим инфу по корзине
  */
@@ -17093,7 +17116,9 @@ ISnew.CartTasks.prototype._push = function () {
   var self = this;
   var tasks = self._taskToWork;
   var items_set = self._owner.order.getItems();
-  var result_task = {};
+  var result_task = {
+    comments: self._owner.order.getComments()
+  };
 
   // если залокано запросом - посылаем в утиль
   if (self._lock || tasks.length == 0) {
@@ -17173,8 +17198,6 @@ ISnew.CartTasks.prototype._done = function (order) {
 ISnew.CartTasks.prototype._fail = function (response) {
   var self = this;
 
-  console.log('cart:update:fail', response);
-
   // если не прокатило - заливаем обратно таски
   if (self._taskInWork.length != 0) {
     _.concat(self._taskToWork, self._taskInWork);
@@ -17224,15 +17247,6 @@ ISnew.CartTasks.prototype._before = function () {
 ISnew.CartDOM = function (options) {
   var self = this;
 
-  self._init(options);
-};
-
-/**
- * Инициализация
- */
-ISnew.CartDOM.prototype._init = function (options) {
-  var self = this;
-
   self.options = {
     inProcess: 'inProcess',
     disabled: 'disabled',
@@ -17245,6 +17259,15 @@ ISnew.CartDOM.prototype._init = function (options) {
     clear: 'data-cart-clear',
     coupon: 'data-coupon-submit'
   };
+
+  self._init(options);
+};
+
+/**
+ * Инициализация
+ */
+ISnew.CartDOM.prototype._init = function (options) {
+  var self = this;
 
   _.assign(self.options, options);
 
@@ -17268,9 +17291,11 @@ ISnew.CartDOM.prototype._addItem = function ($button) {
   var $fields = $form.find('[name*="variant_ids"]');
   var $one_variant = $form.find('[name="variant_id"]');
   var $quantity = $form.find('input[name="quantity"]');
+  var $comment = $form.find('[name="comment"]');
 
   var task = {
     items: {},
+    comments: {},
     button: $button,
     form: $form,
     coupon: self._getCoupon($form)
@@ -17279,9 +17304,12 @@ ISnew.CartDOM.prototype._addItem = function ($button) {
   // складываем данные в объект
   // если в форме был стандартный селектор модификаций, кладем отдельно
   if ($one_variant.length == 1) {
-    task.items[parseInt($one_variant.val())] = parseFloat($quantity.val());
+    task.items[_.toInteger($one_variant.val())] = parseFloat($quantity.val());
+    task.comments[_.toInteger($one_variant.val())] = $comment.val();
   }
   _.assign(task.items, self._getItems($fields));
+
+  _.assign(task.comments, self._getComments($form));
 
   // посылаем данные в корзину
   Cart.add(task);
@@ -17415,6 +17443,24 @@ ISnew.CartDOM.prototype._bindUpdateCart = function () {
   EventBus.subscribe('always:insales:cart', function (data) {
     self._unlockButton(data, 'set_items');
   });
+
+  // Слушаем изменение кол-ва товара в корзине
+  $(function () {
+    // находим форму
+    var $form = $(form);
+
+    // есть ли она?
+    if ($form.length) {
+      // подписываемся на событие
+      EventBus.subscribe('change_quantity:insales:product', function (data) {
+        // а оно было в форме?
+        if (data.action.product.closest($form).length) {
+          // все ок, пинаем
+          self.updateOrder();
+        }
+      });
+    }
+  });
 };
 
 /**
@@ -17504,7 +17550,7 @@ ISnew.CartDOM.prototype._bindCoupon = function () {
  * Вытаскиваем id из строки
  */
 ISnew.CartDOM.prototype._getId = function (string) {
-  return parseInt(string.replace(/\D+/g, ''));
+  return _.toInteger(string.replace(/\D+/g, ''));
 };
 
 /**
@@ -17537,6 +17583,19 @@ ISnew.CartDOM.prototype._unlockButton = function (data, eventName) {
   }
 
   return;
+};
+
+ISnew.CartDOM.prototype._getComments = function ($form) {
+  var self = this;
+  var comments = {};
+  var $comments = $form.find('[name*="cart[order_line_comments]"]');
+
+  $comments.each(function () {
+    var $comment = $(this);
+    comments[self._getId($comment.attr('name'))] = $comment.val();
+  });
+
+  return comments;
 };
 /**
  * Объект отвечающий за работу опшн селектора
@@ -18031,8 +18090,16 @@ ISnew.ProductInstance.prototype._updateStatus = function (status) {
 
   // если обновление вызвала смена варианта, то обновляем чиселку
   // и убиваем поток
+  _$input = self.quantity[0];
+
+  // если в верстке не указан контейнеры со счетчиками - отваливаемся 
+  if (_$input === undefined) {
+    console.warn('Product: Quantity', 'Не указан блок "Количество товаров" для ', self.$product);
+    return false;
+  }
+
   if (status.event == 'update_variant') {
-    self.quantity[0].setVariant(self.variants.getVariant());
+    _$input.setVariant(self.variants.getVariant());
     return false;
   };
 
@@ -18040,8 +18107,8 @@ ISnew.ProductInstance.prototype._updateStatus = function (status) {
   if (self._hasSelector) {
     // если в инстансе есть селектор
     _variant = self.variants.getVariant();
-    _quantity = self.quantity[0].get();
-    _$input = self.quantity[0].$input;
+    _quantity = _$input.get();
+    _$input = _$input.$input;
   } else {
     // если у нас куча считалок
     _variant = status.instance.variant;
@@ -18193,6 +18260,7 @@ ISnew.ProductQuantity.prototype.get = function () {
   var self = this;
   var _quantity = _.clone(self.quantity);
   _.unset(_quantity, 'toCheck');
+
   if (!self.settings.useMax) {
     _.unset(_quantity, 'max');
   }
@@ -18206,7 +18274,7 @@ ISnew.ProductQuantity.prototype.get = function () {
 ISnew.ProductQuantity.prototype._changeQuantity = function (value) {
   var self = this;
 
-  self.quantity.toCheck += parseFloat(value);
+  self.quantity.toCheck += parseFloat(value.toFixed(self.decimal));
 
   self._check();
 };
@@ -18239,7 +18307,7 @@ ISnew.ProductQuantity.prototype._check = function () {
   }
 
   // все ок
-  self.quantity.current = self.quantity.toCheck;
+  self.quantity.current = parseFloat(self.quantity.toCheck.toFixed(self.decimal));
   // дергаем статусы
   self._update();
 };
@@ -18250,7 +18318,7 @@ ISnew.ProductQuantity.prototype._check = function () {
 ISnew.ProductQuantity.prototype._update = function () {
   var self = this;
 
-  self.$input.val(self.quantity.current);
+  self.$input.val(self.quantity.current.toFixed(self.decimal));
 
   if (self._onInit) {
     self._onInit = false;
@@ -18269,8 +18337,17 @@ ISnew.ProductQuantity.prototype._update = function () {
  */
 ISnew.ProductQuantity.prototype._getInstance = function ($selector) {
   var self = this;
+  var _instance = $selector.parents('['+ self.selectors.quantity+']')[0];
 
-  return $selector.parents('['+ self.selectors.quantity+']')[0].Quantity;
+  if (_instance !== undefined) {
+    _instance = _instance.Quantity
+  } else {
+    // если не нашли экземпляр - говорим, что продолбалось, отваливаемся
+    console.warn('Product: Quantity', 'Не указан блок "Количество товаров" для', $selector);
+    return false;
+  }
+
+  return _instance;
 };
 
 /**
@@ -18938,7 +19015,6 @@ ISnew.Products.prototype._getDomId = function () {
       _idList.push(id);
     });
 
-    //console.log('Products: _getDomId: ', _.size(_idList), _idList);
     result.resolve(_.uniq(_idList));
   });
 
@@ -18954,10 +19030,6 @@ ISnew.Products.prototype._getList = function (_idList) {
 
   // проверить все ли товары инициализированны?
   var diffId = _.difference(_idList, self._actualId);
-  /*
-  console.log('Products: _getList: _idList', _idList);
-  console.log('Products: _getList: diffId', diffId);
-  */
 
   if (diffId.length) {
     // чего-то нет
@@ -19488,13 +19560,14 @@ ISnew.Search.prototype._setData = function (_data) {
  */
 ISnew.Search.prototype._patch = function (options) {
   var self = this;
+  var _regExp = new RegExp('('+ Site.RegExp.escape(options.query) +')', 'gi');
 
   return _.reduce(options.suggestions, function (result, product) {
     var temp = {
       id: product.data,
       url: '/product_by_id/'+ product.data,
       title: product.value,
-      markedTitle: product.value
+      markedTitle: product.value.replace(_regExp, self.settings.replacment)
     };
 
     result.push(_.merge(product, temp));
@@ -19601,31 +19674,42 @@ ISnew.SearchDOM.prototype._events = function () {
   var self = this;
 
   EventBus.subscribe('update:insales:search', function (data) {
-    //  срабатывает на события внутри формы
+    var $node;
     if (data.action.form) {
-      data.action.form
-        .find('['+ self.settings.resultPlaceholder +']')
-          .html(Template.render(data, self.settings.template));
+      // срабатывает на события внутри формы
+      $node = data.action.form
+        .find('['+ self.settings.resultPlaceholder +']');
+    } else {
+      // убиваем потраха во всех формах
+      $node = $('['+ self.settings.resultPlaceholder +']')
     }
 
-    data.action.input
-      .prop(self.settings.inProcess, false)
-      .trigger('keyup');
+    $node.html(Template.render(data, self.settings.template));
+
+    // если указан инпут, который надо разлочить
+    if (data.action.input) {
+      data.action.input
+        .prop(self.settings.inProcess, false)
+        .trigger('keyup');
+    }
   });
 };
 
+/**
+ * Перехватываем клик вне поиска
+ */
 ISnew.SearchDOM.prototype._outFocus = function () {
   var self = this;
 
-  $(document).on('blur', '['+ self.settings.searchSelector +']', function (event) {
-    var $input = $(this);
-    var $form = self._getInstance($input);
+  $(document).on('click', function (event) {
+    var $input = $('['+ self.settings.searchSelector +']');
+    var $form = $input.parents('form:first');
 
-    self._owner._get({
-      query: '',
-      input: $input,
-      form: $form,
-    });
+    if (!$(event.target).closest($form).length) {
+      self._owner._get({
+        query: ''
+      });
+    }
   });
 };
 
@@ -19641,3 +19725,4 @@ var Shop = new ISnew.Shop();
 
 Site.URL = new ISnew.tools.URL();
 Site.Translit = new ISnew.tools.Translit();
+Site.RegExp = new ISnew.tools.RegExp();
