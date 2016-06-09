@@ -42,6 +42,12 @@ ISnew.CartOrder.prototype.getItems = function () {
   return items;
 };
 
+ISnew.CartOrder.prototype.getComments = function () {
+  var self = this;
+
+  return self.order_line_comments;
+};
+
 /**
  * Фиксим инфу по корзине
  */

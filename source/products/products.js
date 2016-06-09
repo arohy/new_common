@@ -77,7 +77,6 @@ ISnew.Products.prototype._getDomId = function () {
       _idList.push(id);
     });
 
-    //console.log('Products: _getDomId: ', _.size(_idList), _idList);
     result.resolve(_.uniq(_idList));
   });
 
@@ -93,10 +92,6 @@ ISnew.Products.prototype._getList = function (_idList) {
 
   // проверить все ли товары инициализированны?
   var diffId = _.difference(_idList, self._actualId);
-  /*
-  console.log('Products: _getList: _idList', _idList);
-  console.log('Products: _getList: diffId', diffId);
-  */
 
   if (diffId.length) {
     // чего-то нет
