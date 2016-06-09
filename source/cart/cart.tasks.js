@@ -78,7 +78,6 @@ ISnew.CartTasks.prototype._push = function () {
     result_task.coupon = task.coupon;
   }, items_set);
 
-  console.log('CartTasks: _push: ', items_set, result_task);
   self._send(items_set, result_task);
   return;
 };
@@ -134,8 +133,6 @@ ISnew.CartTasks.prototype._done = function (order) {
  */
 ISnew.CartTasks.prototype._fail = function (response) {
   var self = this;
-
-  console.log('cart:update:fail', response);
 
   // если не прокатило - заливаем обратно таски
   if (self._taskInWork.length != 0) {

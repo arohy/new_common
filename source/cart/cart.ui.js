@@ -68,7 +68,6 @@ ISnew.CartDOM.prototype._addItem = function ($button) {
 
   _.assign(task.comments, self._getComments($form));
 
-  console.log('_addItem:', task);
   // посылаем данные в корзину
   Cart.add(task);
   return;

@@ -7,8 +7,6 @@ ISnew.json.updateCartItems = function (items, options) {
     '_method': 'put'
   };
 
-  console.log('updateCartItems: ', items, options);
-
   options = options || {};
 
   _.forIn(items, function(quantity, variant_id) {
