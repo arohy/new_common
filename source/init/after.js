@@ -11,3 +11,4 @@ var Shop = new ISnew.Shop();
 Site.URL = new ISnew.tools.URL();
 Site.Translit = new ISnew.tools.Translit();
 Site.RegExp = new ISnew.tools.RegExp();
+Site.Image = new ISnew.tools.Image();
