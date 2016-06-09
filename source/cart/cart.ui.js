@@ -209,7 +209,7 @@ ISnew.CartDOM.prototype._bindUpdateCart = function () {
     // есть ли она?
     if ($form.length) {
       // подписываемся на событие
-      EventBus.subscribe('change_quantity:insales:product', function (data) {
+      EventBus.subscribe('change_quantity:insales:item', function (data) {
         // а оно было в форме?
         if (data.action.product.closest($form).length) {
           // все ок, пинаем
