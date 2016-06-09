@@ -8,6 +8,7 @@ ISnew.ProductInstance = function (_owner, $product) {
   self.selectors = {
     //  селектор формы
     product: 'data-product-id',
+    item: 'data-item-id',
     // data атрибут нативного селекта
     nativeSelect: 'data-product-variants',
     // data атрибут блока в который происходит рендер модификаций
@@ -23,6 +24,8 @@ ISnew.ProductInstance = function (_owner, $product) {
   self.settings = self._owner.settings;
   self.product = self._owner;
   self.quantity = {};
+
+  self.type = 'product';
 
   self.$product = $product;
 
@@ -42,6 +45,10 @@ ISnew.ProductInstance.prototype._init = function () {
   self.variants = new ISnew.ProductVariants(self);
   self._initQuantity();
   self.price_kinds = new ISnew.ProductPriceType(self);
+
+  if (self.$product.data('item-id')) {
+    self.type = 'item';
+  }
 
   self._initOptionSelectors();
 };
@@ -126,7 +133,7 @@ ISnew.ProductInstance.prototype._updateStatus = function (status) {
   // и убиваем поток
   _$input = self.quantity[0];
 
-  // если в верстке не указан контейнеры со счетчиками - отваливаемся 
+  // если в верстке не указан контейнеры со счетчиками - отваливаемся
   if (_$input === undefined) {
     console.warn('Product: Quantity', 'Не указан блок "Количество товаров" для ', self.$product);
     return false;
@@ -166,8 +173,8 @@ ISnew.ProductInstance.prototype._updateStatus = function (status) {
   };
 
   if (status.event != 'update_variant') {
-    EventBus.publish(status.event +':insales:product', _variant);
+    EventBus.publish(status.event +':insales:'+ self.type, _variant);
   }
 
-  EventBus.publish('update_variant:insales:product', _variant);
+  EventBus.publish('update_variant:insales:'+ self.type, _variant);
 };
