@@ -17864,7 +17864,7 @@ ISnew.ProductPriceType.prototype.getPrice = function (options) {
   var price = 0;
 
   _.forEach(self.price_kinds[options.variantId], function (price_type) {
-    if (options.quantity < price_type.min_quantity) {
+    if (options.quantity.current < price_type.min_quantity) {
       return false;
     }
 
