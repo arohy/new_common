@@ -127,6 +127,8 @@ ISnew.ProductInstance.prototype._updateStatus = function (status) {
   var self = this;
   var _variant;
   var _quantity;
+  var _quantityCart;
+  var _variantCart;
   var _$input;
 
   // если обновление вызвала смена варианта, то обновляем чиселку
@@ -156,6 +158,10 @@ ISnew.ProductInstance.prototype._updateStatus = function (status) {
     _quantity = status.instance.get();
     _$input = status.instance.$input;
   }
+
+  _quantityCart = Cart.order.get();
+  _variantCart = Cart.order.getItemByID(_variant.id);
+  console.log('HOLY CHist', _variantCart.quantity);
 
   // получаем тип цены
   var _price = self.price_kinds.getPrice({
