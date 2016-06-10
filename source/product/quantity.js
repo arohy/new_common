@@ -28,8 +28,6 @@ ISnew.ProductQuantity = function (_owner, _quantityNode) {
   // привязываем экземпляр к узлу
   _quantityNode.Quantity = self;
 
-  self._onInit = true;
-
   self._init();
 };
 
@@ -181,16 +179,13 @@ ISnew.ProductQuantity.prototype._update = function () {
 
   self.$input.val(self.quantity.current.toFixed(self.decimal));
 
-  if (self._onInit) {
-    self._onInit = false;
-    return false;
-  }
-
-  self._owner._updateStatus({
-    event: 'change_quantity',
-    method: 'update',
-    instance: self,
-  });
+  setTimeout(function () {
+    self._owner._updateStatus({
+      event: 'change_quantity',
+      method: 'update',
+      instance: self,
+    });
+  }, 0);
 };
 
 /**

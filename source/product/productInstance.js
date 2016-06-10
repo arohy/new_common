@@ -127,8 +127,7 @@ ISnew.ProductInstance.prototype._updateStatus = function (status) {
   var self = this;
   var _variant;
   var _quantity;
-  var _quantityCart;
-  var _variantCart;
+  var _atCart;
   var _$input;
 
   // если обновление вызвала смена варианта, то обновляем чиселку
@@ -150,18 +149,20 @@ ISnew.ProductInstance.prototype._updateStatus = function (status) {
   if (self._hasSelector) {
     // если в инстансе есть селектор
     _variant = self.variants.getVariant();
-    _quantity = _$input.get();
+    _quantity = _$input.get().current;
     _$input = _$input.$input;
   } else {
     // если у нас куча считалок
     _variant = status.instance.variant;
-    _quantity = status.instance.get();
+    _quantity = status.instance.get().current;
     _$input = status.instance.$input;
   }
 
-  _quantityCart = Cart.order.get();
-  _variantCart = Cart.order.getItemByID(_variant.id);
-  console.log('HOLY CHist', _variantCart.quantity);
+  _atCart = Cart.order.getItemByID(_variant.id);
+
+  if (_atCart && self.settings) {
+    _quantity += _atCart.quantity;
+  }
 
   // получаем тип цены
   var _price = self.price_kinds.getPrice({

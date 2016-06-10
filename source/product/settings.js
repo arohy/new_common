@@ -17,7 +17,8 @@ ISnew.ProductSettings = function (settings, _owner) {
     decimal: {
       kgm: 1,
       dmt: 1
-    }
+    },
+    withCart: true
   };
 
   self._owner = _owner;
