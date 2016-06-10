@@ -54,7 +54,6 @@ ISnew.CartOrder.prototype.getComments = function () {
 ISnew.CartOrder.prototype._patch = function (current_order) {
   var self = this;
 
-  console.log(_.clone(current_order));
   self.order_lines = current_order.order_lines || current_order.items;
   self.order_line_comments = current_order.order_line_comments || current_order.order.order_line_comments;
 
@@ -142,14 +141,11 @@ ISnew.CartOrder.prototype.getItemByID = function (id) {
   id = _.toInteger(id);
 
   _.forEach(self.order_lines, function (item) {
-    console.log('item: ', item);
     if (item.id === id) {
       _item = item;
       return false;
     }
   });
-
-  console.log('id: ', id, 'item: ', _item);
 
   return _item;
 };

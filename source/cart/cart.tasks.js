@@ -11,6 +11,18 @@ ISnew.CartTasks = function (_owner) {
 
   self._taskToWork = [];
   self._taskInWork = [];
+
+  self._init();
+};
+
+ISnew.CartTasks.prototype._init = function () {
+  var self = this;
+  var _atStore = localStorage.getItem('cart');
+
+  _atStore = JSON.parse(_atStore);
+  if (_atStore && (_.now() - _atStore.addedAt) < 30000) {
+    self._owner.order.set(_atStore);
+  }
 };
 
 /**
@@ -23,11 +35,7 @@ ISnew.CartTasks = function (_owner) {
  */
 ISnew.CartTasks.prototype.send = function (task) {
   var self = this;
-  var _atStore = localStorage.getItem('cart');
 
-  if (_atStore && (_.now() - _atStore.addedAt) < 30000) {
-    self._owner.order.set(JSON.parse(_adStore));
-  }
 
   if (task) {
     self._add(task);
