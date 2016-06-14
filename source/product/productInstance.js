@@ -51,6 +51,7 @@ ISnew.ProductInstance.prototype._init = function () {
   }
 
   self._initOptionSelectors();
+  self._bindUpdateCart();
 };
 
 /**
@@ -184,4 +185,19 @@ ISnew.ProductInstance.prototype._updateStatus = function (status) {
   }
 
   EventBus.publish('update_variant:insales:'+ self.type, _variant);
+};
+
+/**
+ * Слушатель на обновление корзины
+ */
+ISnew.ProductInstance.prototype._bindUpdateCart = function () {
+  var self = this;
+
+  EventBus.subscribe('update_items:insales:cart', function (data) {
+    if (data.action.method != 'init') {
+      _.forEach(self.quantity, function (quantity) {
+        quantity._update();
+      });
+    }
+  });
 };
