@@ -160,7 +160,7 @@ ISnew.ProductInstance.prototype._updateStatus = function (status) {
 
   _atCart = Cart.order.getItemByID(_variant.id);
 
-  if (_atCart && self.settings) {
+  if (_atCart && self.settings && self.type != 'item') {
     _quantity += _atCart.quantity;
   }
 
