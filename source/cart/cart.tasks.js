@@ -11,6 +11,18 @@ ISnew.CartTasks = function (_owner) {
 
   self._taskToWork = [];
   self._taskInWork = [];
+
+  self._init();
+};
+
+ISnew.CartTasks.prototype._init = function () {
+  var self = this;
+  var _atStore = localStorage.getItem('cart');
+
+  _atStore = JSON.parse(_atStore);
+  if (_atStore && (_.now() - _atStore.addedAt) < 30000) {
+    self._owner.order.set(_atStore);
+  }
 };
 
 /**
@@ -23,6 +35,7 @@ ISnew.CartTasks = function (_owner) {
  */
 ISnew.CartTasks.prototype.send = function (task) {
   var self = this;
+
 
   if (task) {
     self._add(task);
@@ -116,6 +129,9 @@ ISnew.CartTasks.prototype._done = function (order) {
 
   // ставим актуальные данные в корзину
   self._owner.order.set(order);
+
+  order.addedAt = _.now();
+  localStorage.setItem('cart', JSON.stringify(order));
 
   data = _.clone(self._owner.order.get());
 

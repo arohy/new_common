@@ -69,6 +69,7 @@ ISnew.CartOrder.prototype._patch = function (current_order) {
   self._itemsPrice();
   self._deliveryPrice(current_order);
   self._url();
+  self._setId()
   self._images();
 
   return;
@@ -112,6 +113,15 @@ ISnew.CartOrder.prototype._url = function () {
   return;
 };
 
+ISnew.CartOrder.prototype._setId = function () {
+  var self = this;
+
+  _.forEach(self.order_lines, function (item) {
+    item.id = item.variant_id;
+  });
+  return;
+};
+
 /**
  * Фиксим картинки товаров
  */
@@ -122,4 +132,20 @@ ISnew.CartOrder.prototype._images = function () {
     item.images = item.product.images;
   });
   return;
+};
+
+ISnew.CartOrder.prototype.getItemByID = function (id) {
+  var self = this;
+  var _item;
+
+  id = _.toInteger(id);
+
+  _.forEach(self.order_lines, function (item) {
+    if (item.id === id) {
+      _item = item;
+      return false;
+    }
+  });
+
+  return _item;
 };

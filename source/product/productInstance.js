@@ -51,6 +51,7 @@ ISnew.ProductInstance.prototype._init = function () {
   }
 
   self._initOptionSelectors();
+  self._bindUpdateCart();
 };
 
 /**
@@ -127,6 +128,7 @@ ISnew.ProductInstance.prototype._updateStatus = function (status) {
   var self = this;
   var _variant;
   var _quantity;
+  var _atCart;
   var _$input;
 
   // если обновление вызвала смена варианта, то обновляем чиселку
@@ -148,13 +150,19 @@ ISnew.ProductInstance.prototype._updateStatus = function (status) {
   if (self._hasSelector) {
     // если в инстансе есть селектор
     _variant = self.variants.getVariant();
-    _quantity = _$input.get();
+    _quantity = _$input.get().current;
     _$input = _$input.$input;
   } else {
     // если у нас куча считалок
     _variant = status.instance.variant;
-    _quantity = status.instance.get();
+    _quantity = status.instance.get().current;
     _$input = status.instance.$input;
+  }
+
+  _atCart = Cart.order.getItemByID(_variant.id);
+
+  if (_atCart && self.settings && self.type != 'item') {
+    _quantity += _atCart.quantity;
   }
 
   // получаем тип цены
@@ -177,4 +185,19 @@ ISnew.ProductInstance.prototype._updateStatus = function (status) {
   }
 
   EventBus.publish('update_variant:insales:'+ self.type, _variant);
+};
+
+/**
+ * Слушатель на обновление корзины
+ */
+ISnew.ProductInstance.prototype._bindUpdateCart = function () {
+  var self = this;
+
+  EventBus.subscribe('update_items:insales:cart', function (data) {
+    if (data.action.method != 'init') {
+      _.forEach(self.quantity, function (quantity) {
+        quantity._update();
+      });
+    }
+  });
 };

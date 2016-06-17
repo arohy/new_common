@@ -21,6 +21,7 @@ ISnew.Template.prototype.render = function (data, template_id) {
     result = self._templateList[template_id](data);
   } else {
     result = false;
+    console.warn('Template: ', template_id, ' не подключен');
   }
 
   return result;
