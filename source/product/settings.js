@@ -18,7 +18,7 @@ ISnew.ProductSettings = function (settings, _owner) {
       kgm: 1,
       dmt: 1
     },
-    withCart: true
+    withCart: false
   };
 
   self._owner = _owner;
