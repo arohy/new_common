@@ -184,7 +184,9 @@ ISnew.ProductQuantity.prototype._check = function () {
 ISnew.ProductQuantity.prototype._update = function () {
   var self = this;
 
-  self.$input.val(self.quantity.current);
+  if (self.quantityChanged) {
+    self.$input.val(self.quantity.current);
+  }
 
   setTimeout(function () {
     var eventName = self.quantityChanged ? 'change_quantity' : 'unchange_quantity';
@@ -254,7 +256,7 @@ ISnew.ProductQuantity.prototype._bindQuantityButtons = function () {
 ISnew.ProductQuantity.prototype._bindQuantityInput = function () {
   var self = this;
 
-  $(document).on('blur', '[data-quantity] input[name]', function (event) {
+  $(document).on('blur input', '[data-quantity] input[name]', function (event) {
     event.preventDefault();
 
     var $input = $(this);
