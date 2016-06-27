@@ -2435,7 +2435,7 @@ ISnew.ProductInstance.prototype._updateStatus = function (status) {
 
   EventBus.publish('update_variant:insales:'+ self.type, _variant);
 
-  EventBus.publish('after:insales:'+ self.type, _variant);
+  EventBus.publish('always:insales:'+ self.type, _variant);
 };
 
 /**
