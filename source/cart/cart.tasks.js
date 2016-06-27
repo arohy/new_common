@@ -140,17 +140,13 @@ ISnew.CartTasks.prototype._done = function (order) {
     EventBus.publish(task.method +':insales:cart', data);
   });
 
-<<<<<<< d351e5d90e124fb158e0d0fca598936b456f127e
-=======
   //  снимаем флаг с кнопки
-  if (data.action.button) {
-    var checkout_button = data.action.button[0];
-    if (checkout_button.checkoutButton) {
-      checkout_button.checkoutButton = false;
-    }
+  var _button = data.action.button;
+
+  if (_button && _button.checkoutButton) {
+    _button.checkoutButton = false;
   }
 
->>>>>>> Фикс флага на кнопке заказа в один клик
   EventBus.publish('update_items:insales:cart', data);
   return;
 };
