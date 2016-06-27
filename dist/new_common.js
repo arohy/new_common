@@ -16093,6 +16093,7 @@ ISnew.Template.prototype.render = function (data, template_id) {
     result = self._templateList[template_id](data);
   } else {
     result = false;
+    console.warn('Template: ', template_id, ' не подключен');
   }
 
   return result;
@@ -17008,6 +17009,7 @@ ISnew.CartOrder.prototype._patch = function (current_order) {
   self._itemsPrice();
   self._deliveryPrice(current_order);
   self._url();
+  self._setId()
   self._images();
 
   return;
@@ -17051,6 +17053,15 @@ ISnew.CartOrder.prototype._url = function () {
   return;
 };
 
+ISnew.CartOrder.prototype._setId = function () {
+  var self = this;
+
+  _.forEach(self.order_lines, function (item) {
+    item.id = item.variant_id;
+  });
+  return;
+};
+
 /**
  * Фиксим картинки товаров
  */
@@ -17061,6 +17072,22 @@ ISnew.CartOrder.prototype._images = function () {
     item.images = item.product.images;
   });
   return;
+};
+
+ISnew.CartOrder.prototype.getItemByID = function (id) {
+  var self = this;
+  var _item;
+
+  id = _.toInteger(id);
+
+  _.forEach(self.order_lines, function (item) {
+    if (item.id === id) {
+      _item = item;
+      return false;
+    }
+  });
+
+  return _item;
 };
 /**
  * Менеджер задач для корзины
@@ -17075,6 +17102,18 @@ ISnew.CartTasks = function (_owner) {
 
   self._taskToWork = [];
   self._taskInWork = [];
+
+  self._init();
+};
+
+ISnew.CartTasks.prototype._init = function () {
+  var self = this;
+  var _atStore = localStorage.getItem('cart');
+
+  _atStore = JSON.parse(_atStore);
+  if (_atStore && (_.now() - _atStore.addedAt) < 30000) {
+    self._owner.order.set(_atStore);
+  }
 };
 
 /**
@@ -17087,6 +17126,7 @@ ISnew.CartTasks = function (_owner) {
  */
 ISnew.CartTasks.prototype.send = function (task) {
   var self = this;
+
 
   if (task) {
     self._add(task);
@@ -17180,6 +17220,9 @@ ISnew.CartTasks.prototype._done = function (order) {
 
   // ставим актуальные данные в корзину
   self._owner.order.set(order);
+
+  order.addedAt = _.now();
+  localStorage.setItem('cart', JSON.stringify(order));
 
   data = _.clone(self._owner.order.get());
 
@@ -17864,7 +17907,7 @@ ISnew.ProductPriceType.prototype.getPrice = function (options) {
   var price = 0;
 
   _.forEach(self.price_kinds[options.variantId], function (price_type) {
-    if (options.quantity.current < price_type.min_quantity) {
+    if (options.quantity < price_type.min_quantity) {
       return false;
     }
 
@@ -18017,6 +18060,7 @@ ISnew.ProductInstance.prototype._init = function () {
   }
 
   self._initOptionSelectors();
+  self._bindUpdateCart();
 };
 
 /**
@@ -18093,6 +18137,7 @@ ISnew.ProductInstance.prototype._updateStatus = function (status) {
   var self = this;
   var _variant;
   var _quantity;
+  var _atCart;
   var _$input;
 
   // если обновление вызвала смена варианта, то обновляем чиселку
@@ -18114,13 +18159,19 @@ ISnew.ProductInstance.prototype._updateStatus = function (status) {
   if (self._hasSelector) {
     // если в инстансе есть селектор
     _variant = self.variants.getVariant();
-    _quantity = _$input.get();
+    _quantity = _$input.get().current;
     _$input = _$input.$input;
   } else {
     // если у нас куча считалок
     _variant = status.instance.variant;
-    _quantity = status.instance.get();
+    _quantity = status.instance.get().current;
     _$input = status.instance.$input;
+  }
+
+  _atCart = Cart.order.getItemByID(_variant.id);
+
+  if (_atCart && self.settings && self.type != 'item') {
+    _quantity += _atCart.quantity;
   }
 
   // получаем тип цены
@@ -18143,6 +18194,21 @@ ISnew.ProductInstance.prototype._updateStatus = function (status) {
   }
 
   EventBus.publish('update_variant:insales:'+ self.type, _variant);
+};
+
+/**
+ * Слушатель на обновление корзины
+ */
+ISnew.ProductInstance.prototype._bindUpdateCart = function () {
+  var self = this;
+
+  EventBus.subscribe('update_items:insales:cart', function (data) {
+    if (data.action.method != 'init') {
+      _.forEach(self.quantity, function (quantity) {
+        quantity._update();
+      });
+    }
+  });
 };
 /**
  * Класс для работы с полем кол-во товара
@@ -18173,8 +18239,6 @@ ISnew.ProductQuantity = function (_owner, _quantityNode) {
 
   // привязываем экземпляр к узлу
   _quantityNode.Quantity = self;
-
-  self._onInit = true;
 
   self._init();
 };
@@ -18327,16 +18391,13 @@ ISnew.ProductQuantity.prototype._update = function () {
 
   self.$input.val(self.quantity.current.toFixed(self.decimal));
 
-  if (self._onInit) {
-    self._onInit = false;
-    return false;
-  }
-
-  self._owner._updateStatus({
-    event: 'change_quantity',
-    method: 'update',
-    instance: self,
-  });
+  setTimeout(function () {
+    self._owner._updateStatus({
+      event: 'change_quantity',
+      method: 'update',
+      instance: self,
+    });
+  }, 0);
 };
 
 /**
@@ -18425,7 +18486,8 @@ ISnew.ProductSettings = function (settings, _owner) {
     decimal: {
       kgm: 1,
       dmt: 1
-    }
+    },
+    withCart: false
   };
 
   self._owner = _owner;
