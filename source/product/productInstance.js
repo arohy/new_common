@@ -150,12 +150,12 @@ ISnew.ProductInstance.prototype._updateStatus = function (status) {
   if (self._hasSelector) {
     // если в инстансе есть селектор
     _variant = self.variants.getVariant();
-    _quantity = _$input.get().current;
+    _quantity = _$input.get();
     _$input = _$input.$input;
   } else {
     // если у нас куча считалок
     _variant = status.instance.variant;
-    _quantity = status.instance.get().current;
+    _quantity = status.instance.get();
     _$input = status.instance.$input;
   }
 
@@ -168,7 +168,7 @@ ISnew.ProductInstance.prototype._updateStatus = function (status) {
   // получаем тип цены
   var _price = self.price_kinds.getPrice({
     variantId: _variant.id,
-    quantity: _quantity
+    quantity: _quantity.current
   });
 
   // формируем действие
@@ -180,11 +180,15 @@ ISnew.ProductInstance.prototype._updateStatus = function (status) {
     quantityInput: _$input
   };
 
+  EventBus.publish('before:insales:'+ self.type, _variant);
+
   if (status.event != 'update_variant') {
     EventBus.publish(status.event +':insales:'+ self.type, _variant);
   }
 
   EventBus.publish('update_variant:insales:'+ self.type, _variant);
+
+  EventBus.publish('always:insales:'+ self.type, _variant);
 };
 
 /**
@@ -196,7 +200,8 @@ ISnew.ProductInstance.prototype._bindUpdateCart = function () {
   EventBus.subscribe('update_items:insales:cart', function (data) {
     if (data.action.method != 'init') {
       _.forEach(self.quantity, function (quantity) {
-        quantity._update();
+        // Добавлен дебаунс для предотвращени
+        _.debounce(quantity._update, 200);
       });
     }
   });
