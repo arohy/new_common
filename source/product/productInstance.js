@@ -180,7 +180,7 @@ ISnew.ProductInstance.prototype._updateStatus = function (status) {
     quantityInput: _$input
   };
 
-  EventBus.publish('before:insales:'+ status.type, _variant);
+  EventBus.publish('before:insales:'+ self.type, _variant);
 
   if (status.event != 'update_variant') {
     EventBus.publish(status.event +':insales:'+ self.type, _variant);
@@ -188,7 +188,7 @@ ISnew.ProductInstance.prototype._updateStatus = function (status) {
 
   EventBus.publish('update_variant:insales:'+ self.type, _variant);
 
-  EventBus.publish('after:insales:'+ status.type, _variant);
+  EventBus.publish('after:insales:'+ self.type, _variant);
 };
 
 /**

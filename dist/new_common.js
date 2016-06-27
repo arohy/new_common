@@ -2427,11 +2427,15 @@ ISnew.ProductInstance.prototype._updateStatus = function (status) {
     quantityInput: _$input
   };
 
+  EventBus.publish('before:insales:'+ self.type, _variant);
+
   if (status.event != 'update_variant') {
     EventBus.publish(status.event +':insales:'+ self.type, _variant);
   }
 
   EventBus.publish('update_variant:insales:'+ self.type, _variant);
+
+  EventBus.publish('after:insales:'+ self.type, _variant);
 };
 
 /**
@@ -2443,7 +2447,8 @@ ISnew.ProductInstance.prototype._bindUpdateCart = function () {
   EventBus.subscribe('update_items:insales:cart', function (data) {
     if (data.action.method != 'init') {
       _.forEach(self.quantity, function (quantity) {
-        _.debounce(quantity._update, 150);
+        // Добавлен дебаунс для предотвращени
+        _.debounce(quantity._update, 200);
       });
     }
   });
