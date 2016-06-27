@@ -196,7 +196,7 @@ ISnew.ProductInstance.prototype._bindUpdateCart = function () {
   EventBus.subscribe('update_items:insales:cart', function (data) {
     if (data.action.method != 'init') {
       _.forEach(self.quantity, function (quantity) {
-        quantity._update();
+        _.debounce(quantity._update, 150);
       });
     }
   });
