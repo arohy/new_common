@@ -186,7 +186,9 @@ ISnew.ProductInstance.prototype._updateStatus = function (status) {
     EventBus.publish(status.event +':insales:'+ self.type, _variant);
   }
 
-  EventBus.publish('update_variant:insales:'+ self.type, _variant);
+  if (status.event != 'unchange_quantity') {
+    EventBus.publish('update_variant:insales:'+ self.type, _variant);
+  }
 
   EventBus.publish('always:insales:'+ self.type, _variant);
 };
