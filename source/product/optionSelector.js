@@ -57,6 +57,8 @@ ISnew.OptionSelector.prototype._init = function () {
 
   self.$optionSelector = self.$product.find('['+ self.selectors.optionSelector +']');
 
+  self.$nativeSelect.hide();
+
   self._bindEvents();
   //  вызов рендера
   self._renderSelector();
