@@ -216,3 +216,11 @@ ISnew.Cart.prototype.addItem = function (form) {
     fadeDuration: 250
   });
 };
+
+ISnew.Cart.prototype.setConfig = function (settings) {
+  var self = this;
+
+  self.ui.setConfig(settings);
+
+  return;
+};

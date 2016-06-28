@@ -1,7 +1,7 @@
 /**
  * Связка с DOM
  */
-ISnew.CartDOM = function (options) {
+ISnew.CartDOM = function () {
   var self = this;
 
   self.options = {
@@ -14,19 +14,19 @@ ISnew.CartDOM = function (options) {
     update: 'data-cart-update',
     submit: 'data-cart-submit',
     clear: 'data-cart-clear',
-    coupon: 'data-coupon-submit'
+    coupon: 'data-coupon-submit',
+
+    reloadOnCoupon: true
   };
 
-  self._init(options);
+  self._init();
 };
 
 /**
  * Инициализация
  */
-ISnew.CartDOM.prototype._init = function (options) {
+ISnew.CartDOM.prototype._init = function () {
   var self = this;
-
-  _.assign(self.options, options);
 
   // Прибиваем все обработчики
   self._bindAddItem();
@@ -38,6 +38,13 @@ ISnew.CartDOM.prototype._init = function (options) {
   return;
 };
 
+ISnew.CartDOM.prototype.setConfig = function (options) {
+  var self = this;
+
+  _.assign(self.options, options);
+
+  return;
+};
 /**
  * Добавляем товары из формы
  */
@@ -272,12 +279,13 @@ ISnew.CartDOM.prototype._bindClearOrder = function () {
 /**
  * Отправка купона
  */
-ISnew.CartDOM.prototype.setCoupon = function ($form) {
+ISnew.CartDOM.prototype.setCoupon = function ($form, $button) {
   var self = this;
   var task = {
     items: {},
     form: $form,
-    coupon: self._getCoupon($form)
+    coupon: self._getCoupon($form),
+    button: $button
   };
 
   Cart.setCoupon(task);
@@ -298,9 +306,29 @@ ISnew.CartDOM.prototype._bindCoupon = function () {
     self.setCoupon($button.parents('form:first'), $button);
   });
 
+  $(document).on('keypress', '[name="cart[coupon]"]', function (event) {
+    if (event.keyCode == 13) {
+      event.stopPropagation();
+      event.preventDefault();
+
+      self.setCoupon($(this).parents('form:first'));
+    }
+  });
+
   // снимаем метку "в процессе" с формы
   EventBus.subscribe('always:insales:cart', function (data) {
     self._unlockButton(data, 'set_coupon');
+  });
+
+  // прогружаем верстку
+  EventBus.subscribe('set_coupon:insales:cart', function (data) {
+    if (data.action.form.is('['+ self.options.form +']')) {
+      if (self.options.reloadOnCoupon) {
+        document.location.reload();
+      } else {
+        console.log('Вы отключили атвоматическое обновление страницы корзины после применения купона. Создайте свой обработчик по событию шины "set_coupon:insales:cart"');
+      }
+    }
   });
   return;
 };
