@@ -1937,6 +1937,8 @@ ISnew.OptionSelector.prototype._init = function () {
 
   self.$optionSelector = self.$product.find('['+ self.selectors.optionSelector +']');
 
+  self.$nativeSelect.hide();
+
   self._bindEvents();
   //  вызов рендера
   self._renderSelector();
@@ -2497,7 +2499,10 @@ ISnew.ProductQuantity.prototype._init = function () {
   // снимаем с конфиги
   _settings = self._getConfig();
 
-  self.quantity.toCheck = self._getQuantity();
+  self.quantity = {
+    current: self._getQuantity(),
+    toCheck: self._getQuantity()
+  };
 
   // уточняем из товара единицу измерения
   self.unit = self._owner.product.unit;
@@ -2639,9 +2644,7 @@ ISnew.ProductQuantity.prototype._check = function () {
 ISnew.ProductQuantity.prototype._update = function () {
   var self = this;
 
-  if (self.quantityChanged) {
-    self.$input.val(self.quantity.current);
-  }
+  self.$input.val(self.quantity.current.toFixed(self.decimal));
 
   setTimeout(function () {
     var eventName = self.quantityChanged ? 'change_quantity' : 'unchange_quantity';
