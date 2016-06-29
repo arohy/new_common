@@ -3,9 +3,10 @@
  */
 
 ISnew.json.makeCheckout = function (client, order) {
-  console.log(client, order);
+  var URL = new ISnew.tools.URL();
   var dfd = $.Deferred();
   var checkout = {
+    lang: URL.getKeyValue('lang'),
     pid: 1,
     'order[delivery_variant_id]': _.toInteger(order.delivery),
     'order[payment_gateway_id]': _.toInteger(order.payment)
