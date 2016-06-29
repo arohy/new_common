@@ -11,8 +11,6 @@ ISnew.json.getProductsList = function (id_array) {
   // указваем, сколько id нужно отправить за раз
   var query_limit = 25;
 
-  console.log(fields);
-
   /**
    * Генерим адреса для запросов
    *
