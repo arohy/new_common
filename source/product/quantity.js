@@ -117,7 +117,7 @@ ISnew.ProductQuantity.prototype.setVariant = function (variant) {
 };
 
 /**
- *
+ * Получение текущего количества и прочей инфы
  */
 ISnew.ProductQuantity.prototype.get = function () {
   var self = this;
@@ -252,19 +252,26 @@ ISnew.ProductQuantity.prototype._bindQuantityButtons = function () {
 
 /**
  * Слушаем поле.
- * Для простоты мы слушаем потерю фокуса
  */
 ISnew.ProductQuantity.prototype._bindQuantityInput = function () {
   var self = this;
 
-  $(document).on('blur input', '[data-quantity] input[name]', function (event) {
-    event.preventDefault();
+  $(document)
+    .on('blur change', '['+ self.selectors.quantity +'] input[name]', function (event) {
+      event.preventDefault();
 
-    var $input = $(this);
-    var quantity = self._getInstance($input);
+      self._getInstance($(this))
+        ._setQuantity();
+    })
+    .on('keypress', '['+ self.selectors.quantity +'] input[name]', function (event) {
+      if (event.keyCode == 13) {
+        event.preventDefault();
+        event.stopPropagation();
 
-    quantity._setQuantity();
-  });
+        self._getInstance($(this))
+        ._setQuantity();
+      }
+    });
 };
 
 ISnew.ProductQuantity.prototype._fixValue = function (_value) {
