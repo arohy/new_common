@@ -9,7 +9,11 @@
  */
 
 ISnew.json.addCartItems = function (items, options) {
-  var fields = {};
+  var URL = new ISnew.tools.URL();
+  var fields = {
+    lang: URL.getKeyValue('lang')
+  };
+
   options = options || {};
 
   _.forIn(items, function (quantity, variant_id) {
