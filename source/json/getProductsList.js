@@ -3,8 +3,15 @@
  */
 
 ISnew.json.getProductsList = function (id_array) {
+  var URL = new ISnew.tools.URL();
+  var fields = {
+    format: 'json',
+    lang: URL.getKeyValue('lang')
+  };
   // указваем, сколько id нужно отправить за раз
   var query_limit = 25;
+
+  console.log(fields);
 
   /**
    * Генерим адреса для запросов
@@ -23,7 +30,7 @@ ISnew.json.getProductsList = function (id_array) {
 
   // собираем задачи
   var promises = $.map(paths, function (path) {
-    return $.ajax(path).then(function (response) {
+    return $.getJSON(path, fields).then(function (response) {
         return response;
       });
   });
