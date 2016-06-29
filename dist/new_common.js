@@ -1167,6 +1167,14 @@ ISnew.Cart.prototype.addItem = function (form) {
     fadeDuration: 250
   });
 };
+
+ISnew.Cart.prototype.setConfig = function (settings) {
+  var self = this;
+
+  self.ui.setConfig(settings);
+
+  return;
+};
 /**
  * Класс отвечает за работу и форматирование состава корзины
  */
@@ -1523,7 +1531,7 @@ ISnew.CartTasks.prototype._before = function () {
 /**
  * Связка с DOM
  */
-ISnew.CartDOM = function (options) {
+ISnew.CartDOM = function () {
   var self = this;
 
   self.options = {
@@ -1536,19 +1544,19 @@ ISnew.CartDOM = function (options) {
     update: 'data-cart-update',
     submit: 'data-cart-submit',
     clear: 'data-cart-clear',
-    coupon: 'data-coupon-submit'
+    coupon: 'data-coupon-submit',
+
+    reloadOnCoupon: true
   };
 
-  self._init(options);
+  self._init();
 };
 
 /**
  * Инициализация
  */
-ISnew.CartDOM.prototype._init = function (options) {
+ISnew.CartDOM.prototype._init = function () {
   var self = this;
-
-  _.assign(self.options, options);
 
   // Прибиваем все обработчики
   self._bindAddItem();
@@ -1560,6 +1568,13 @@ ISnew.CartDOM.prototype._init = function (options) {
   return;
 };
 
+ISnew.CartDOM.prototype.setConfig = function (options) {
+  var self = this;
+
+  _.assign(self.options, options);
+
+  return;
+};
 /**
  * Добавляем товары из формы
  */
@@ -1794,12 +1809,13 @@ ISnew.CartDOM.prototype._bindClearOrder = function () {
 /**
  * Отправка купона
  */
-ISnew.CartDOM.prototype.setCoupon = function ($form) {
+ISnew.CartDOM.prototype.setCoupon = function ($form, $button) {
   var self = this;
   var task = {
     items: {},
     form: $form,
-    coupon: self._getCoupon($form)
+    coupon: self._getCoupon($form),
+    button: $button
   };
 
   Cart.setCoupon(task);
@@ -1820,9 +1836,29 @@ ISnew.CartDOM.prototype._bindCoupon = function () {
     self.setCoupon($button.parents('form:first'), $button);
   });
 
+  $(document).on('keypress', '[name="cart[coupon]"]', function (event) {
+    if (event.keyCode == 13) {
+      event.stopPropagation();
+      event.preventDefault();
+
+      self.setCoupon($(this).parents('form:first'));
+    }
+  });
+
   // снимаем метку "в процессе" с формы
   EventBus.subscribe('always:insales:cart', function (data) {
     self._unlockButton(data, 'set_coupon');
+  });
+
+  // прогружаем верстку
+  EventBus.subscribe('set_coupon:insales:cart', function (data) {
+    if (data.action.form.is('['+ self.options.form +']')) {
+      if (self.options.reloadOnCoupon) {
+        document.location.reload();
+      } else {
+        console.log('Вы отключили атвоматическое обновление страницы корзины после применения купона. Создайте свой обработчик по событию шины "set_coupon:insales:cart"');
+      }
+    }
   });
   return;
 };
@@ -2574,7 +2610,7 @@ ISnew.ProductQuantity.prototype.setVariant = function (variant) {
 };
 
 /**
- *
+ * Получение текущего количества и прочей инфы
  */
 ISnew.ProductQuantity.prototype.get = function () {
   var self = this;
@@ -2709,19 +2745,26 @@ ISnew.ProductQuantity.prototype._bindQuantityButtons = function () {
 
 /**
  * Слушаем поле.
- * Для простоты мы слушаем потерю фокуса
  */
 ISnew.ProductQuantity.prototype._bindQuantityInput = function () {
   var self = this;
 
-  $(document).on('blur input', '[data-quantity] input[name]', function (event) {
-    event.preventDefault();
+  $(document)
+    .on('blur change', '['+ self.selectors.quantity +'] input[name]', function (event) {
+      event.preventDefault();
 
-    var $input = $(this);
-    var quantity = self._getInstance($input);
+      self._getInstance($(this))
+        ._setQuantity();
+    })
+    .on('keypress', '['+ self.selectors.quantity +'] input[name]', function (event) {
+      if (event.keyCode == 13) {
+        event.preventDefault();
+        event.stopPropagation();
 
-    quantity._setQuantity();
-  });
+        self._getInstance($(this))
+        ._setQuantity();
+      }
+    });
 };
 
 ISnew.ProductQuantity.prototype._fixValue = function (_value) {
