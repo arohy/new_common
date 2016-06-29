@@ -3,8 +3,11 @@
  */
 
 ISnew.json.sendMessage = function (input) {
+  var URL = new ISnew.tools.URL();
   var result = $.Deferred();
-  var message = {};
+  var message = {
+    lang: URL.getKeyValue('lang')
+  };
 
   _.forIn(input, function (value, key) {
     message['feedback['+ key +']'] = value;
