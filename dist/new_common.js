@@ -2749,20 +2749,22 @@ ISnew.ProductQuantity.prototype._bindQuantityButtons = function () {
 ISnew.ProductQuantity.prototype._bindQuantityInput = function () {
   var self = this;
 
-  $(document)
-    .on('blur change', '['+ self.selectors.quantity +'] input[name]', function (event) {
-      event.preventDefault();
+  function _updateQuantity (event) {
+    event.preventDefault();
 
-      self._getInstance($(this))
-        ._setQuantity();
-    })
+    self._getInstance($(this))
+      ._setQuantity();
+  };
+
+  $(document)
+    .on('blur change', '['+ self.selectors.quantity +'] input[name]', _.debounce(_updateQuantity, 150))
     .on('keypress', '['+ self.selectors.quantity +'] input[name]', function (event) {
       if (event.keyCode == 13) {
         event.preventDefault();
         event.stopPropagation();
 
         self._getInstance($(this))
-        ._setQuantity();
+          ._setQuantity();
       }
     });
 };
