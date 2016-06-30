@@ -4,9 +4,10 @@
 
 ISnew.json.addCompareItem = function (id) {
   var URL = new ISnew.tools.URL();
+  var _lang = URL.getKeyValue('lang') || '';
   var fields = {
-    'product[id]': _.toInteger(id),
-    lang: URL.getKeyValue('lang')
+    lang: _lang,
+    'product[id]': _.toInteger(id)
   };
 
   return $.post('/compares.json', fields);

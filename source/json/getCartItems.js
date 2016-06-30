@@ -6,8 +6,9 @@ ISnew.json.getCartItems = function () {
   var result = $.Deferred();
   var cookieCart = $.cookie('cart');
   var URL = new ISnew.tools.URL();
+  var _lang = URL.getKeyValue('lang') || '';
   var fields = {
-    lang: URL.getKeyValue('lang')
+    lang: _lang
   };
 
   /*
@@ -22,6 +23,7 @@ ISnew.json.getCartItems = function () {
   } else {
     $.getJSON('/cart_items.json', fields)
       .done(function (order) {
+        // url'ов нет
         result.resolve(order);
       })
       .fail(function (response) {

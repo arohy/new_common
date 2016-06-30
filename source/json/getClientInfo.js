@@ -1,7 +1,8 @@
 ISnew.json.getClientInfo = function (){
   var URL = new ISnew.tools.URL();
+  var _lang = URL.getKeyValue('lang') || '';
   var fields = {
-    lang: URL.getKeyValue('lang')
+    lang: _lang
   };
   var result = $.Deferred();
 
@@ -21,6 +22,7 @@ ISnew.json.getClientInfo = function (){
     })
     .fail(function (response) {
       console.log('json.getClientInfo: fail: ', response);
+      result.reject(response);
     });
 
   return result.promise();

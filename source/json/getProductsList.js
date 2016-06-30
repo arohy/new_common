@@ -4,9 +4,10 @@
 
 ISnew.json.getProductsList = function (id_array) {
   var URL = new ISnew.tools.URL();
+  var _lang = URL.getKeyValue('lang') || '';
   var fields = {
-    format: 'json',
-    lang: URL.getKeyValue('lang')
+    lang: _lang,
+    format: 'json'
   };
   // указваем, сколько id нужно отправить за раз
   var query_limit = 25;
@@ -52,6 +53,11 @@ ISnew.json.getProductsList = function (id_array) {
         })
         .flatten()
         .union()
+        .forEach(function (product) {
+          if (product && _lang) {
+            product.url += '?lang='+ _lang;
+          }
+        })
         .value()
     });
 };

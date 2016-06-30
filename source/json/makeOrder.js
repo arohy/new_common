@@ -4,9 +4,10 @@
 
 ISnew.json.makeCheckout = function (client, order) {
   var URL = new ISnew.tools.URL();
-  var dfd = $.Deferred();
+  var result = $.Deferred();
+  var _lang = URL.getKeyValue('lang') || '';
   var checkout = {
-    lang: URL.getKeyValue('lang'),
+    lang: _lang,
     pid: 1,
     'order[delivery_variant_id]': _.toInteger(order.delivery),
     'order[payment_gateway_id]': _.toInteger(order.payment)
@@ -16,19 +17,17 @@ ISnew.json.makeCheckout = function (client, order) {
     checkout['client['+ field +']'] = value;
   });
 
-  console.log(checkout);
-
   $.post('/fast_checkout.json', checkout)
     .done(function (response) {
       if (response.status == 'ok') {
-        dfd.resolve(response);
+        result.resolve(response);
       } else {
-        dfd.reject(response);
+        result.reject(response);
       }
     })
     .fail(function (response) {
-      dfd.reject(response)
+      result.reject(response)
     })
 
-  return dfd.promise();
+  return result.promise();
 };

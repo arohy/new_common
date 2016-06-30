@@ -54,8 +54,8 @@ ISnew.CartOrder.prototype.getComments = function () {
 ISnew.CartOrder.prototype._patch = function (current_order) {
   var self = this;
 
-  self.order_lines = current_order.order_lines || current_order.items;
-  self.order_line_comments = current_order.order_line_comments || current_order.order.order_line_comments;
+  self.order_lines = current_order.items;
+  self.order_line_comments = current_order.order.order_line_comments;
 
   self.positions_count = self.order_lines.length;
 
@@ -68,7 +68,6 @@ ISnew.CartOrder.prototype._patch = function (current_order) {
 
   self._itemsPrice();
   self._deliveryPrice(current_order);
-  self._url();
   self._setId()
   self._images();
 
@@ -98,18 +97,6 @@ ISnew.CartOrder.prototype._deliveryPrice = function (current_order) {
 
   self.delivery_price = parseFloat(delivery_price);
 
-  return;
-};
-
-/**
- * Фиксим url с учетом языков
- */
-ISnew.CartOrder.prototype._url = function () {
-  var self = this;
-  _.forEach(self.order_lines, function (item) {
-    //console.log(item);
-    // TODO: пока хз. нужен язык
-  });
   return;
 };
 

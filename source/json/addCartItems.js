@@ -10,8 +10,9 @@
 
 ISnew.json.addCartItems = function (items, options) {
   var URL = new ISnew.tools.URL();
+  var _lang = URL.getKeyValue('lang') || '';
   var fields = {
-    lang: URL.getKeyValue('lang')
+    lang: _lang
   };
 
   options = options || {};

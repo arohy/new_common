@@ -4,14 +4,19 @@
 
 ISnew.json.getProduct = function (id) {
   var URL = new ISnew.tools.URL();
+  var _lang = URL.getKeyValue('lang') || '';
   var fields = {
-    format: 'json',
-    lang: URL.getKeyValue('lang')
+    lang: _lang,
+    format: 'json'
   };
   var result = $.Deferred();
 
   $.getJSON('/product_by_id/'+ _.toInteger(id) +'.json', fields)
     .done(function (response) {
+      if (response.product && _lang) {
+        response.product.url += '?lang='+ _lang;
+      }
+
       result.resolve(response.product);
     })
     .fail(function (response) {
