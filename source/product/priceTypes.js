@@ -41,12 +41,14 @@ ISnew.ProductPriceType.prototype._initPrices = function (product) {
       price: parseFloat(variant.price)
     });
 
-    _.forEach(variant.prices, function (price, index) {
-      price_types[variant.id].push({
-        min_quantity: price_kinds[index].value,
-        price: parseFloat(variant.prices[index])
-      });
-    })
+    if (product.price_kinds.length) {
+      _.forEach(variant.prices, function (price, index) {
+        price_types[variant.id].push({
+          min_quantity: price_kinds[index].value,
+          price: parseFloat(variant.prices[index])
+        });
+      })
+    }
   });
 
   return price_types;
