@@ -667,7 +667,12 @@ ISnew.tools.URL.prototype.getKeyValue = function (key) {
  */
 
 ISnew.json.addCartItems = function (items, options) {
-  var fields = {};
+  var URL = new ISnew.tools.URL();
+  var _lang = URL.getKeyValue('lang') || '';
+  var fields = {
+    lang: _lang
+  };
+
   options = options || {};
 
   _.forIn(items, function (quantity, variant_id) {
@@ -689,7 +694,10 @@ ISnew.json.addCartItems = function (items, options) {
  */
 
 ISnew.json.addCompareItem = function (id) {
+  var URL = new ISnew.tools.URL();
+  var _lang = URL.getKeyValue('lang') || '';
   var fields = {
+    lang: _lang,
     'product[id]': _.toInteger(id)
   };
 
@@ -702,6 +710,11 @@ ISnew.json.addCompareItem = function (id) {
 ISnew.json.getCartItems = function () {
   var result = $.Deferred();
   var cookieCart = $.cookie('cart');
+  var URL = new ISnew.tools.URL();
+  var _lang = URL.getKeyValue('lang') || '';
+  var fields = {
+    lang: _lang
+  };
 
   /*
    * В куке состав корзины хранится, если там не более 4х РАЗНЫХ модификаций
@@ -713,8 +726,9 @@ ISnew.json.getCartItems = function () {
     result.resolve(order);
     // reject??
   } else {
-    $.getJSON('/cart_items.json')
+    $.getJSON('/cart_items.json', fields)
       .done(function (order) {
+        // url'ов нет
         result.resolve(order);
       })
       .fail(function (response) {
@@ -725,9 +739,14 @@ ISnew.json.getCartItems = function () {
   return result.promise();
 };
 ISnew.json.getClientInfo = function (){
+  var URL = new ISnew.tools.URL();
+  var _lang = URL.getKeyValue('lang') || '';
+  var fields = {
+    lang: _lang
+  };
   var result = $.Deferred();
 
-  $.getJSON('/client_account/contacts.json')
+  $.getJSON('/client_account/contacts.json', fields)
     .done(function (response) {
       switch (response.status) {
         case 'error':
@@ -743,6 +762,7 @@ ISnew.json.getClientInfo = function (){
     })
     .fail(function (response) {
       console.log('json.getClientInfo: fail: ', response);
+      result.reject(response);
     });
 
   return result.promise();
@@ -752,36 +772,79 @@ ISnew.json.getClientInfo = function (){
  */
 
 ISnew.json.getCollection = function () {
+  var URL = new ISnew.tools.URL();
   var path = '/collection/'+ _.toString(arguments[0]) +'.json';
-  var fields = {};
+  var _lang = URL.getKeyValue('lang') || '';
+  var fields = {
+    lang: _lang
+  };
+  var result = $.Deferred();
 
   _.chain(arguments)
     .drop()
     .compact()
-    .each(function (value) {
-      _.assign(fields, value)
+    .forEach(function (value) {
+      _.assign(fields, value);
     })
     .value();
 
-  return $.getJSON(path, fields);
+  $.getJSON(path, fields)
+    .done(function (response) {
+      _.forEach(response.products, function (product) {
+        if (product && _lang) {
+          product.url += '?lang='+ _lang;
+        }
+      });
+
+      result.resolve(response);
+    })
+    .fail(function (response) {
+      result.reject(response);
+    })
+
+  return result.promise();
 };
 /**
  * Добавление товара в сравнение
  */
 
 ISnew.json.getCompareItems = function (id) {
+  var URL = new ISnew.tools.URL();
+  var _lang = URL.getKeyValue('lang') || '';
+  var fields = {
+    lang: _lang
+  };
+  var result = $.Deferred();
 
-  return $.getJSON('/compares.json');
+  $.getJSON('/compares.json', fields)
+    .done(function (response) {
+      result.resolve(response);
+    })
+    .fail(function (response) {
+      result.reject(response);
+    });
+
+  return result.promise();
 };
 /*
  * Получение информации о товаре
  */
 
 ISnew.json.getProduct = function (id) {
+  var URL = new ISnew.tools.URL();
+  var _lang = URL.getKeyValue('lang') || '';
+  var fields = {
+    lang: _lang,
+    format: 'json'
+  };
   var result = $.Deferred();
 
-  $.getJSON('/product_by_id/'+ _.toInteger(id) +'.json', { format: 'json' })
+  $.getJSON('/product_by_id/'+ _.toInteger(id) +'.json', fields)
     .done(function (response) {
+      if (response.product && _lang) {
+        response.product.url += '?lang='+ _lang;
+      }
+
       result.resolve(response.product);
     })
     .fail(function (response) {
@@ -796,6 +859,12 @@ ISnew.json.getProduct = function (id) {
  */
 
 ISnew.json.getProductsList = function (id_array) {
+  var URL = new ISnew.tools.URL();
+  var _lang = URL.getKeyValue('lang') || '';
+  var fields = {
+    lang: _lang,
+    format: 'json'
+  };
   // указваем, сколько id нужно отправить за раз
   var query_limit = 25;
 
@@ -816,7 +885,7 @@ ISnew.json.getProductsList = function (id_array) {
 
   // собираем задачи
   var promises = $.map(paths, function (path) {
-    return $.ajax(path).then(function (response) {
+    return $.getJSON(path, fields).then(function (response) {
         return response;
       });
   });
@@ -840,6 +909,11 @@ ISnew.json.getProductsList = function (id_array) {
         })
         .flatten()
         .union()
+        .forEach(function (product) {
+          if (product && _lang) {
+            product.url += '?lang='+ _lang;
+          }
+        })
         .value()
     });
 };
@@ -848,9 +922,11 @@ ISnew.json.getProductsList = function (id_array) {
  */
 
 ISnew.json.makeCheckout = function (client, order) {
-  console.log(client, order);
-  var dfd = $.Deferred();
+  var URL = new ISnew.tools.URL();
+  var result = $.Deferred();
+  var _lang = URL.getKeyValue('lang') || '';
   var checkout = {
+    lang: _lang,
     pid: 1,
     'order[delivery_variant_id]': _.toInteger(order.delivery),
     'order[payment_gateway_id]': _.toInteger(order.payment)
@@ -860,29 +936,30 @@ ISnew.json.makeCheckout = function (client, order) {
     checkout['client['+ field +']'] = value;
   });
 
-  console.log(checkout);
-
   $.post('/fast_checkout.json', checkout)
     .done(function (response) {
       if (response.status == 'ok') {
-        dfd.resolve(response);
+        result.resolve(response);
       } else {
-        dfd.reject(response);
+        result.reject(response);
       }
     })
     .fail(function (response) {
-      dfd.reject(response)
+      result.reject(response)
     })
 
-  return dfd.promise();
+  return result.promise();
 };
 /*
  * Удаление товара из корзины
  */
 
 ISnew.json.removeCartItem = function (variant_id) {
+  var URL = new ISnew.tools.URL();
   var path = '/cart_items/'+ _.toInteger(variant_id) +'.json';
+  var _lang = URL.getKeyValue('lang') || '';
   var fields = {
+    lang: _lang,
     '_method': 'delete'
   };
 
@@ -893,7 +970,10 @@ ISnew.json.removeCartItem = function (variant_id) {
  */
 
 ISnew.json.removeCompareItem = function (id) {
+  var URL = new ISnew.tools.URL();
+  var _lang = URL.getKeyValue('lang') || '';
   var fields = {
+    lang: _lang,
       _method: 'delete',
     };
   var path   = '/compares/'+ _.toInteger(id) +'.json';
@@ -905,8 +985,12 @@ ISnew.json.removeCompareItem = function (id) {
  */
 
 ISnew.json.sendMessage = function (input) {
+  var URL = new ISnew.tools.URL();
   var result = $.Deferred();
-  var message = {};
+  var _lang = URL.getKeyValue('lang') || '';
+  var message = {
+    lang: _lang
+  };
 
   _.forIn(input, function (value, key) {
     message['feedback['+ key +']'] = value;
@@ -929,17 +1013,21 @@ ISnew.json.sendMessage = function (input) {
  */
 
 ISnew.json.updateCartItems = function (items, options) {
+  var URL = new ISnew.tools.URL();
+  var _lang = URL.getKeyValue('lang') || '';
   var fields = {
+    lang: _lang,
     '_method': 'put'
   };
+  var dfd = $.Deferred();
 
   options = options || {};
 
-  _.forIn(items, function(quantity, variant_id) {
+  _.forIn(items, function (quantity, variant_id) {
     fields['cart[quantity]['+ variant_id +']'] = _.toInteger(quantity);
   });
 
-  _.forIn(options.comments, function(comment, variant_id) {
+  _.forIn(options.comments, function (comment, variant_id) {
     fields['cart[order_line_comments]['+ variant_id +']'] = comment;
   });
 
@@ -947,7 +1035,22 @@ ISnew.json.updateCartItems = function (items, options) {
     fields['cart[coupon]'] = options.coupon;
   }
 
-  return $.post('/cart_items.json', fields);
+  $.post('/cart_items.json', fields)
+    .done(function (response) {
+      _.forEach(response.items, function (item) {
+        if (item && _lang) {
+          item.product_url += '?lang='+ _lang;
+          item.product.url += '?lang='+ _lang;
+        }
+      });
+
+      dfd.resolve(response);
+    })
+    .fail(function (response) {
+      dfd.reject(response);
+    });
+
+  return dfd.promise();
 };
 /**
  * Cart
@@ -1231,8 +1334,8 @@ ISnew.CartOrder.prototype.getComments = function () {
 ISnew.CartOrder.prototype._patch = function (current_order) {
   var self = this;
 
-  self.order_lines = current_order.order_lines || current_order.items;
-  self.order_line_comments = current_order.order_line_comments || current_order.order.order_line_comments;
+  self.order_lines = current_order.items;
+  self.order_line_comments = current_order.order.order_line_comments;
 
   self.positions_count = self.order_lines.length;
 
@@ -1245,7 +1348,6 @@ ISnew.CartOrder.prototype._patch = function (current_order) {
 
   self._itemsPrice();
   self._deliveryPrice(current_order);
-  self._url();
   self._setId()
   self._images();
 
@@ -1275,18 +1377,6 @@ ISnew.CartOrder.prototype._deliveryPrice = function (current_order) {
 
   self.delivery_price = parseFloat(delivery_price);
 
-  return;
-};
-
-/**
- * Фиксим url с учетом языков
- */
-ISnew.CartOrder.prototype._url = function () {
-  var self = this;
-  _.forEach(self.order_lines, function (item) {
-    //console.log(item);
-    // TODO: пока хз. нужен язык
-  });
   return;
 };
 
@@ -2164,12 +2254,14 @@ ISnew.ProductPriceType.prototype._initPrices = function (product) {
       price: parseFloat(variant.price)
     });
 
-    _.forEach(variant.prices, function (price, index) {
-      price_types[variant.id].push({
-        min_quantity: price_kinds[index].value,
-        price: parseFloat(variant.prices[index])
-      });
-    })
+    if (product.price_kinds.length) {
+      _.forEach(variant.prices, function (price, index) {
+        price_types[variant.id].push({
+          min_quantity: price_kinds[index].value,
+          price: parseFloat(variant.prices[index])
+        });
+      })
+    }
   });
 
   return price_types;
@@ -3467,7 +3559,7 @@ ISnew.ProductsStorage = function (_owner) {
   self._settings = {
     maxProducts: 100,
     json: 'products',
-    liveTime: 300000 // milisec
+    liveTime: 180000 // milisec
   };
 
   self._owner = _owner;
@@ -3524,9 +3616,18 @@ ISnew.ProductsStorage.prototype.getProducts = function (_idList) {
  */
 ISnew.ProductsStorage.prototype._loadJSON = function () {
   var self = this;
+  var URL = new ISnew.tools.URL();
   var _json = self._storage.getItem(self._settings.json);
+  var _lang = self._storage.getItem('lang');
+  var _currentLang = URL.getKeyValue('lang') || '';
 
   _json = JSON.parse(_json) || {};
+  _lang = JSON.parse(_lang);
+
+  if (_lang !== _currentLang) {
+    _json = {};
+    self._storage.setItem('lang', JSON.stringify(_currentLang));
+  }
 
   return _json;
 };
