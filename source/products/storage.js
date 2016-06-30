@@ -8,7 +8,7 @@ ISnew.ProductsStorage = function (_owner) {
   self._settings = {
     maxProducts: 100,
     json: 'products',
-    liveTime: 300000 // milisec
+    liveTime: 180000 // milisec
   };
 
   self._owner = _owner;
@@ -65,9 +65,18 @@ ISnew.ProductsStorage.prototype.getProducts = function (_idList) {
  */
 ISnew.ProductsStorage.prototype._loadJSON = function () {
   var self = this;
+  var URL = new ISnew.tools.URL();
   var _json = self._storage.getItem(self._settings.json);
+  var _lang = self._storage.getItem('lang');
+  var _currentLang = URL.getKeyValue('lang') || '';
 
   _json = JSON.parse(_json) || {};
+  _lang = JSON.parse(_lang);
+
+  if (_lang !== _currentLang) {
+    _json = {};
+    self._storage.setItem('lang', JSON.stringify(_currentLang));
+  }
 
   return _json;
 };

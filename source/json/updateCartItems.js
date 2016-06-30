@@ -3,17 +3,19 @@
  */
 
 ISnew.json.updateCartItems = function (items, options) {
+  var URL = new ISnew.tools.URL();
   var fields = {
+    lang: URL.getKeyValue('lang'),
     '_method': 'put'
   };
 
   options = options || {};
 
-  _.forIn(items, function(quantity, variant_id) {
+  _.forIn(items, function (quantity, variant_id) {
     fields['cart[quantity]['+ variant_id +']'] = _.toInteger(quantity);
   });
 
-  _.forIn(options.comments, function(comment, variant_id) {
+  _.forIn(options.comments, function (comment, variant_id) {
     fields['cart[order_line_comments]['+ variant_id +']'] = comment;
   });
 

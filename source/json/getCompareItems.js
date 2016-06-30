@@ -3,6 +3,10 @@
  */
 
 ISnew.json.getCompareItems = function (id) {
+  var URL = new ISnew.tools.URL();
+  var fields = {
+    lang: URL.getKeyValue('lang')
+  };
 
-  return $.getJSON('/compares.json');
+  return $.getJSON('/compares.json', fields);
 };
