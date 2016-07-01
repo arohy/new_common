@@ -62,7 +62,8 @@ ISnew.CartDOM.prototype._addItem = function ($button) {
     comments: {},
     button: $button,
     form: $form,
-    coupon: self._getCoupon($form)
+    coupon: self._getCoupon($form),
+    isQuickCheckout: $button.checkoutButton || false
   };
 
   // складываем данные в объект
