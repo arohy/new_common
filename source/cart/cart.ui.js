@@ -45,38 +45,16 @@ ISnew.CartDOM.prototype.setConfig = function (options) {
 
   return;
 };
+
 /**
  * Добавляем товары из формы
  */
 ISnew.CartDOM.prototype._addItem = function ($button) {
   var self = this;
-
   var $form = $button.parents('form:first');
-  var $fields = $form.find('[name*="variant_ids"]');
-  var $one_variant = $form.find('[name="variant_id"]');
-  var $quantity = $form.find('input[name="quantity"]');
-  var $comment = $form.find('[name="comment"]');
 
-  var task = {
-    items: {},
-    comments: {},
-    button: $button,
-    form: $form,
-    coupon: self._getCoupon($form),
-    isQuickCheckout: $button.checkoutButton || false
-  };
+  task = self._parseProductForm($form, $button);
 
-  // складываем данные в объект
-  // если в форме был стандартный селектор модификаций, кладем отдельно
-  if ($one_variant.length == 1) {
-    task.items[_.toInteger($one_variant.val())] = parseFloat($quantity.val());
-    task.comments[_.toInteger($one_variant.val())] = $comment.val();
-  }
-  _.assign(task.items, self._getItems($fields));
-
-  _.assign(task.comments, self._getComments($form));
-
-  // посылаем данные в корзину
   Cart.add(task);
   return;
 };
@@ -111,6 +89,18 @@ ISnew.CartDOM.prototype._bindAddItem = function () {
   EventBus.subscribe('always:insales:cart', function (data) {
     self._unlockButton(data, 'add_items');
   });
+};
+
+/**
+ *
+ */
+ISnew.CartDOM.prototype._quickCheckout = function ($button) {
+  var self = this;
+  var $form = $button.parents('form:first');
+
+  task = self._parseProductForm($form, $button);
+
+  return;
 };
 
 /**
@@ -384,4 +374,37 @@ ISnew.CartDOM.prototype._getComments = function ($form) {
   });
 
   return comments;
+};
+
+/**
+ * Разбираем форму товара
+ */
+ISnew.CartDOM.prototype._parseProductForm = function ($form, $button) {
+  var self = this;
+
+  var $fields = $form.find('[name*="variant_ids"]');
+  var $one_variant = $form.find('[name="variant_id"]');
+  var $quantity = $form.find('input[name="quantity"]');
+  var $comment = $form.find('[name="comment"]');
+
+  var task = {
+    items: {},
+    comments: {},
+    button: $button,
+    form: $form,
+    coupon: self._getCoupon($form),
+    isQuickCheckout: $button.checkoutButton || false
+  };
+
+  // складываем данные в объект
+  // если в форме был стандартный селектор модификаций, кладем отдельно
+  if ($one_variant.length == 1) {
+    task.items[_.toInteger($one_variant.val())] = parseFloat($quantity.val());
+    task.comments[_.toInteger($one_variant.val())] = $comment.val();
+  }
+  _.assign(task.items, self._getItems($fields));
+
+  _.assign(task.comments, self._getComments($form));
+
+  return task;
 };

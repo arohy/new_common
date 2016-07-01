@@ -11,6 +11,7 @@ ISnew.Cart = function () {
   self.ui = new ISnew.CartDOM();
   self.order = new ISnew.CartOrder(self);
   self.tasks = new ISnew.CartTasks(self);
+  self.quickCheckout = new ISnew.CartQuickCheckout(self);
 
   self.init();
 };
@@ -156,6 +157,33 @@ ISnew.Cart.prototype._clear_items = function (task, current_items) {
 };
 
 /**
+ * Добавление товаров в корзину для "Заказа в один клик"
+ */
+ISnew.Cart.prototype.quick_checkout = function (task) {
+  var self = this;
+  task = task || {};
+  task.method = 'add_quick_checkout';
+
+  console.log(task);
+
+  self.tasks.send(task);
+};
+
+ISnew.Cart.prototype._add_quick_checkout = function (task, current_items) {
+  var self = this;
+
+  _.forIn(task.items, function(quantity, variant_id) {
+    var current_quantity = _.toInteger(current_items[variant_id]) + _.toInteger(quantity);
+
+    current_items[variant_id] = current_quantity;
+  });
+
+  console.log(task, current_items);
+
+  return current_items;
+};
+
+/**
  * Устанавливаем купон
  */
 ISnew.Cart.prototype.setCoupon = function (task) {
@@ -203,24 +231,16 @@ ISnew.Cart.prototype._update = function (items, task) {
 };
 
 /**
- * Фикс для заказа в один клик
+ * Установка настроек для корзины
  */
-ISnew.Cart.prototype.addItem = function (form) {
-  var self = this;
-  var _button = $(form).find('['+ self.ui.options.add +']');
-  //  Ставим флаг на кнопку
-  _button.checkoutButton = true;
-  self.ui._addItem(_button);
-  // вызываем модалку чекаута
-  $('#insales-quick-checkout-dialog').modal({
-    fadeDuration: 250
-  });
-};
-
 ISnew.Cart.prototype.setConfig = function (settings) {
   var self = this;
 
   self.ui.setConfig(settings);
 
+  return;
+};
+
+ISnew.Cart.prototype.addItem = function () {
   return;
 };

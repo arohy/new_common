@@ -2,22 +2,19 @@
  * Оформление заказа
  */
 
-ISnew.json.makeQuickCheckout = function (client) {
+ISnew.json.makeQuickCheckout = function (formData) {
   var URL = new ISnew.tools.URL();
   var result = $.Deferred();
   var _lang = URL.getKeyValue('lang') || '';
-  var checkout = {
-    lang: _lang,
-    pid: 1
-  };
 
-  _.forIn(client, function (value, field) {
-    checkout['client['+ field +']'] = value;
-  });
+  formData.lang = _lang;
+  formData.pid = 1;
+  formData.dataType = 'json';
+  formData.type = 'POST';
 
-  $.post('/orders/create_with_quick_checkout.json', checkout)
+  $.ajax('/orders/create_with_quick_checkout.json', formData)
     .done(function (response) {
-      if (response.status == 'ok') {
+      if (response.result == 'ok') {
         result.resolve(response);
       } else {
         result.reject(response);
