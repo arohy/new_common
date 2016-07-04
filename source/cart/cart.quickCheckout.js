@@ -25,11 +25,17 @@ ISnew.CartQuickCheckout.prototype._init = function () {
 
   $(function () {
     self.$modal = $('.m-modal--checkout');
-    self.$close = $('.m-modal-close');
+    self.$message = $('#insales-quick-checkout-msg');
+    if (!self.$message.length) {
+      self.$message = $('<div id="insales-quick-checkout-msg" class="m-modal m-modal--msg">\n<div class="m-modal-wrapper">\n<button class="button m-button m-modal-close" data-modal="close"></button>\n<div class="m-modal-msg center"></div>\n</div>\n</div>');
+      self.$message.appendTo($('body'));
+    }
+
     self.$send = $('.m-modal-button--checkout');
     self.$errors = $('.m-modal-errors');
     self.$overlay = $('<div class="m-overlay" />');
     self.$form = $('#quick_checkout_form');
+    self.$close = $('.m-modal-close');
 
     self._bindCloseModal();
     self._bindSend();
@@ -43,10 +49,10 @@ ISnew.CartQuickCheckout.prototype._init = function () {
 /**
  * Открытие модалки
  */
-ISnew.CartQuickCheckout.prototype.openModal = function () {
+ISnew.CartQuickCheckout.prototype.openModal = function ($modal) {
   var self = this;
 
-  self.$modal.css({
+  $modal.css({
     position: 'fixed',
     display: 'block',
   });
@@ -58,10 +64,10 @@ ISnew.CartQuickCheckout.prototype.openModal = function () {
 /**
  * Закрытие модалки
  */
-ISnew.CartQuickCheckout.prototype.closeModal = function () {
+ISnew.CartQuickCheckout.prototype.closeModal = function ($modal) {
   var self = this;
 
-  self.$modal.removeAttr('style');
+  $modal.removeAttr('style');
   self.$overlay.remove();
 
   return;
@@ -109,7 +115,7 @@ ISnew.CartQuickCheckout.prototype._bindOpenModal = function () {
         self._targetForm = self._getProductForm($button);
         self._targetButton = $button;
 
-        self.openModal();
+        self.openModal(self.$modal);
       } else {
         // иначе - дергаем событие
         EventBus.publish('add_disabled:insales:quick_checkout', {
@@ -138,6 +144,8 @@ ISnew.CartQuickCheckout.prototype._send = function () {
     ajaxParams.data = self.$form.serialize();
   }
 
+  self.$errors.html('');
+
   ISnew.json.makeQuickCheckout(ajaxParams)
     .done(function (response) {
       self._success(response);
@@ -152,19 +160,12 @@ ISnew.CartQuickCheckout.prototype._send = function () {
  */
 ISnew.CartQuickCheckout.prototype._success = function (response) {
   var self = this;
-  var iframe;
 
-  console.log(response);
+  self._owner.clear();
 
-  iframe = $("<iframe src='/orders/successful' width='0' height='0'></iframe>");
-
-  $('body').append(iframe);
-  iframe.on('load', function() {
-    return $(iframe).remove();
-  });
+  self.showMessage(response.message);
 
   EventBus.publish('success:insales:quick_checkout', response);
-
   return;
 };
 
@@ -173,10 +174,6 @@ ISnew.CartQuickCheckout.prototype._success = function (response) {
  */
 ISnew.CartQuickCheckout.prototype._errors = function (response) {
   var self = this;
-
-  console.log(response);
-
-  self.$errors.html('');
 
   _.forEach(response.errors, function (error) {
     self.$errors.append($('<div class="m-modal-error">'+ error +'</div>'));
@@ -209,7 +206,7 @@ ISnew.CartQuickCheckout.prototype._bindCloseModal = function () {
 
     self._targetForm = {};
     self._targetButton = {};
-    self.closeModal();
+    self.closeModal($('.m-modal'));
     self.$errors.html('');
   }
 
@@ -266,4 +263,25 @@ ISnew.CartQuickCheckout.prototype._bindEvents = function () {
   EventBus.subscribe('add_quick_checkout:insales:cart', function (data) {
     self._send();
   });
+};
+
+/**
+ *
+ */
+ISnew.CartQuickCheckout.prototype.showMessage = function (message) {
+  var self = this;
+
+  self.closeModal(self.$modal);
+
+  self.openModal(self.$message);
+  $('.m-modal-msg', self.$message).html(message);
+};
+
+/**
+ *
+ */
+ISnew.CartQuickCheckout.prototype.hideMessage = function () {
+  var self = this;
+
+  self.closeModal(self.$message);
 };
