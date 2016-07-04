@@ -164,8 +164,6 @@ ISnew.Cart.prototype.quick_checkout = function (task) {
   task = task || {};
   task.method = 'add_quick_checkout';
 
-  console.log(task);
-
   self.tasks.send(task);
 };
 
@@ -177,8 +175,6 @@ ISnew.Cart.prototype._add_quick_checkout = function (task, current_items) {
 
     current_items[variant_id] = current_quantity;
   });
-
-  console.log(task, current_items);
 
   return current_items;
 };
