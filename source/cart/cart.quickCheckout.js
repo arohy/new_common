@@ -69,6 +69,7 @@ ISnew.CartQuickCheckout.prototype.closeModal = function ($modal) {
 
   $modal.removeAttr('style');
   self.$overlay.remove();
+  self._targetForm._quickCheckout;
 
   return;
 };
@@ -81,13 +82,12 @@ ISnew.CartQuickCheckout.prototype.send = function () {
   var items;
 
   if (!self._targetForm._quickCheckout) {
+    self._targetForm._quickCheckout = true;
+
     items = self._owner.ui._parseProductForm(self._targetForm, self._targetButton);
     self._owner.quick_checkout(items);
   } else {
     console.log('QuickCheckout: in process');
-
-    self._targetForm._quickCheckout = true;
-
     self._send();
   }
 
@@ -116,6 +116,7 @@ ISnew.CartQuickCheckout.prototype._bindOpenModal = function () {
         self._targetButton = $button;
 
         self.openModal(self.$modal);
+        self.$form.find('input:visible:first').focus();
       } else {
         // иначе - дергаем событие
         EventBus.publish('add_disabled:insales:quick_checkout', {
@@ -199,6 +200,13 @@ ISnew.CartQuickCheckout.prototype._bindCloseModal = function () {
   $(document)
     .on('click', '.m-overlay', function (event) {
       _close();
+    })
+    .on('keyup', function (event) {
+      if (event.keyCode == 27) {
+        event.preventDefault();
+
+        _close();
+      }
     });
 
   function _close () {
@@ -229,6 +237,14 @@ ISnew.CartQuickCheckout.prototype._bindSend = function () {
       event.preventDefault();
 
       self.send();
+    });
+
+  self.$form
+    .on('keypress', function (event) {
+      if (event.keyCode == 13) {
+        event.preventDefault();
+        self.send();
+      }
     });
 
   return;
