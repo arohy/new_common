@@ -159,15 +159,15 @@ ISnew.Cart.prototype._clear_items = function (task, current_items) {
 /**
  * Добавление товаров в корзину для "Заказа в один клик"
  */
-ISnew.Cart.prototype.quick_checkout = function (task) {
+ISnew.Cart.prototype.add_checkout = function (task) {
   var self = this;
   task = task || {};
-  task.method = 'add_quick_checkout';
+  task.method = 'add_checkout';
 
   self.tasks.send(task);
 };
 
-ISnew.Cart.prototype._add_quick_checkout = function (task, current_items) {
+ISnew.Cart.prototype._add_checkout = function (task, current_items) {
   var self = this;
 
   _.forIn(task.items, function(quantity, variant_id) {
