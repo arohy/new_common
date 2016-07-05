@@ -4,6 +4,8 @@
 
 'use strict';
 
+console.warn('Внимание подключена новая версия JS API InSales');
+
 if (!ISnew) {
   var ISnew = {};
 }

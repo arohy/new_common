@@ -46,7 +46,7 @@ ISnew.EventsLogger.prototype.addListner = function (eventName) {
     self.loggersList[component][eventName] = true;
 
     EventBus.subscribe(eventName, function (data) {
-      console.log('LISTNER: ', eventName, data);
+      console.log('LISTNER: ', eventName, _.cloneDeep(data));
     });
   }
 
