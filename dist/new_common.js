@@ -131,6 +131,8 @@ Ct["[object Error]"]=Ct["[object Function]"]=Ct["[object WeakMap]"]=false;var zt
 
 'use strict';
 
+console.warn('Внимание подключена новая версия JS API InSales');
+
 if (!ISnew) {
   var ISnew = {};
 }
@@ -502,7 +504,7 @@ ISnew.EventsLogger.prototype.addListner = function (eventName) {
     self.loggersList[component][eventName] = true;
 
     EventBus.subscribe(eventName, function (data) {
-      console.log('LISTNER: ', eventName, data);
+      console.log('LISTNER: ', eventName, _.cloneDeep(data));
     });
   }
 
@@ -931,6 +933,7 @@ ISnew.json.makeCheckout = function (client, order) {
     'order[delivery_variant_id]': _.toInteger(order.delivery),
     'order[payment_gateway_id]': _.toInteger(order.payment)
   };
+  var iframe;
 
   _.forIn(client, function (value, field) {
     checkout['client['+ field +']'] = value;
@@ -939,6 +942,12 @@ ISnew.json.makeCheckout = function (client, order) {
   $.post('/fast_checkout.json', checkout)
     .done(function (response) {
       if (response.status == 'ok') {
+        iframe = $("<iframe src='/orders/successful' width='0' height='0'></iframe>");
+        $('body').append(iframe);
+        iframe.on('load', function() {
+          return $(iframe).remove();
+        });
+
         result.resolve(response);
       } else {
         result.reject(response);
@@ -947,6 +956,42 @@ ISnew.json.makeCheckout = function (client, order) {
     .fail(function (response) {
       result.reject(response)
     })
+
+  return result.promise();
+};
+/**
+ * Оформление заказа
+ */
+
+ISnew.json.makeQuickCheckout = function (formData) {
+  var URL = new ISnew.tools.URL();
+  var result = $.Deferred();
+  var _lang = URL.getKeyValue('lang') || '';
+  var iframe;
+
+  formData.lang = _lang;
+  formData.pid = 1;
+  formData.dataType = 'json';
+  formData.type = 'POST';
+
+  $.ajax('/orders/create_with_quick_checkout.json', formData)
+    .done(function (response) {
+      if (response.result == 'ok') {
+        iframe = $("<iframe src='/orders/successful' width='0' height='0'></iframe>");
+
+        $('body').append(iframe);
+        iframe.on('load', function() {
+          return $(iframe).remove();
+        });
+
+        result.resolve(response);
+      } else {
+        result.reject(response);
+      }
+    })
+    .fail(function (response) {
+      result.reject(response);
+    });
 
   return result.promise();
 };
@@ -1065,6 +1110,7 @@ ISnew.Cart = function () {
   self.ui = new ISnew.CartDOM();
   self.order = new ISnew.CartOrder(self);
   self.tasks = new ISnew.CartTasks(self);
+  self.quickCheckout = new ISnew.CartQuickCheckout(self);
 
   self.init();
 };
@@ -1210,6 +1256,29 @@ ISnew.Cart.prototype._clear_items = function (task, current_items) {
 };
 
 /**
+ * Добавление товаров в корзину для "Заказа в один клик"
+ */
+ISnew.Cart.prototype.add_checkout = function (task) {
+  var self = this;
+  task = task || {};
+  task.method = 'add_checkout';
+
+  self.tasks.send(task);
+};
+
+ISnew.Cart.prototype._add_checkout = function (task, current_items) {
+  var self = this;
+
+  _.forIn(task.items, function(quantity, variant_id) {
+    var current_quantity = _.toInteger(current_items[variant_id]) + _.toInteger(quantity);
+
+    current_items[variant_id] = current_quantity;
+  });
+
+  return current_items;
+};
+
+/**
  * Устанавливаем купон
  */
 ISnew.Cart.prototype.setCoupon = function (task) {
@@ -1257,25 +1326,17 @@ ISnew.Cart.prototype._update = function (items, task) {
 };
 
 /**
- * Фикс для заказа в один клик
+ * Установка настроек для корзины
  */
-ISnew.Cart.prototype.addItem = function (form) {
-  var self = this;
-  var _button = $(form).find('['+ self.ui.options.add +']');
-  //  Ставим флаг на кнопку
-  _button.checkoutButton = true;
-  self.ui._addItem(_button);
-  // вызываем модалку чекаута
-  $('#insales-quick-checkout-dialog').modal({
-    fadeDuration: 250
-  });
-};
-
 ISnew.Cart.prototype.setConfig = function (settings) {
   var self = this;
 
   self.ui.setConfig(settings);
 
+  return;
+};
+
+ISnew.Cart.prototype.addItem = function () {
   return;
 };
 /**
@@ -1415,6 +1476,320 @@ ISnew.CartOrder.prototype.getItemByID = function (id) {
   });
 
   return _item;
+};
+/**
+ * CuickCheckout
+ */
+ISnew.CartQuickCheckout = function (_owner) {
+  var self = this;
+
+  self._owner = _owner;
+
+  self.selectors = {
+    disabled: 'disabled',
+
+    open: 'data-quick-checkout',
+
+    sendButton: '.m-modal-button--checkout',
+    closeButton: '.m-modal-close',
+    errors: '.m-modal-errors',
+    form: '#quick_checkout_form',
+    modal: '.m-modal--checkout',
+    msgModal: '#insales-quick-checkout-msg',
+  };
+
+  self._init();
+
+  return;
+};
+
+ISnew.CartQuickCheckout.prototype._init = function () {
+  var self = this;
+
+  self._bindOpenModal();
+
+  $(function () {
+    self.$modal = $(self.selectors.modal);
+    self.$message = $(self.msgModal);
+    if (!self.$message.length) {
+      self.$message = $('<div id="insales-quick-checkout-msg" class="m-modal m-modal--msg">\n<div class="m-modal-wrapper">\n<button class="button m-button m-modal-close" data-modal="close"></button>\n<div class="m-modal-msg center"></div>\n</div>\n</div>');
+      self.$message.appendTo($('body'));
+    }
+
+    self.$send = $(self.selectors.sendButton);
+    self.$errors = $(self.selectors.errors);
+    self.$overlay = $('<div class="m-overlay" />');
+    self.$form = $(self.selectors.form);
+    self.$close = $(self.selectors.closeButton);
+
+    self._bindCloseModal();
+    self._bindSend();
+  });
+
+  self._bindEvents();
+
+  return;
+};
+
+/**
+ * Открытие модалки
+ */
+ISnew.CartQuickCheckout.prototype.openModal = function ($modal) {
+  var self = this;
+
+  $modal.css({
+    position: 'fixed',
+    display: 'block',
+  });
+  $('body').append(self.$overlay);
+
+  return;
+};
+
+/**
+ * Закрытие модалки
+ */
+ISnew.CartQuickCheckout.prototype.closeModal = function ($modal) {
+  var self = this;
+
+  $modal.removeAttr('style');
+  self.$overlay.remove();
+  self._targetForm._quickCheckout;
+
+  return;
+};
+
+/**
+ * Запуск добавления товаров, отправка формы
+ */
+ISnew.CartQuickCheckout.prototype.send = function () {
+  var self = this;
+  var items;
+
+  if (!self._targetForm._quickCheckout) {
+    self._targetForm._quickCheckout = true;
+
+    items = self._owner.ui._parseProductForm(self._targetForm, self._targetButton);
+    self._owner.add_checkout(items);
+  } else {
+    console.log('QuickCheckout: in process');
+    self._send();
+  }
+
+  return;
+};
+
+/**
+ * Обработчик открытия модалки
+ */
+ISnew.CartQuickCheckout.prototype._bindOpenModal = function () {
+  var self = this;
+
+  $(document).on('click', '[data-quick-checkout]', function (event) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    var $button = $(this);
+
+    if (!$button.prop(self.selectors.disabled)) {
+      // если кнопка не заблочена - показваем модалку
+      self._targetForm = self._getProductForm($button);
+      self._targetButton = $button;
+
+      self.openModal(self.$modal);
+      self.$form.find('input:visible:first').focus();
+    } else {
+      // иначе - дергаем событие
+      EventBus.publish('add_disabled:insales:quick_checkout', {
+        button: $button,
+      });
+    }
+  });
+
+  return;
+};
+
+/**
+ * Отправка формы из модалки
+ */
+ISnew.CartQuickCheckout.prototype._send = function () {
+  var self = this;
+  var ajaxParams = {};
+  var task = {
+    action: {
+      method: 'send',
+      modal: self.$modal,
+      form: self.$form
+    }
+  };
+
+  if (self.$form.find(':file').length && window.FormData) {
+    ajaxParams.data = new FormData(self.$form.get(0));
+    ajaxParams.processData = false;
+  } else {
+    ajaxParams.data = self.$form.serialize();
+  }
+
+  self.$errors.html('');
+
+  EventBus.publish('before:insales:quick_checkout', task);
+
+  ISnew.json.makeQuickCheckout(ajaxParams)
+    .done(function (response) {
+      _.merge(task, response);
+      self._success(task);
+    })
+    .fail(function (response) {
+      _.merge(task, response)
+      self._errors(task);
+    })
+    .always(function () {
+      EventBus.publish('always:insales:quick_checkout', task)
+    });
+};
+
+/**
+ * Все ок
+ */
+ISnew.CartQuickCheckout.prototype._success = function (task) {
+  var self = this;
+
+  self._owner.clear();
+
+  self.showMessage(task.message);
+
+  EventBus.publish('success:insales:quick_checkout', task);
+  return;
+};
+
+/**
+ * Прилетели ошибки
+ */
+ISnew.CartQuickCheckout.prototype._errors = function (task) {
+  var self = this;
+
+  _.forEach(task.errors, function (error) {
+    self.$errors.append($('<div class="m-modal-error">'+ error +'</div>'));
+  });
+
+  EventBus.publish('errors:insales:quick_checkout', task);
+
+  return;
+};
+
+/**
+ * Обработчики закрытия модалки
+ */
+ISnew.CartQuickCheckout.prototype._bindCloseModal = function () {
+  var self = this;
+
+  self.$close
+    .off('click')
+    .on('click', function (event) {
+      _close();
+    });
+
+  $(document)
+    .on('click', '.m-overlay', function (event) {
+      _close();
+    })
+    .on('keyup', function (event) {
+      if (event.keyCode == 27) {
+        event.preventDefault();
+
+        _close();
+      }
+    });
+
+  function _close () {
+    event.preventDefault();
+
+    self._targetForm = {};
+    self._targetButton = {};
+    self.closeModal($('.m-modal'));
+    self.$errors.html('');
+  }
+
+  return;
+};
+
+/**
+ * Обработка отправки
+ */
+ISnew.CartQuickCheckout.prototype._bindSend = function () {
+  var self = this;
+
+  self.$send
+    // сносим все обработчики
+    .off('click')
+    // вешаем свой
+    .on('click', function (event) {
+      event.preventDefault();
+
+      self.send();
+    });
+
+  self.$form
+    .on('keypress', function (event) {
+      if (event.keyCode == 13) {
+        event.preventDefault();
+        self.send();
+      }
+    });
+
+  return;
+};
+
+/**
+ * Разбор формы модалки
+ */
+ISnew.CartQuickCheckout.prototype._getProductForm = function ($button) {
+  var self = this;
+  var _target = $button.attr(self.selectors.open) || false;
+  var _parent = $button.parents('form:first') || false;
+  var $form;
+
+  if (_target && $(_target).is('form')) {
+    $form = $(_target);
+  } else if (_parent && $(_parent).is('form')) {
+    $form = $(_parent);
+  } else {
+    console.log('CartQuickCheckout: _getProductForm: target form: WAAAAT?!');
+  }
+
+  return $form;
+};
+
+/**
+ * Прибиваем слушателей шины
+ */
+ISnew.CartQuickCheckout.prototype._bindEvents = function () {
+  var self = this;
+
+  EventBus.subscribe('add_checkout:insales:cart', function (data) {
+    self._send();
+  });
+};
+
+/**
+ *
+ */
+ISnew.CartQuickCheckout.prototype.showMessage = function (message) {
+  var self = this;
+
+  self.closeModal(self.$modal);
+
+  self.openModal(self.$message);
+  $('.m-modal-msg', self.$message).html(message);
+};
+
+/**
+ *
+ */
+ISnew.CartQuickCheckout.prototype.hideMessage = function () {
+  var self = this;
+
+  self.closeModal(self.$message);
 };
 /**
  * Менеджер задач для корзины
@@ -1558,13 +1933,6 @@ ISnew.CartTasks.prototype._done = function (order) {
     EventBus.publish(task.method +':insales:cart', data);
   });
 
-  //  снимаем флаг с кнопки
-  var _button = data.action.button;
-
-  if (_button && _button.checkoutButton) {
-    _button.checkoutButton = false;
-  }
-
   EventBus.publish('update_items:insales:cart', data);
   return;
 };
@@ -1665,37 +2033,16 @@ ISnew.CartDOM.prototype.setConfig = function (options) {
 
   return;
 };
+
 /**
  * Добавляем товары из формы
  */
 ISnew.CartDOM.prototype._addItem = function ($button) {
   var self = this;
-
   var $form = $button.parents('form:first');
-  var $fields = $form.find('[name*="variant_ids"]');
-  var $one_variant = $form.find('[name="variant_id"]');
-  var $quantity = $form.find('input[name="quantity"]');
-  var $comment = $form.find('[name="comment"]');
 
-  var task = {
-    items: {},
-    comments: {},
-    button: $button,
-    form: $form,
-    coupon: self._getCoupon($form)
-  };
+  task = self._parseProductForm($form, $button);
 
-  // складываем данные в объект
-  // если в форме был стандартный селектор модификаций, кладем отдельно
-  if ($one_variant.length == 1) {
-    task.items[_.toInteger($one_variant.val())] = parseFloat($quantity.val());
-    task.comments[_.toInteger($one_variant.val())] = $comment.val();
-  }
-  _.assign(task.items, self._getItems($fields));
-
-  _.assign(task.comments, self._getComments($form));
-
-  // посылаем данные в корзину
   Cart.add(task);
   return;
 };
@@ -1730,6 +2077,18 @@ ISnew.CartDOM.prototype._bindAddItem = function () {
   EventBus.subscribe('always:insales:cart', function (data) {
     self._unlockButton(data, 'add_items');
   });
+};
+
+/**
+ *
+ */
+ISnew.CartDOM.prototype._quickCheckout = function ($button) {
+  var self = this;
+  var $form = $button.parents('form:first');
+
+  task = self._parseProductForm($form, $button);
+
+  return;
 };
 
 /**
@@ -2003,6 +2362,39 @@ ISnew.CartDOM.prototype._getComments = function ($form) {
   });
 
   return comments;
+};
+
+/**
+ * Разбираем форму товара
+ */
+ISnew.CartDOM.prototype._parseProductForm = function ($form, $button) {
+  var self = this;
+
+  var $fields = $form.find('[name*="variant_ids"]');
+  var $one_variant = $form.find('[name="variant_id"]');
+  var $quantity = $form.find('input[name="quantity"]');
+  var $comment = $form.find('[name="comment"]');
+
+  var task = {
+    items: {},
+    comments: {},
+    button: $button,
+    form: $form,
+    coupon: self._getCoupon($form),
+    isQuickCheckout: $button.checkoutButton || false
+  };
+
+  // складываем данные в объект
+  // если в форме был стандартный селектор модификаций, кладем отдельно
+  if ($one_variant.length == 1) {
+    task.items[_.toInteger($one_variant.val())] = parseFloat($quantity.val());
+    task.comments[_.toInteger($one_variant.val())] = $comment.val();
+  }
+  _.assign(task.items, self._getItems($fields));
+
+  _.assign(task.comments, self._getComments($form));
+
+  return task;
 };
 /**
  * Объект отвечающий за работу опшн селектора
