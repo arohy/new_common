@@ -7,10 +7,16 @@ ISnew.CartQuickCheckout = function (_owner) {
   self._owner = _owner;
 
   self.selectors = {
-    inProcess: 'inProcess',
     disabled: 'disabled',
 
     open: 'data-quick-checkout',
+
+    sendButton: '.m-modal-button--checkout',
+    closeButton: '.m-modal-close',
+    errors: '.m-modal-errors',
+    form: '#quick_checkout_form',
+    modal: '.m-modal--checkout',
+    msgModal: '#insales-quick-checkout-msg',
   };
 
   self._init();
@@ -24,18 +30,18 @@ ISnew.CartQuickCheckout.prototype._init = function () {
   self._bindOpenModal();
 
   $(function () {
-    self.$modal = $('.m-modal--checkout');
-    self.$message = $('#insales-quick-checkout-msg');
+    self.$modal = $(self.selectors.modal);
+    self.$message = $(self.msgModal);
     if (!self.$message.length) {
       self.$message = $('<div id="insales-quick-checkout-msg" class="m-modal m-modal--msg">\n<div class="m-modal-wrapper">\n<button class="button m-button m-modal-close" data-modal="close"></button>\n<div class="m-modal-msg center"></div>\n</div>\n</div>');
       self.$message.appendTo($('body'));
     }
 
-    self.$send = $('.m-modal-button--checkout');
-    self.$errors = $('.m-modal-errors');
+    self.$send = $(self.selectors.sendButton);
+    self.$errors = $(self.selectors.errors);
     self.$overlay = $('<div class="m-overlay" />');
-    self.$form = $('#quick_checkout_form');
-    self.$close = $('.m-modal-close');
+    self.$form = $(self.selectors.form);
+    self.$close = $(self.selectors.closeButton);
 
     self._bindCloseModal();
     self._bindSend();
@@ -85,7 +91,7 @@ ISnew.CartQuickCheckout.prototype.send = function () {
     self._targetForm._quickCheckout = true;
 
     items = self._owner.ui._parseProductForm(self._targetForm, self._targetButton);
-    self._owner.quick_checkout(items);
+    self._owner.add_checkout(items);
   } else {
     console.log('QuickCheckout: in process');
     self._send();
@@ -106,23 +112,18 @@ ISnew.CartQuickCheckout.prototype._bindOpenModal = function () {
 
     var $button = $(this);
 
-    if (!$button.prop(self.selectors.inProcess)) {
-      // если эту кнопку еще не жали
-      if (!$button.prop(self.selectors.disabled)) {
-        // если кнопка не заблочена - показваем модалку
-        // вешаем на кнопку метку "В обработке"
-        //$button.prop(self.selectors.inProcess, true);
-        self._targetForm = self._getProductForm($button);
-        self._targetButton = $button;
+    if (!$button.prop(self.selectors.disabled)) {
+      // если кнопка не заблочена - показваем модалку
+      self._targetForm = self._getProductForm($button);
+      self._targetButton = $button;
 
-        self.openModal(self.$modal);
-        self.$form.find('input:visible:first').focus();
-      } else {
-        // иначе - дергаем событие
-        EventBus.publish('add_disabled:insales:quick_checkout', {
-          button: $button,
-        });
-      }
+      self.openModal(self.$modal);
+      self.$form.find('input:visible:first').focus();
+    } else {
+      // иначе - дергаем событие
+      EventBus.publish('add_disabled:insales:quick_checkout', {
+        button: $button,
+      });
     }
   });
 
@@ -135,8 +136,13 @@ ISnew.CartQuickCheckout.prototype._bindOpenModal = function () {
 ISnew.CartQuickCheckout.prototype._send = function () {
   var self = this;
   var ajaxParams = {};
-
-  console.log(self);
+  var task = {
+    action: {
+      method: 'send',
+      modal: self.$modal,
+      form: self.$form
+    }
+  };
 
   if (self.$form.find(':file').length && window.FormData) {
     ajaxParams.data = new FormData(self.$form.get(0));
@@ -147,40 +153,47 @@ ISnew.CartQuickCheckout.prototype._send = function () {
 
   self.$errors.html('');
 
+  EventBus.publish('before:insales:quick_checkout', task);
+
   ISnew.json.makeQuickCheckout(ajaxParams)
     .done(function (response) {
-      self._success(response);
+      _.merge(task, response);
+      self._success(task);
     })
     .fail(function (response) {
-      self._errors(response);
+      _.merge(task, response)
+      self._errors(task);
+    })
+    .always(function () {
+      EventBus.publish('always:insales:quick_checkout', task)
     });
 };
 
 /**
  * Все ок
  */
-ISnew.CartQuickCheckout.prototype._success = function (response) {
+ISnew.CartQuickCheckout.prototype._success = function (task) {
   var self = this;
 
   self._owner.clear();
 
-  self.showMessage(response.message);
+  self.showMessage(task.message);
 
-  EventBus.publish('success:insales:quick_checkout', response);
+  EventBus.publish('success:insales:quick_checkout', task);
   return;
 };
 
 /**
  * Прилетели ошибки
  */
-ISnew.CartQuickCheckout.prototype._errors = function (response) {
+ISnew.CartQuickCheckout.prototype._errors = function (task) {
   var self = this;
 
-  _.forEach(response.errors, function (error) {
+  _.forEach(task.errors, function (error) {
     self.$errors.append($('<div class="m-modal-error">'+ error +'</div>'));
   });
 
-  EventBus.publish('errors:insales:quick_checkout', response.errors);
+  EventBus.publish('errors:insales:quick_checkout', task);
 
   return;
 };
@@ -227,8 +240,6 @@ ISnew.CartQuickCheckout.prototype._bindCloseModal = function () {
 ISnew.CartQuickCheckout.prototype._bindSend = function () {
   var self = this;
 
-  console.warn('Внимание подключена новая версия JS API InSales');
-
   self.$send
     // сносим все обработчики
     .off('click')
@@ -255,7 +266,7 @@ ISnew.CartQuickCheckout.prototype._bindSend = function () {
  */
 ISnew.CartQuickCheckout.prototype._getProductForm = function ($button) {
   var self = this;
-  var _target = $button.attr('data-quick-checkout') || false;
+  var _target = $button.attr(self.selectors.open) || false;
   var _parent = $button.parents('form:first') || false;
   var $form;
 
@@ -276,7 +287,7 @@ ISnew.CartQuickCheckout.prototype._getProductForm = function ($button) {
 ISnew.CartQuickCheckout.prototype._bindEvents = function () {
   var self = this;
 
-  EventBus.subscribe('add_quick_checkout:insales:cart', function (data) {
+  EventBus.subscribe('add_checkout:insales:cart', function (data) {
     self._send();
   });
 };
