@@ -1,17 +1,22 @@
 /**
  * Cart
- *
- * Зависит от ISnew.json, Events, ISnew.CartHelper
  */
 
 // TODO: сделать синглтон
-ISnew.Cart = function () {
+var _quickCheckout = require('./cart.quickCheckout');
+var _order = require('./cart.order');
+var _taskManager = require('./cart.tasks');
+var _UI = require('./cart.ui');
+
+var ajax = require('../json/ajax.cart');
+
+module.exports = Cart = function () {
   var self = this;
 
-  self.ui = new ISnew.CartDOM();
-  self.order = new ISnew.CartOrder(self);
-  self.tasks = new ISnew.CartTasks(self);
-  self.quickCheckout = new ISnew.CartQuickCheckout(self);
+  self.ui = new _UI();
+  self.order = new _order(self);
+  self.tasks = new _taskManager(self);
+  self.quickCheckout = new _quickCheckout(self);
 
   self.init();
 };
@@ -21,7 +26,7 @@ ISnew.Cart = function () {
  */
 // TODO: изменить на нормальныйую логику после нормолизации ответов json
 // TODO: может не надо? у нас теперь появляется нормальный таск манагер :)
-ISnew.Cart.prototype.init = function () {
+Cart.prototype.init = function () {
   var self = this;
   var task = {
     method: 'init'
@@ -30,7 +35,7 @@ ISnew.Cart.prototype.init = function () {
   self.tasks.send(task);
 };
 
-ISnew.Cart.prototype._get = function () {
+Cart.prototype._get = function () {
   var self = this;
   var current_items = {};
 
@@ -42,7 +47,7 @@ ISnew.Cart.prototype._get = function () {
  *
  * на вход - объект. смотреть доку
  */
-ISnew.Cart.prototype.add = function (task) {
+Cart.prototype.add = function (task) {
   var self = this;
 
   task = task || {};
@@ -51,7 +56,7 @@ ISnew.Cart.prototype.add = function (task) {
   self.tasks.send(task);
 };
 
-ISnew.Cart.prototype._add_items = function (task, current_items) {
+Cart.prototype._add_items = function (task, current_items) {
   var self = this;
 
   _.forIn(task.items, function(quantity, variant_id) {
@@ -67,7 +72,7 @@ ISnew.Cart.prototype._add_items = function (task, current_items) {
  * Удадить из корзины заданное кол-во товаров
  * на вход - объект с парами variant_id: quantity
  */
-ISnew.Cart.prototype.remove = function (task) {
+Cart.prototype.remove = function (task) {
   var self = this;
 
   task = task || {};
@@ -76,7 +81,7 @@ ISnew.Cart.prototype.remove = function (task) {
   self.tasks.send(task);
 };
 
-ISnew.Cart.prototype._remove_items = function (task, current_items) {
+Cart.prototype._remove_items = function (task, current_items) {
   var self = this;
 
   _.forIn(task.items, function(quantity, variant_id) {
@@ -92,7 +97,7 @@ ISnew.Cart.prototype._remove_items = function (task, current_items) {
  * Устанавливает кол-во товаров в корзине для каждой позиции
  * на вход - объект с парами variant_id: quantity
  */
-ISnew.Cart.prototype.set = function (task) {
+Cart.prototype.set = function (task) {
   var self = this;
   task = task || {};
   task.method = 'set_items';
@@ -100,7 +105,7 @@ ISnew.Cart.prototype.set = function (task) {
   self.tasks.send(task);
 };
 
-ISnew.Cart.prototype._set_items = function (task, current_items) {
+Cart.prototype._set_items = function (task, current_items) {
   var self = this;
 
   _.forIn(task.items, function(quantity, variant_id) {
@@ -114,7 +119,7 @@ ISnew.Cart.prototype._set_items = function (task, current_items) {
  * Удалить позиции из корзины
  * на вход - массив с variant_id
  */
-ISnew.Cart.prototype.delete = function (task) {
+Cart.prototype.delete = function (task) {
   var self = this;
   task = task || {};
   task.method = 'delete_items';
@@ -122,7 +127,7 @@ ISnew.Cart.prototype.delete = function (task) {
   self.tasks.send(task);
 };
 
-ISnew.Cart.prototype._delete_items = function (task, current_items) {
+Cart.prototype._delete_items = function (task, current_items) {
   var self = this;
 
   _.chain(task.items)
@@ -138,7 +143,7 @@ ISnew.Cart.prototype._delete_items = function (task, current_items) {
 /**
  * Полностью очистить корзину
  */
-ISnew.Cart.prototype.clear = function (task) {
+Cart.prototype.clear = function (task) {
   var self = this;
   task = task || {};
   task.method = 'clear_items';
@@ -146,7 +151,7 @@ ISnew.Cart.prototype.clear = function (task) {
   self.tasks.send(task);
 };
 
-ISnew.Cart.prototype._clear_items = function (task, current_items) {
+Cart.prototype._clear_items = function (task, current_items) {
   var self = this;
 
   _.forIn(current_items, function(quantity, variant_id) {
@@ -159,7 +164,7 @@ ISnew.Cart.prototype._clear_items = function (task, current_items) {
 /**
  * Добавление товаров в корзину для "Заказа в один клик"
  */
-ISnew.Cart.prototype.add_checkout = function (task) {
+Cart.prototype.add_checkout = function (task) {
   var self = this;
   task = task || {};
   task.method = 'add_checkout';
@@ -167,7 +172,7 @@ ISnew.Cart.prototype.add_checkout = function (task) {
   self.tasks.send(task);
 };
 
-ISnew.Cart.prototype._add_checkout = function (task, current_items) {
+Cart.prototype._add_checkout = function (task, current_items) {
   var self = this;
 
   _.forIn(task.items, function(quantity, variant_id) {
@@ -182,7 +187,7 @@ ISnew.Cart.prototype._add_checkout = function (task, current_items) {
 /**
  * Устанавливаем купон
  */
-ISnew.Cart.prototype.setCoupon = function (task) {
+Cart.prototype.setCoupon = function (task) {
   var self = this;
 
   task = task || {};
@@ -191,7 +196,7 @@ ISnew.Cart.prototype.setCoupon = function (task) {
   self.tasks.send(task);
 };
 
-ISnew.Cart.prototype._set_coupon = function (task, current_items) {
+Cart.prototype._set_coupon = function (task, current_items) {
   var self = this;
 
   return current_items;
@@ -200,7 +205,7 @@ ISnew.Cart.prototype._set_coupon = function (task, current_items) {
 /**
  * Получить состав корзины
  */
-ISnew.Cart.prototype.getOrder = function () {
+Cart.prototype.getOrder = function () {
   var self = this;
 
   return self.order.get();
@@ -209,12 +214,12 @@ ISnew.Cart.prototype.getOrder = function () {
 /**
  * Обновление состава корзины
  */
-ISnew.Cart.prototype._update = function (items, task) {
+Cart.prototype._update = function (items, task) {
   var self = this;
 
   self.tasks._before();
 
-  ISnew.json.updateCartItems(items, task)
+  ajax.update(items, task)
     .done(function (response) {
       self.tasks._done(response);
     })
@@ -229,7 +234,7 @@ ISnew.Cart.prototype._update = function (items, task) {
 /**
  * Установка настроек для корзины
  */
-ISnew.Cart.prototype.setConfig = function (settings) {
+Cart.prototype.setConfig = function (settings) {
   var self = this;
 
   self.ui.setConfig(settings);
@@ -237,6 +242,6 @@ ISnew.Cart.prototype.setConfig = function (settings) {
   return;
 };
 
-ISnew.Cart.prototype.addItem = function () {
+Cart.prototype.addItem = function () {
   return;
 };
