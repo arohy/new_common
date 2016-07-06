@@ -2,10 +2,10 @@
  * Объект отвечающий за работу опшн селектора
  *
  * @class
- * @name ISnew.OptionSelector
+ * @name OptionSelector
  *
  * @param {jQuery Object} $product - ссылка на форму
- * @param {object} _product ссылка на родительский класс ISnew.Products
+ * @param {object} _product ссылка на родительский класс Products
  *
  * @property {object} selector в объекте хранятся названия селекторов
  * @property {object} $product опорный DOM-узел, который описывает товар
@@ -13,7 +13,12 @@
  * @property {object} $optionSelector контейнер куда происходит рендер селекторов опций
  *
  */
-ISnew.OptionSelector = function (_owner) {
+var $ = require('jquery');
+var _ = require('lodash');
+
+var Error = require('../tools/error');
+
+module.exports = OptionSelector = function (_owner) {
   var self = this;
 
   self._owner = _owner;
@@ -28,10 +33,10 @@ ISnew.OptionSelector = function (_owner) {
  * Инициализация
  *
  * @param {json} product json с информацией о товаре
- * @param {object} _product ссылка на родительский класс ISnew.Products
+ * @param {object} _product ссылка на родительский класс Products
  *
  */
-ISnew.OptionSelector.prototype._init = function () {
+OptionSelector.prototype._init = function () {
   var self = this;
   var product = self._owner;
 
@@ -69,7 +74,7 @@ ISnew.OptionSelector.prototype._init = function () {
 /**
  * Основная обертка
  */
-ISnew.OptionSelector.prototype._renderSelector = function () {
+OptionSelector.prototype._renderSelector = function () {
   var self = this;
 
   var variants = self._owner.variants;
@@ -95,14 +100,14 @@ ISnew.OptionSelector.prototype._renderSelector = function () {
 /**
  * Рендер разметки
  */
-ISnew.OptionSelector.prototype._renderOption = function (option) {
+OptionSelector.prototype._renderOption = function (option) {
   var self = this;
 
   var renderType = option.option.renderType;
 
   //  если не получили шаблон
   if (!renderType) {
-    throw new ISnew.tools.Error('ErrorOptionSelector', 'ошибка в получении шаблона');
+    throw new Error('ErrorOptionSelector', 'ошибка в получении шаблона');
   }
 
   return Template.render(option, renderType);
@@ -111,7 +116,7 @@ ISnew.OptionSelector.prototype._renderOption = function (option) {
 /**
  * инитим события
  */
-ISnew.OptionSelector.prototype._bindEvents = function () {
+OptionSelector.prototype._bindEvents = function () {
   var self = this;
 
   if (document._optionSelectors) {
@@ -129,7 +134,7 @@ ISnew.OptionSelector.prototype._bindEvents = function () {
 /**
  * Навешиваем свой дефолтный слушатель для обновления рендера
  */
-ISnew.OptionSelector.prototype._bindUpdateVariant = function () {
+OptionSelector.prototype._bindUpdateVariant = function () {
   var self = this;
 
   EventBus.subscribe('update_variant:insales:product', function (data) {
@@ -154,7 +159,7 @@ ISnew.OptionSelector.prototype._bindUpdateVariant = function () {
 /**
  * Слушаем изменения в нативном селекте
  */
-ISnew.OptionSelector.prototype._bindSetVariant = function () {
+OptionSelector.prototype._bindSetVariant = function () {
   var self = this;
 
   $(document).on('change', '['+ self.selectors.nativeSelect +']', function (event) {
@@ -175,7 +180,7 @@ ISnew.OptionSelector.prototype._bindSetVariant = function () {
 };
 
 //  Слушаем изменения в селекторах модификаций
-ISnew.OptionSelector.prototype._bindOptionTriggers = function () {
+OptionSelector.prototype._bindOptionTriggers = function () {
   var self = this;
 
   $(document).on('change click', '[data-option-bind]', function (event) {

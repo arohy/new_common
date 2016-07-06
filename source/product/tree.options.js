@@ -7,7 +7,7 @@
  *
  * @return {object} options модифицированный объект опций, добавляется renderType из параметров продукта, добавляется handle как название опции транслитом.
  */
-ISnew.ProductVariants.prototype._initOptions = function () {
+ProductVariants.prototype._initOptions = function () {
   var self = this;
 
   var options = self._owner.product.option_names;
@@ -47,7 +47,7 @@ ISnew.ProductVariants.prototype._initOptions = function () {
  * @param {object} value значение опции, прилетает из перебора всех вариантов. value добавляется в объект self.options[index].values.
  * @param {number} index порядковый номер опции.
  */
-ISnew.ProductVariants.prototype._addValues = function (value, index) {
+ProductVariants.prototype._addValues = function (value, index) {
   var self = this;
 
   var optionValues = self.options[index].values;
@@ -67,7 +67,7 @@ ISnew.ProductVariants.prototype._addValues = function (value, index) {
  */
 
 // TODO: у нас может быть ситуация, когда нет опций в товаре.
-ISnew.ProductVariants.prototype._selectedOptions = function (options) {
+ProductVariants.prototype._selectedOptions = function (options) {
   var self = this;
   var leaf = self.tree;
 
@@ -85,7 +85,7 @@ ISnew.ProductVariants.prototype._selectedOptions = function (options) {
  * Устанавливаем опцию внешним обработчиком.
  * АХТУНГ!!! Влечет обновление актуального варианта!
  */
-ISnew.ProductVariants.prototype.setOption = function (option) {
+ProductVariants.prototype.setOption = function (option) {
   var self = this;
 
   var index = _.findKey(self.options, function (_option) {
@@ -127,7 +127,7 @@ ISnew.ProductVariants.prototype.setOption = function (option) {
 /**
  * Получить опцию
  */
-ISnew.ProductVariants.prototype.getOption = function (index) {
+ProductVariants.prototype.getOption = function (index) {
   var self = this;
 
   return self.options[index];
@@ -139,7 +139,7 @@ ISnew.ProductVariants.prototype.getOption = function (index) {
  * @param  {number} level уровень опции в дереве (self.tree)
  * @return {object} option опция готовая для рендера, в значениях опции проставлен value.disabled или удалены не относящиеся к варианту значения в зависимости от настроек продукта (self._owner.settings.filtered);
  */
-ISnew.ProductVariants.prototype.getFilterOption = function (level) {
+ProductVariants.prototype.getFilterOption = function (level) {
   var self = this;
 
   var option = _.cloneDeep(self.getOption(level));
@@ -162,7 +162,7 @@ ISnew.ProductVariants.prototype.getFilterOption = function (level) {
 /**
  * Установить опции по варианту
  */
-ISnew.ProductVariants.prototype._setOptionByVariant = function (variant_id) {
+ProductVariants.prototype._setOptionByVariant = function (variant_id) {
   var self = this;
 
   var index = _.findKey(self.variants, function (variant) {
@@ -180,7 +180,7 @@ ISnew.ProductVariants.prototype._setOptionByVariant = function (variant_id) {
 /**
  * генерим путь по выбранным опциям
  */
-ISnew.ProductVariants.prototype._getSelectedVector = function (_length) {
+ProductVariants.prototype._getSelectedVector = function (_length) {
   var self = this;
   var vector = '';
   _length = (_length || self.options.length) - 1;
