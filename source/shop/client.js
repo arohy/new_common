@@ -1,8 +1,11 @@
 /**
  * Класс для работы с клиентом сайта
  */
+var $ = require('jquery');
+var _ = require('lodash');
+var ajaxShop = require('../json/ajax.shop');
 
-ISnew.Client = function (_owner) {
+module.exports = Client = function (_owner) {
   var self = this;
 
   self._owner = _owner;
@@ -13,7 +16,7 @@ ISnew.Client = function (_owner) {
 /**
  * Инициализация
  */
-ISnew.Client.prototype._init = function () {
+Client.prototype._init = function () {
   var self = this;
 
   self._get();
@@ -22,17 +25,17 @@ ISnew.Client.prototype._init = function () {
 /**
  * Забираем инфу с сервера
  */
-ISnew.Client.prototype._get = function () {
+Client.prototype._get = function () {
   var self = this;
   var result = $.Deferred();
 
-  ISnew.json.getClientInfo()
+  ajaxShop.client()
     .done(function (response) {
       _.merge(self, response);
       result.resolve(self);
     })
     .fail(function (response) {
-      console.log('ISnew.Client: _get: fail: ', response);
+      console.log('Client: _get: fail: ', response);
       result.reject(response);
     });
 
@@ -42,7 +45,7 @@ ISnew.Client.prototype._get = function () {
 /**
  * Обновление данных
  */
-ISnew.Client.prototype.get = function () {
+Client.prototype.get = function () {
   var self = this;
 
   return self._get();

@@ -1,7 +1,9 @@
 /**
  * Класс для работы с валютой.
  */
-ISnew.Money = function () {
+var _ = require('lodash');
+
+module.exports = Money = function () {
   var self = this;
 
   self._init();
@@ -10,13 +12,13 @@ ISnew.Money = function () {
 /**
  * Разбиралка настроек
  */
-ISnew.Money.prototype._init = function () {
+Money.prototype._init = function () {
   var self = this;
 
   return;
 };
 
-ISnew.Money.prototype._set = function (params) {
+Money.prototype._set = function (params) {
   var self = this;
 
   self.options = $.parseJSON(params);
@@ -24,13 +26,13 @@ ISnew.Money.prototype._set = function (params) {
   return;
 };
 
-ISnew.Money.prototype.set = function (params) {
+Money.prototype.set = function (params) {
   var self = this;
 
   self._set(params);
 };
 
-ISnew.Money.prototype.format = function (amount) {
+Money.prototype.format = function (amount) {
   var self = this;
   var value = amount;
   var patern = /(\d)(?=(\d\d\d)+(?!\d))/g;
