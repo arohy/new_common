@@ -1,9 +1,11 @@
 /*
  * Отправление сообщения
  */
+var URL = require('../tools/url');
+var $ = require('jquery');
+var _ = require('lodash');
 
-ISnew.json.sendMessage = function (input) {
-  var URL = new ISnew.tools.URL();
+module.exports = function (input) {
   var result = $.Deferred();
   var _lang = URL.getKeyValue('lang') || '';
   var message = {

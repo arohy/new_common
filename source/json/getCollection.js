@@ -1,9 +1,11 @@
 /*
  * Получение информации о коллекции
  */
+var URL = require('../tools/url');
+var $ = require('jquery');
+var _ = require('lodash');
 
-ISnew.json.getCollection = function () {
-  var URL = new ISnew.tools.URL();
+getCollection = function () {
   var path = '/collection/'+ _.toString(arguments[0]) +'.json';
   var _lang = URL.getKeyValue('lang') || '';
   var fields = {

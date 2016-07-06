@@ -1,11 +1,12 @@
 /*
  * Получение состава корзины
  */
+var URL = require('../tools/url');
+var $ = require('jquery');
 
-ISnew.json.getCartItems = function () {
+module.exports = function () {
   var result = $.Deferred();
   var cookieCart = $.cookie('cart');
-  var URL = new ISnew.tools.URL();
   var _lang = URL.getKeyValue('lang') || '';
   var fields = {
     lang: _lang

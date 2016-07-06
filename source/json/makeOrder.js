@@ -1,9 +1,11 @@
 /**
  * Оформление заказа
  */
+var URL = require('../tools/url');
+var $ = require('jquery');
+var _ = require('lodash');
 
-ISnew.json.makeCheckout = function (client, order) {
-  var URL = new ISnew.tools.URL();
+module.exports = function (client, order) {
   var result = $.Deferred();
   var _lang = URL.getKeyValue('lang') || '';
   var checkout = {
