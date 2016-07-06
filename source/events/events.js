@@ -9,11 +9,15 @@
  */
 
 // TODO: сделать синглтон
-ISnew.EventBus = function () {
+
+var _ = require('lodash');
+var logger = require('./events.logger');
+
+module.exports = EventBus = function () {
   var self = this;
 
   self.eventsList = {};
-  self.logger = new ISnew.EventsLogger();
+  self.logger = new logger();
 
   return;
 };
@@ -21,7 +25,7 @@ ISnew.EventBus = function () {
 /**
  * Публикация события с данными
  */
-ISnew.EventBus.prototype.publish = function (eventId, data) {
+EventBus.prototype.publish = function (eventId, data) {
   var self = this;
 
   self.logger.addListner(eventId);
@@ -32,7 +36,7 @@ ISnew.EventBus.prototype.publish = function (eventId, data) {
 /**
  * Подписаться на событие
  */
-ISnew.EventBus.prototype.subscribe = function (eventId, callback) {
+EventBus.prototype.subscribe = function (eventId, callback) {
   var self = this;
 
   return self._selectEvent(eventId).add(callback);
@@ -41,7 +45,7 @@ ISnew.EventBus.prototype.subscribe = function (eventId, callback) {
 /**
  * Отписаться от события
  */
-ISnew.EventBus.prototype.unsubscribe = function (eventId, callback) {
+EventBus.prototype.unsubscribe = function (eventId, callback) {
   var self = this;
 
   return self._selectEvent(eventId).remove(callback);
@@ -50,7 +54,7 @@ ISnew.EventBus.prototype.unsubscribe = function (eventId, callback) {
 /**
  * Выбор нужного события
  */
-ISnew.EventBus.prototype._selectEvent = function (eventId) {
+EventBus.prototype._selectEvent = function (eventId) {
   var self = this;
   var Event;
 
