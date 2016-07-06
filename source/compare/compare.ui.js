@@ -1,14 +1,15 @@
 /**
- * DOM + ISnew.Compare
+ * DOM + Compare
  */
+var $ = require('jquery');
 
-ISnew.CompareDOM = function (options) {
+module.exports = CompareDOM = function (options) {
   var self = this;
 
   self._init(options);
 }
 
-ISnew.CompareDOM.prototype._init = function (options) {
+CompareDOM.prototype._init = function (options) {
   var self = this;
 
   self.options = {
@@ -26,7 +27,7 @@ ISnew.CompareDOM.prototype._init = function (options) {
 /**
  * Обработчик добавления
  */
-ISnew.CompareDOM.prototype._bindAddItem = function () {
+CompareDOM.prototype._bindAddItem = function () {
   var self = this;
 
   $(document).on('click', '['+ self.options.add +']', function (event) {
@@ -50,7 +51,7 @@ ISnew.CompareDOM.prototype._bindAddItem = function () {
 /**
  * Основаня логика добавления товара в сравнение по кнопке
  */
-ISnew.CompareDOM.prototype._addItem = function ($button) {
+CompareDOM.prototype._addItem = function ($button) {
   var self = this;
   var task = {
     button: $button,
@@ -64,7 +65,7 @@ ISnew.CompareDOM.prototype._addItem = function ($button) {
 /**
  * Обработчик удаления
  */
-ISnew.CompareDOM.prototype._bindDelteItem = function () {
+CompareDOM.prototype._bindDelteItem = function () {
   var self = this;
 
   $(document).on('click', '['+ self.options.delete +']', function (event) {
@@ -87,7 +88,7 @@ ISnew.CompareDOM.prototype._bindDelteItem = function () {
 /**
  * Основаня логика удаления товара из сравнения по кнопке
  */
-ISnew.CompareDOM.prototype._deleteItem = function ($button) {
+CompareDOM.prototype._deleteItem = function ($button) {
   var self = this;
   var task = {
     button: $button,

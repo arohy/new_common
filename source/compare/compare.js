@@ -3,14 +3,19 @@
  */
 
 // TODO: сделать синглтон
-ISnew.Compare = function (options) {
+var _ = require('lodash');
+
+var _UI = require('./compare.ui');
+var ajax = require('../json/ajax.compare');
+
+module.exports = Compare = function (options) {
   options = options || {};
 
   var self = this;
   self.products = [];
   self.maxItems = options.maxItems || 4;
 
-  self.ui = new ISnew.CompareDOM(options);
+  self.ui = new _UI(options);
 
   // Обновляемся
   self._update();
@@ -19,7 +24,7 @@ ISnew.Compare = function (options) {
 /**
  * Добавляем товар
  */
-ISnew.Compare.prototype.add = function (task) {
+Compare.prototype.add = function (task) {
   var self = this;
 
   task.item = parseInt(task.item);
@@ -41,7 +46,7 @@ ISnew.Compare.prototype.add = function (task) {
     return;
   } else {
     self._before(task);
-    ISnew.json.addCompareItem(task.item)
+    ajax.add(task.item)
       .done(function (response) {
         self._update(task);
       })
@@ -57,14 +62,14 @@ ISnew.Compare.prototype.add = function (task) {
 /**
  * Удаляем товар
  */
-ISnew.Compare.prototype.remove = function (task) {
+Compare.prototype.remove = function (task) {
   var self = this;
 
   task.item = parseInt(task.item);
   task.method = 'remove_item';
 
   self._before(task);
-  ISnew.json.removeCompareItem(task.item)
+  ajax.remove(task.item)
     .done(function (response) {
       self._update(task);
     })
@@ -79,7 +84,7 @@ ISnew.Compare.prototype.remove = function (task) {
 /**
  * Обновляем состояние сравнения
  */
-ISnew.Compare.prototype.update = function () {
+Compare.prototype.update = function () {
   var self = this;
 
   self._update({
@@ -90,7 +95,7 @@ ISnew.Compare.prototype.update = function () {
 /**
  *
  */
-ISnew.Compare.prototype.getCompare = function () {
+Compare.prototype.getCompare = function () {
   var self = this;
 
   return self;
@@ -99,7 +104,7 @@ ISnew.Compare.prototype.getCompare = function () {
 /**
  * Получение актуальной инфы с сервера
  */
-ISnew.Compare.prototype._update = function (task) {
+Compare.prototype._update = function (task) {
   var self = this;
 
   task = task || {};
@@ -109,7 +114,7 @@ ISnew.Compare.prototype._update = function (task) {
     self._before(task);
   }
 
-  ISnew.json.getCompareItems()
+  ajax.get()
     .done(function (response) {
       self.products = response.products;
       self._events(task);
@@ -125,7 +130,7 @@ ISnew.Compare.prototype._update = function (task) {
 /**
  * Вызов событий
  */
-ISnew.Compare.prototype._events = function (task) {
+Compare.prototype._events = function (task) {
   var self = this;
   var data = self;
   data.action = task;
@@ -139,13 +144,13 @@ ISnew.Compare.prototype._events = function (task) {
 /**
  * Событие ПЕРЕД действием
  */
-ISnew.Compare.prototype._before = function (task) {
+Compare.prototype._before = function (task) {
   EventBus.publish('before:insales:compares', task);
 };
 
 /**
  * Мы закончили что-то делать в сравнении
  */
-ISnew.Compare.prototype._always = function (task) {
+Compare.prototype._always = function (task) {
   EventBus.publish('always:insales:compares', task);
 };
