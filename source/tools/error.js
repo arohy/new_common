@@ -1,7 +1,7 @@
 /**
  * Тул для вывода ошибок.
  */
-ISnew.tools.Error = function (name, message) {
+module.exports = Error = function (name, message) {
   var self = this;
   var errorObject = new Error(message);
 
