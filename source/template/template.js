@@ -3,8 +3,9 @@
  */
 var $ = require('jquery');
 var _ = require('lodash');
+var _default = require('./templateDefault');
 
-Template = function () {
+module.exports = Template = function () {
   var self = this;
   self._templateList = {};
 
@@ -90,6 +91,4 @@ Template.prototype.has = function (template_id) {
   return _has;
 };
 
-Template.prototype._setDefault = require('./templateDefault');
-
-module.exports = new Template();
+Template.prototype._setDefault = _default;
