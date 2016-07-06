@@ -1,7 +1,9 @@
 /**
  * Тул для разбора url.
  */
-ISnew.tools.URL = function () {
+var _ = require('lodash');
+
+URL = function () {
   var self = this;
 
   self._init();
@@ -10,7 +12,7 @@ ISnew.tools.URL = function () {
 /**
  * Разбор урла
  */
-ISnew.tools.URL.prototype._init = function () {
+URL.prototype._init = function () {
   var self = this;
   self.keys = {};
   self.location = window.location;
@@ -31,8 +33,10 @@ ISnew.tools.URL.prototype._init = function () {
 /**
  * Вытаскиваем значение ключа
  */
-ISnew.tools.URL.prototype.getKeyValue = function (key) {
+URL.prototype.getKeyValue = function (key) {
   var self = this;
 
   return self.keys[key];
 };
+
+module.exports = new URL();
