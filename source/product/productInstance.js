@@ -5,11 +5,6 @@
 var $ = require('jquery');
 var _ = require('lodash');
 
-var _Tree =  require('./tree');
-var _Prices = require('./priceTypes');
-var _OptionSelector = require('./optionSelector');
-var _Quantity = require('./quantity');
-
 var EventBus = require('../events/events');
 
 var ProductInstance = function (_owner, $product) {
@@ -52,9 +47,9 @@ ProductInstance.prototype._init = function () {
   var self = this;
 
   // привязываем нужные объекты
-  self.variants = new _Tree(self);
+  self.variants = new (require('./tree')) (self);
   self._initQuantity();
-  self.price_kinds = new _Prices(self);
+  self.price_kinds = new (require('./priceTypes')) (self);
 
   if (self.$product.data('item-id')) {
     self.type = 'item';
@@ -80,7 +75,7 @@ ProductInstance.prototype._initOptionSelectors = function () {
   if (!_isActive) {
     // У нас нет активных селекторов
     // заряжаем
-    self.optionSelector = new _OptionSelector(self);
+    self.optionSelector = new (require('./optionSelector')) (self);
   } else {
     // данный селектор активен
     // наверное оти перезаписать настройки
@@ -101,7 +96,7 @@ ProductInstance.prototype._initQuantity = function () {
   var $quantity = self.$product.find('['+ self.selectors.quantity +']');
 
   $quantity.each(function (index) {
-    self.quantity[index] = new _Quantity(self, this);
+    self.quantity[index] = new (require('./quantity')) (self, this);
   });
 };
 
