@@ -2,16 +2,7 @@
  * Cart
  */
 
-// TODO: сделать синглтон
 var _ = require('lodash');
-
-/*
-var _quickCheckout = require('./cart.quickCheckout');
-var _order = require('./cart.order');
-var _taskManager = require('./cart.tasks');
-var _UI = require('./cart.ui');
-var _EB = require('../events/events');
-*/
 
 var ajax = require('../json/ajax.cart');
 
@@ -21,7 +12,7 @@ var _Singleton = require('../tools/singleton');
 var Cart = function () {
   var self = this;
 
-  self.ui = require('./cart.ui');
+  self.ui = new (require('./cart.ui')) (self);
   self.order = new (require('./cart.order')) (self);
   self.tasks = new (require('./cart.tasks')) (self);
   self.quickCheckout = new (require('./cart.quickCheckout')) (self);

@@ -6,7 +6,7 @@ var _ = require('lodash');
 
 var EventBus = require('../events/events');
 
-var CartDOM = function () {
+var CartDOM = function (_owner) {
   var self = this;
 
   self.options = {
@@ -23,6 +23,8 @@ var CartDOM = function () {
 
     reloadOnCoupon: true
   };
+
+  self._owner = _owner;
 
   self._init();
 };
@@ -60,7 +62,7 @@ CartDOM.prototype._addItem = function ($button) {
 
   task = self._parseProductForm($form, $button);
 
-  Cart.add(task);
+  self._owner.add(task);
   return;
 };
 
@@ -120,7 +122,7 @@ CartDOM.prototype._deleteItem = function ($button) {
   };
 
   // посылаем данные в корзину
-  Cart.delete(task);
+  self._owner.delete(task);
   return;
 };
 
@@ -168,7 +170,7 @@ CartDOM.prototype.updateOrder = function ($button) {
 
   task.items = self._getItems($fields);
 
-  Cart.set(task);
+  self._owner.set(task);
   return;
 };
 
@@ -245,7 +247,7 @@ CartDOM.prototype.clearOder = function ($button) {
 
   task.items = _.keys(self._getItems($fields));
 
-  Cart.delete(task);
+  self._owner.delete(task);
   return;
 };
 
@@ -284,7 +286,7 @@ CartDOM.prototype.setCoupon = function ($form, $button) {
     button: $button
   };
 
-  Cart.setCoupon(task);
+  self._owner.setCoupon(task);
   return;
 };
 
