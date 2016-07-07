@@ -10,6 +10,7 @@
 
 // TODO: сделать синглтон
 
+var $ = require('jquery');
 var _ = require('lodash');
 var _Logger = require('./events.logger');
 
