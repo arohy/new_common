@@ -3,6 +3,8 @@
  */
 var $ = require('jquery');
 
+var EventBus = require('../events/events');
+
 var CompareDOM = function (_owner) {
   var self = this;
   self._owner = _owner;

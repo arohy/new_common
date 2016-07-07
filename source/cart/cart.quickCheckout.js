@@ -5,7 +5,7 @@ var $ = require('jquery');
 var _ = require('lodash');
 
 var ajax = require('../json/ajax.checkout');
-//var EventBus = require('../events/events');
+var EventBus = require('../events/events');
 
 var CartQuickCheckout = function (_owner) {
   var self = this;
