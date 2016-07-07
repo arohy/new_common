@@ -5,7 +5,7 @@
  */
 var _ = require('lodash');
 
-module.exports = EventsLogger = function () {
+var EventsLogger = function () {
   var self = this;
 
   self.loggersList = {};
@@ -85,3 +85,5 @@ EventsLogger.prototype._isListen = function (eventName) {
 EventsLogger.prototype._component = function (eventName) {
   return _.last(eventName.split(':'));
 };
+
+module.exports = EventsLogger;

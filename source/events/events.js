@@ -11,13 +11,21 @@
 // TODO: сделать синглтон
 
 var _ = require('lodash');
-var logger = require('./events.logger');
+var _Logger = require('./events.logger');
 
-module.exports = EventBus = function () {
+var _Singlton = require('../tools/singlton');
+
+var EventBus = function () {
   var self = this;
 
+  if (window.EventBus) {
+    return window.EventBus;
+  }
+
   self.eventsList = {};
-  self.logger = new logger();
+  self.logger = new _Logger();
+
+  window.EventBus = self;
 
   return;
 };
@@ -70,3 +78,5 @@ EventBus.prototype._selectEvent = function (eventId) {
 
   return Event;
 };
+
+module.exports = _Singlton(EventBus).getInstance();
