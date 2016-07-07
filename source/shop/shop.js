@@ -3,9 +3,11 @@
  */
 var client = require('./client');
 var money = require('./money');
-var ajaxShop = require('../json/ajax.shop');
 
-module.exports = Shop = function () {
+var ajaxShop = require('../json/ajax.shop');
+var _Singlton = require('../tools/singlton');
+
+var Shop = function () {
   var self = this;
 
   self.money = new money();
@@ -26,3 +28,5 @@ Shop.prototype.sendMessage = function (message) {
 
   return ajaxShop.message(message);
 };
+
+module.exports = _Singlton(Shop).getInstance();

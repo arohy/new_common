@@ -5,7 +5,7 @@ var $ = require('jquery');
 var _ = require('lodash');
 var ajaxShop = require('../json/ajax.shop');
 
-module.exports = Client = function (_owner) {
+var Client = function (_owner) {
   var self = this;
 
   self._owner = _owner;
@@ -50,3 +50,5 @@ Client.prototype.get = function () {
 
   return self._get();
 };
+
+module.exports = Client;

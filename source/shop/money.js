@@ -3,7 +3,7 @@
  */
 var _ = require('lodash');
 
-module.exports = Money = function () {
+var Money = function () {
   var self = this;
 
   self._init();
@@ -56,3 +56,5 @@ Money.prototype.format = function (amount) {
 
   return value;
 };
+
+module.exports = Money;
