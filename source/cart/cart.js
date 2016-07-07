@@ -3,20 +3,28 @@
  */
 
 // TODO: сделать синглтон
+var _ = require('lodash');
+
+/*
 var _quickCheckout = require('./cart.quickCheckout');
 var _order = require('./cart.order');
 var _taskManager = require('./cart.tasks');
 var _UI = require('./cart.ui');
+var _EB = require('../events/events');
+*/
 
 var ajax = require('../json/ajax.cart');
 
-module.exports = Cart = function () {
+var EventBus = require('../events/events');
+var _Singlton = require('../tools/singlton');
+
+var Cart = function () {
   var self = this;
 
-  self.ui = new _UI();
-  self.order = new _order(self);
-  self.tasks = new _taskManager(self);
-  self.quickCheckout = new _quickCheckout(self);
+  self.ui = require('./cart.ui');
+  self.order = new (require('./cart.order')) (self);
+  self.tasks = new (require('./cart.tasks')) (self);
+  self.quickCheckout = new (require('./cart.quickCheckout')) (self);
 
   self.init();
 };
@@ -245,3 +253,5 @@ Cart.prototype.setConfig = function (settings) {
 Cart.prototype.addItem = function () {
   return;
 };
+
+module.exports = _Singlton(Cart).getInstance();

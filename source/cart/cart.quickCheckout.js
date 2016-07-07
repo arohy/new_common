@@ -7,7 +7,7 @@ var _ = require('lodash');
 var ajax = require('../json/ajax.checkout');
 //var EventBus = require('../events/events');
 
-module.exports = CartQuickCheckout = function (_owner) {
+var CartQuickCheckout = function (_owner) {
   var self = this;
 
   self._owner = _owner;
@@ -318,3 +318,5 @@ CartQuickCheckout.prototype.hideMessage = function () {
 
   self.closeModal(self.$message);
 };
+
+module.exports = CartQuickCheckout;

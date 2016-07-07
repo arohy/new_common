@@ -4,9 +4,9 @@
 var $ = require('jquery');
 var _ = require('lodash');
 
-//var EventBus = require('../events/events');
+var EventBus = require('../events/events');
 
-module.exports = CartDOM = function () {
+var CartDOM = function () {
   var self = this;
 
   self.options = {
@@ -413,3 +413,5 @@ CartDOM.prototype._parseProductForm = function ($form, $button) {
 
   return task;
 };
+
+module.exports = CartDOM;

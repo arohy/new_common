@@ -3,9 +3,10 @@
  * Занимается контролем за задачами, склейкой и отправкой
  */
 var _ = require('lodash');
-//var EventBus = require('../events/events');
 
-module.exports = CartTasks = function (_owner) {
+var EventBus = require('../events/events');
+
+var CartTasks = function (_owner) {
   var self = this;
 
   self._owner = _owner;
@@ -196,3 +197,5 @@ CartTasks.prototype._before = function () {
   });
   return;
 };
+
+module.exports = CartTasks;

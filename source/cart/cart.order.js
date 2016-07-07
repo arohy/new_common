@@ -3,7 +3,7 @@
  */
 var _ = require('lodash');
 
-module.exports = CartOrder = function (_cart) {
+var CartOrder = function (_cart) {
   var self = this;
 
   self._owner = _cart;
@@ -137,3 +137,5 @@ CartOrder.prototype.getItemByID = function (id) {
 
   return _item;
 };
+
+module.exports = CartOrder;
