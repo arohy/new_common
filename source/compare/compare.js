@@ -6,9 +6,8 @@
 var _ = require('lodash');
 
 var ajax = require('../json/ajax.compare');
-
 var EventBus = require('../events/events');
-var _Singleton = require('../tools/singleton')
+var _Singleton = require('../tools/singleton');
 
 var Compare = function (options) {
   options = options || {};
@@ -17,7 +16,7 @@ var Compare = function (options) {
   self.products = [];
   self.maxItems = options.maxItems || 4;
 
-  self.ui = require('./compare.ui');
+  self.ui = new (require('./compare.ui')) (self);
 
   // Обновляемся
   self._update();

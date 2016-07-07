@@ -3,13 +3,14 @@
  */
 var $ = require('jquery');
 
-var CompareDOM = function (options) {
+var CompareDOM = function (_owner) {
   var self = this;
+  self._owner = _owner;
 
-  self._init(options);
+  self._init();
 }
 
-CompareDOM.prototype._init = function (options) {
+CompareDOM.prototype._init = function () {
   var self = this;
 
   self.options = {
@@ -58,7 +59,7 @@ CompareDOM.prototype._addItem = function ($button) {
     item: parseInt($button.attr(self.options.add))
   };
 
-  Compare.add(task);
+  self._owner.add(task);
   return;
 };
 
@@ -95,7 +96,7 @@ CompareDOM.prototype._deleteItem = function ($button) {
     item: parseInt($button.attr(self.options.delete))
   };
 
-  Compare.remove(task);
+  self._owner.remove(task);
 };
 
 module.exports = CompareDOM;
