@@ -1,7 +1,7 @@
 /**
  * Тул для вывода ошибок.
  */
-module.exports = Error = function (name, message) {
+var Error = function (name, message) {
   var self = this;
   var errorObject = new Error(message);
 
@@ -21,3 +21,5 @@ module.exports = Error = function (name, message) {
 
   return self;
 };
+
+module.exports = Error;

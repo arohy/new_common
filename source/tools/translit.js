@@ -3,7 +3,7 @@
  */
 var _ = require('lodash');
 
-module.exports = Translit = function( string ) {
+var Translit = function( string ) {
   var self = this;
 
   var space = '_';
@@ -38,3 +38,5 @@ Translit.prototype.replace = function (string) {
     return test;
   }, '');
 }
+
+module.exports = Translit;

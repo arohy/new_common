@@ -3,7 +3,9 @@
  */
 var _ = require('lodash');
 
-URL = function () {
+var _Singleton = require('../tools/singleton');
+
+var URL = function () {
   var self = this;
 
   self._init();
@@ -39,4 +41,4 @@ URL.prototype.getKeyValue = function (key) {
   return self.keys[key];
 };
 
-module.exports = new URL();
+module.exports = _Singleton(URL).getInstance();
