@@ -10,7 +10,7 @@
  */
 var _ = require('lodash');
 
-module.exports = ProductPriceType = function (_owner) {
+var ProductPriceType = function (_owner) {
   var self = this;
   self._owner = _owner;
 
@@ -73,3 +73,5 @@ ProductPriceType.prototype.getPrice = function (options) {
 
   return price;
 };
+
+module.exports = ProductPriceType;

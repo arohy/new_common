@@ -4,7 +4,9 @@
 var $ = require('jquery');
 var _ = require('lodash');
 
-module.exports = ProductQuantity = function (_owner, _quantityNode) {
+var EventBus = require('../events/events');
+
+var ProductQuantity = function (_owner, _quantityNode) {
   var self = this;
 
   // задаем базывае
@@ -287,3 +289,5 @@ ProductQuantity.prototype._fixValue = function (_value) {
     .round(self.decimal)
     .value();
 };
+
+module.exports = ProductQuantity;

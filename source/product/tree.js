@@ -21,7 +21,7 @@ var URL = require('../tools/url');
 var _Translit = require('../tools/translit');
 var Translit = new _Translit();
 
-module.exports = ProductVariants = function (_owner) {
+var ProductVariants = function (_owner) {
   var self = this;
 
   self._owner = _owner;
@@ -480,3 +480,5 @@ ProductVariants.prototype._getSelectedVector = function (_length) {
 
   return vector;
 };
+
+module.exports = ProductVariants;

@@ -17,8 +17,9 @@ var $ = require('jquery');
 var _ = require('lodash');
 
 var Error = require('../tools/error');
+var EventBus = require('../events/events');
 
-module.exports = OptionSelector = function (_owner) {
+var OptionSelector = function (_owner) {
   var self = this;
 
   self._owner = _owner;
@@ -210,3 +211,5 @@ OptionSelector.prototype._bindOptionTriggers = function () {
     product.variants.setOption(option);
   });
 };
+
+module.exports = OptionSelector;

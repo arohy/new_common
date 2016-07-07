@@ -10,7 +10,9 @@ var _Prices = require('./priceTypes');
 var _OptionSelector = require('./optionSelector');
 var _Quantity = require('./quantity');
 
-module.exports = ProductInstance = function (_owner, $product) {
+var EventBus = require('../events/events');
+
+var ProductInstance = function (_owner, $product) {
   var self = this;
 
   self.selectors = {
@@ -214,3 +216,5 @@ ProductInstance.prototype._bindUpdateCart = function () {
     }
   });
 };
+
+module.exports = ProductInstance;

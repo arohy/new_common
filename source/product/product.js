@@ -15,7 +15,7 @@ var Error = require('../tools/error');
 var _Settings = require('./settings');
 var _Instance = require('./productInstance');
 
-module.exports = Product = function (product, settings) {
+var Product = function (product, settings) {
   var self = this;
 
   // Банхамер должен быть на входе
@@ -96,3 +96,5 @@ Product.prototype._initInstance = function () {
     new _Instance(self, $(this));
   });
 };
+
+module.exports = Product;

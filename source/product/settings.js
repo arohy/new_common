@@ -3,7 +3,7 @@
  */
 var _ = require('lodash');
 
-module.exports = ProductSettings = function (settings, _owner) {
+var ProductSettings = function (settings, _owner) {
   var self = this;
 
   self._default = {
@@ -64,3 +64,5 @@ ProductSettings.prototype.set = function (settings) {
 
   self._owner._init();
 };
+
+module.exports = ProductSettings;
