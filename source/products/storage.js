@@ -8,7 +8,9 @@ var _ = require('lodash');
 var ajax = require('../json/ajax.product');
 var URL = require('../tools/url');
 
-module.exports = ProductsStorage = function (_owner) {
+var EventBus = require('../events/events');
+
+var ProductsStorage = function (_owner) {
   var self = this;
 
   self._settings = {
@@ -130,3 +132,5 @@ ProductsStorage.prototype._checkAlive = function () {
     };
   });
 };
+
+module.exports = ProductsStorage;

@@ -7,7 +7,9 @@ var _ = require('lodash');
 var _Storage = require('./storage');
 var _Product = require('../product/product');
 
-module.exports = Products = function () {
+var _Singleton = require('../tools/singleton');
+
+var Products = function () {
   var self = this;
 
   // настройки
@@ -146,3 +148,5 @@ Products.prototype._initProduct = function (_productJSON) {
 
   self._products[_productJSON.id] = new _Product(_productJSON, self._settings);
 };
+
+module.exports = _Singleton(Products).getInstance();
