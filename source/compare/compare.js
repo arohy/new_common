@@ -5,17 +5,19 @@
 // TODO: сделать синглтон
 var _ = require('lodash');
 
-var _UI = require('./compare.ui');
 var ajax = require('../json/ajax.compare');
 
-module.exports = Compare = function (options) {
+var EventBus = require('../events/events');
+var _Singleton = require('../tools/singleton')
+
+var Compare = function (options) {
   options = options || {};
 
   var self = this;
   self.products = [];
   self.maxItems = options.maxItems || 4;
 
-  self.ui = new _UI(options);
+  self.ui = require('./compare.ui');
 
   // Обновляемся
   self._update();
@@ -154,3 +156,5 @@ Compare.prototype._before = function (task) {
 Compare.prototype._always = function (task) {
   EventBus.publish('always:insales:compares', task);
 };
+
+module.exports = _Singleton(Compare).getInstance();

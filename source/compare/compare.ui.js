@@ -3,7 +3,7 @@
  */
 var $ = require('jquery');
 
-module.exports = CompareDOM = function (options) {
+var CompareDOM = function (options) {
   var self = this;
 
   self._init(options);
@@ -97,3 +97,5 @@ CompareDOM.prototype._deleteItem = function ($button) {
 
   Compare.remove(task);
 };
+
+module.exports = CompareDOM;
