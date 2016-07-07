@@ -21,7 +21,7 @@ Money.prototype._init = function () {
 Money.prototype._set = function (params) {
   var self = this;
 
-  self.options = $.parseJSON(params);
+  self.options = JSON.parse(params);
 
   return;
 };
