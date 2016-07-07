@@ -13,7 +13,7 @@
 var _ = require('lodash');
 var _Logger = require('./events.logger');
 
-var _Singlton = require('../tools/singlton');
+var _Singleton = require('../tools/singleton');
 
 var EventBus = function () {
   var self = this;
@@ -79,4 +79,4 @@ EventBus.prototype._selectEvent = function (eventId) {
   return Event;
 };
 
-module.exports = _Singlton(EventBus).getInstance();
+module.exports = _Singleton(EventBus).getInstance();

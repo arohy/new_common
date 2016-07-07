@@ -16,7 +16,7 @@ var _EB = require('../events/events');
 var ajax = require('../json/ajax.cart');
 
 var EventBus = require('../events/events');
-var _Singlton = require('../tools/singlton');
+var _Singleton = require('../tools/singleton');
 
 var Cart = function () {
   var self = this;
@@ -254,4 +254,4 @@ Cart.prototype.addItem = function () {
   return;
 };
 
-module.exports = _Singlton(Cart).getInstance();
+module.exports = _Singleton(Cart).getInstance();

@@ -5,7 +5,7 @@ var $ = require('jquery');
 var _ = require('lodash');
 
 var _default = require('./templateDefault');
-var _Singlton = require('../tools/singlton');
+var _Singleton = require('../tools/singleton');
 
 var Template = function () {
   var self = this;
@@ -95,4 +95,4 @@ Template.prototype.has = function (template_id) {
 
 Template.prototype._setDefault = _default;
 
-module.exports = _Singlton(Template).getInstance();
+module.exports = _Singleton(Template).getInstance();

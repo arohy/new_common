@@ -11,7 +11,7 @@ var _UI = require('./search.ui');
 var _regExp = require('../tools/regExp');
 
 var EventBus = require('../events/events');
-var _Singlton = require('../tools/singlton');
+var _Singleton = require('../tools/singleton');
 
 var Search = function () {
   var self = this;
@@ -143,4 +143,4 @@ Search.prototype._isValid = function (query) {
   return query !== '' && query.length >= self.settings.letters;
 };
 
-module.exports = _Singlton(Search).getInstance();
+module.exports = _Singleton(Search).getInstance();
