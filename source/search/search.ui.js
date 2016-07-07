@@ -1,7 +1,9 @@
 var $ = require('jquery');
 var _ = require('lodash');
 
-module.exports = SearchDOM = function (_owner) {
+var EventBus = require('../events/events');
+
+var SearchDOM = function (_owner) {
   var self = this;
 
   self._owner = _owner;
@@ -138,3 +140,5 @@ SearchDOM.prototype._outFocus = function () {
     }
   });
 };
+
+module.exports = SearchDOM;

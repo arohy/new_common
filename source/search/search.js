@@ -10,7 +10,10 @@ var _ = require('lodash');
 var _UI = require('./search.ui');
 var _regExp = require('../tools/regExp');
 
-module.exports = Search = function () {
+var EventBus = require('../events/events');
+var _Singlton = require('../tools/singlton');
+
+var Search = function () {
   var self = this;
 
   // настройки по-умолчанию
@@ -139,3 +142,5 @@ Search.prototype._isValid = function (query) {
 
   return query !== '' && query.length >= self.settings.letters;
 };
+
+module.exports = _Singlton(Search).getInstance();
