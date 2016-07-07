@@ -1,17 +1,14 @@
 /**
  * Класс для работы с Магазином??
  */
-var client = require('./client');
-var money = require('./money');
-
 var ajaxShop = require('../json/ajax.shop');
 var _Singleton = require('../tools/singleton');
 
 var Shop = function () {
   var self = this;
 
-  self.money = new money();
-  self.client = new client(self);
+  self.money = new (require('./money'))();
+  self.client = new (require('./client'))(self);
 
   self._init();
 }
