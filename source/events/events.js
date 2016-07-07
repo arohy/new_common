@@ -12,7 +12,6 @@
 
 var $ = require('jquery');
 var _ = require('lodash');
-var _Logger = require('./events.logger');
 
 var _Singleton = require('../tools/singleton');
 
@@ -24,7 +23,7 @@ var EventBus = function () {
   }
 
   self.eventsList = {};
-  self.logger = new _Logger();
+  self.logger = new (require('./events.logger')) (self);
 
   window.EventBus = self;
 

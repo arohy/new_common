@@ -5,8 +5,9 @@
  */
 var _ = require('lodash');
 
-var EventsLogger = function () {
+var EventsLogger = function (_owner) {
   var self = this;
+  self._owner = _owner;
 
   self.loggersList = {};
 };
@@ -29,7 +30,7 @@ EventsLogger.prototype.add = function (component) {
 EventsLogger.prototype._init = function (component) {
   var self = this;
 
-  _.forEach(EventBus.eventsList, function (item, eventName) {
+  _.forEach(self._owner.eventsList, function (item, eventName) {
     self.addListner(eventName)
   });
 
@@ -47,7 +48,7 @@ EventsLogger.prototype.addListner = function (eventName) {
   if (self._inList(component) && !self._isListen(eventName)) {
     self.loggersList[component][eventName] = true;
 
-    EventBus.subscribe(eventName, function (data) {
+    self._owner.subscribe(eventName, function (data) {
       console.log('LISTNER: ', eventName, _.cloneDeep(data));
     });
   }
