@@ -3,9 +3,11 @@
  */
 var $ = require('jquery');
 var _ = require('lodash');
-var _default = require('./templateDefault');
 
-module.exports = Template = function () {
+var _default = require('./templateDefault');
+var _Singlton = require('../tools/singlton');
+
+var Template = function () {
   var self = this;
   self._templateList = {};
 
@@ -92,3 +94,5 @@ Template.prototype.has = function (template_id) {
 };
 
 Template.prototype._setDefault = _default;
+
+module.exports = _Singlton(Template).getInstance();
