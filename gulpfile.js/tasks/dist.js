@@ -1,14 +1,30 @@
 var gulp = require('gulp');
 
-var plumber = require('gulp-plumber');
-var combine = require('stream-combiner');
-var rigger = require('gulp-rigger');
+var browserify = require('browserify');
 
-gulp.task('dist', function () {
-  return gulp.src(['source/*.js'])
-    .pipe(combine(
-      plumber(),
-      rigger(),
-      gulp.dest('./dist')
-    ))
+var gutil = require('gulp-util');
+var source = require('vinyl-source-stream');
+
+var options = {
+  file: 'test.js',
+  destDir: './dist/'
+};
+
+var b = browserify({
+  entries: './source/' + options.file,
+  debug: false,
+
+  cache: {},
+  packageCache: {},
 });
+
+gulp.task('dist', bundle);
+
+
+//========================
+function bundle () {
+  return b.bundle()
+    .on('error', gutil.log.bind(gutil, 'Browserify Error'))
+    .pipe(source(options.file))
+    .pipe(gulp.dest(options.destDir));
+};

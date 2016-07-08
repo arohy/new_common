@@ -1,29 +1,33 @@
 var gulp = require('gulp');
+
 var browserify = require('browserify');
+var watchify = require('watchify');
 
-var buffer = require('gulp-buffer');
+var gutil = require('gulp-util');
 var source = require('vinyl-source-stream');
-var uglify = require('gulp-uglify');
-var sourcemaps = require('gulp-sourcemaps');
 
-var _enrty = './source/test.js';
+var options = {
+  file: 'test.js',
+  destDir: './media/'
+};
 
-gulp.task('browserify-build', function () {
-  var b = browserify({
-    entries: _enrty,
-    debug: false
-  });
+var b = watchify(browserify({
+  entries: './source/' + options.file,
+  debug: false,
 
+  cache: {},
+  packageCache: {},
+}));
+
+gulp.task('browserify-watch', bundle);
+
+b.on('update', bundle);
+b.on('log',  gutil.log);
+
+//========================
+function bundle () {
   return b.bundle()
-    .pipe(source('test.js'))
-    .pipe(buffer())
-    //.pipe(uglify())
-    .pipe(gulp.dest('./media/'));
-});
-
-gulp.task('browserify-watch', function() {
-  return gulp.watch(['source/**/*.js'],
-    { cwd: './' },
-    ['browserify-build']
-  );
-});
+    .on('error', gutil.log.bind(gutil, 'Browserify Error'))
+    .pipe(source(options.file))
+    .pipe(gulp.dest(options.destDir));
+};
