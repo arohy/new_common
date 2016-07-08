@@ -7,10 +7,9 @@
 var $ = require('jquery');
 var _ = require('lodash');
 
-var _UI = require('./search.ui');
-var _regExp = require('../tools/regExp');
-
 var EventBus = require('../events/events');
+
+var _regTools = new (require('../tools/regTools')) ();
 var _Singleton = require('../tools/singleton');
 
 var Search = function () {
@@ -45,7 +44,7 @@ Search.prototype._init = function () {
 
   self.setConfig({});
 
-  self._ui = new _UI(self);
+  self._ui = new (require('./search.ui')) (self);
 };
 
 /**
@@ -122,7 +121,7 @@ Search.prototype._setData = function (_data) {
  */
 Search.prototype._patch = function (options) {
   var self = this;
-  var _regExp = new RegExp('('+ _regExp.escape(options.query) +')', 'gi');
+  var _regExp = new RegExp('('+ _regTools.escape(options.query) +')', 'gi');
 
   return _.reduce(options.suggestions, function (result, product) {
     var temp = {
