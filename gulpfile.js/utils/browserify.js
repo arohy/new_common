@@ -5,6 +5,7 @@ var uglifyify = require('uglifyify');
 var watchify = require('watchify');
 
 var gutil = require('gulp-util');
+var rename = require('gulp-rename');
 var source = require('vinyl-source-stream');
 
 var buffer = require('vinyl-buffer');
@@ -12,16 +13,29 @@ var sourcemaps = require('gulp-sourcemaps');
 var gulpif = require('gulp-if');
 var lazypipe = require('lazypipe');
 
-// Сборка мап,
-var makeJSMap = lazypipe()
-  .pipe(sourcemaps.init, { loadMaps: true })
-    // Add transformation tasks to the pipeline here.
-  .pipe(sourcemaps.write, './');
+/**
+ * entry - base file
+ * destDir - destination target Dir
+ * destFile - compiled file name
+ * destMinFile - min compiled file name
+ * uglify: true/false
+ * watch: true/false
+ */
+
+// Мумификация,
+var minimization = function (options) {
+  return lazypipe()
+    .pipe(rename, options.destMinFile)
+    .pipe(sourcemaps.init, { loadMaps: true })
+      // Add transformation tasks to the pipeline here.
+    .pipe(sourcemaps.write, './')
+    .pipe(gulp.dest, options.destDir)();
+}
 
 // ==========================================================
 var build = function (options) {
   var b = browserify({
-    entries: './source/' + options.file,
+    entries: './source/' + options.entry,
     debug: true,
     cache: {},
     packageCache: {},
@@ -47,10 +61,10 @@ var build = function (options) {
 function _bundle (b, options) {
   return b.bundle()
     .on('error', gutil.log.bind(gutil, 'Browserify Error'))
-    .pipe(source(options.file))
+    .pipe(source(options.entry))
+    .pipe(gulp.dest(options.destDir))
     .pipe(buffer())
-    .pipe(gulpif(options.uglify, makeJSMap()))
-    .pipe(gulp.dest(options.destDir));
+    .pipe(gulpif(options.uglify, minimization(options)));
 };
 
 module.exports = build;

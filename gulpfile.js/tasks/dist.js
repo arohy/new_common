@@ -4,8 +4,10 @@ var init = require('../utils/browserify');
 
 gulp.task('dist', function () {
   init({
+    entry: 'test.js',
     destDir: './dist/',
-    file: 'test.js',
+    destFile: 'test.js',
+    destMinFile: 'test2.min.js',
     watch: false,
     uglify: true,
   });
