@@ -5,9 +5,9 @@ var init = require('../utils/browserify');
 // =========================================================
 gulp.task('dev-watch', function () {
   init({
-    entry: 'test.js',
+    entry: 'new_common.js',
     destDir: './media/',
-    destFile: 'test.js',
+    destFile: 'new_common.js',
     watch: true,
     uglify: false,
   });
