@@ -187,7 +187,6 @@ CartDOM.prototype._bindUpdateCart = function () {
       // блочим отправку формы и запускаем обработку
       event.preventDefault();
 
-      self.updateOrder();
       // TODO: удалить
       self.updateOrder($(event.target));
     }
