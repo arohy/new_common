@@ -1,3 +1,3 @@
 var gulp = require('gulp');
 
-gulp.task('dev', ['insup-load', 'browserify-watch'], function() {});
+gulp.task('dev', ['insup-load', 'dev-watch'], function() {});
