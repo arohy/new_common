@@ -1,12 +1,12 @@
 var _ = require('lodash');
 
-var RegExp = function () {
+var RegTools = function () {
   var self = this;
 
   self._toEscape = /[|\\{}()[\]^$+*?.]/g;
 }
 
-RegExp.prototype.escape = function (string) {
+RegTools.prototype.escape = function (string) {
   var self = this;
 
   if (!_.isString(string)) {
@@ -17,4 +17,4 @@ RegExp.prototype.escape = function (string) {
   return string.replace(self._toEscape, '\\$&');
 };
 
-module.exports = RegExp;
+module.exports = RegTools;
