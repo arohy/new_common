@@ -5,7 +5,7 @@ var URL = require('../tools/url');
 var $ = require('jquery');
 var _ = require('lodash');
 
-getCollection = function () {
+module.exports = function () {
   var path = '/collection/'+ _.toString(arguments[0]) +'.json';
   var _lang = URL.getKeyValue('lang') || '';
   var fields = {
