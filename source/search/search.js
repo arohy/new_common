@@ -2,9 +2,17 @@
  * Live search
  *
  * @class
- * @name ISnew.Search
+ * @name Search
  */
-ISnew.Search = function () {
+var $ = require('jquery');
+var _ = require('lodash');
+
+var EventBus = require('../events/events');
+
+var _regTools = new (require('../tools/regTools')) ();
+var _Singleton = require('../tools/singleton');
+
+var Search = function () {
   var self = this;
 
   // настройки по-умолчанию
@@ -31,12 +39,12 @@ ISnew.Search = function () {
  *
  * @param  {object} options конфигурация поиска
  */
-ISnew.Search.prototype._init = function () {
+Search.prototype._init = function () {
   var self = this;
 
   self.setConfig({});
 
-  self._ui = new ISnew.SearchDOM(self);
+  self._ui = new (require('./search.ui')) (self);
 };
 
 /**
@@ -46,7 +54,7 @@ ISnew.Search.prototype._init = function () {
  *   input: jquery(input)
  * }
  */
-ISnew.Search.prototype._get = function (options) {
+Search.prototype._get = function (options) {
   var self = this;
 
   EventBus.publish('before:insales:search');
@@ -65,7 +73,7 @@ ISnew.Search.prototype._get = function (options) {
   }
 };
 
-ISnew.Search.prototype._update = function (options) {
+Search.prototype._update = function (options) {
   var self = this;
 
   var data = {
@@ -85,7 +93,7 @@ ISnew.Search.prototype._update = function (options) {
 /**
  * Обновляем настройки
  */
-ISnew.Search.prototype.setConfig = function (settings) {
+Search.prototype.setConfig = function (settings) {
   var self = this;
 
   _.merge(self, self._default, { settings: settings });
@@ -102,7 +110,7 @@ ISnew.Search.prototype.setConfig = function (settings) {
  * fields: [ 'price_min', 'price_min_available' ],
  * hide_items_out_of_stock: Site.account.hide_items
  */
-ISnew.Search.prototype._setData = function (_data) {
+Search.prototype._setData = function (_data) {
   var self = this;
 
   _.merge(self, { data: _data });
@@ -111,9 +119,9 @@ ISnew.Search.prototype._setData = function (_data) {
 /**
  * приводим в общий порядок список поиска
  */
-ISnew.Search.prototype._patch = function (options) {
+Search.prototype._patch = function (options) {
   var self = this;
-  var _regExp = new RegExp('('+ Site.RegExp.escape(options.query) +')', 'gi');
+  var _regExp = new RegExp('('+ _regTools.escape(options.query) +')', 'gi');
 
   return _.reduce(options.suggestions, function (result, product) {
     var temp = {
@@ -128,8 +136,10 @@ ISnew.Search.prototype._patch = function (options) {
   }, []);
 };
 
-ISnew.Search.prototype._isValid = function (query) {
+Search.prototype._isValid = function (query) {
   var self = this;
 
   return query !== '' && query.length >= self.settings.letters;
 };
+
+module.exports = _Singleton(Search).getInstance();

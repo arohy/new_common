@@ -2,13 +2,21 @@
  * Класс Хранилища json Товаров
  * управляет всем процессом получения и хранения json'ов
  */
-ISnew.ProductsStorage = function (_owner) {
+var $ = require('jquery');
+var _ = require('lodash');
+
+var ajax = require('../json/ajax.product');
+var URL = require('../tools/url');
+
+var EventBus = require('../events/events');
+
+var ProductsStorage = function (_owner) {
   var self = this;
 
   self._settings = {
     maxProducts: 100,
     json: 'products',
-    liveTime: 300000 // milisec
+    liveTime: 180000 // milisec
   };
 
   self._owner = _owner;
@@ -23,7 +31,7 @@ ISnew.ProductsStorage = function (_owner) {
 /**
  * Инициализация
  */
-ISnew.ProductsStorage.prototype._init = function () {
+ProductsStorage.prototype._init = function () {
   var self = this;
 
   // грузим сохраненные товары
@@ -35,7 +43,7 @@ ISnew.ProductsStorage.prototype._init = function () {
 /**
  * Отдаем json'ы товаров и хранилища
  */
-ISnew.ProductsStorage.prototype.getProducts = function (_idList) {
+ProductsStorage.prototype.getProducts = function (_idList) {
   var self = this;
   var result = $.Deferred();
 
@@ -44,7 +52,7 @@ ISnew.ProductsStorage.prototype.getProducts = function (_idList) {
 
   if (diffId.length) {
     // если про что-то не знаем - тащим всю портянку
-    ISnew.json.getProductsList(diffId)
+    ajax.getList(diffId)
       .done(function (_JSONs) {
         // обрабатываем ответы
         self._updateJSON(_JSONs);
@@ -63,11 +71,19 @@ ISnew.ProductsStorage.prototype.getProducts = function (_idList) {
 /**
  * Получение сохраненных товаров
  */
-ISnew.ProductsStorage.prototype._loadJSON = function () {
+ProductsStorage.prototype._loadJSON = function () {
   var self = this;
   var _json = self._storage.getItem(self._settings.json);
+  var _lang = self._storage.getItem('lang');
+  var _currentLang = URL.getKeyValue('lang') || '';
 
   _json = JSON.parse(_json) || {};
+  _lang = JSON.parse(_lang);
+
+  if (_lang !== _currentLang) {
+    _json = {};
+    self._storage.setItem('lang', JSON.stringify(_currentLang));
+  }
 
   return _json;
 };
@@ -75,7 +91,7 @@ ISnew.ProductsStorage.prototype._loadJSON = function () {
 /**
  * Сохранение товаров
  */
-ISnew.ProductsStorage.prototype._saveJSON = function () {
+ProductsStorage.prototype._saveJSON = function () {
   var self = this;
   var _json = JSON.stringify(self._json);
 
@@ -87,7 +103,7 @@ ISnew.ProductsStorage.prototype._saveJSON = function () {
 /**
  * Обновление базы )
  */
-ISnew.ProductsStorage.prototype._updateJSON = function (_JSONs) {
+ProductsStorage.prototype._updateJSON = function (_JSONs) {
   var self = this;
 
   // Добавляем записи
@@ -105,7 +121,7 @@ ISnew.ProductsStorage.prototype._updateJSON = function (_JSONs) {
 /**
  * Проверяем актуальность записей
  */
-ISnew.ProductsStorage.prototype._checkAlive = function () {
+ProductsStorage.prototype._checkAlive = function () {
   var self = this;
   var currentMoment = _.now();
 
@@ -116,3 +132,5 @@ ISnew.ProductsStorage.prototype._checkAlive = function () {
     };
   });
 };
+
+module.exports = ProductsStorage;

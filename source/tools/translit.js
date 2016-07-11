@@ -1,7 +1,9 @@
 /**
  * производим транслитерацию строки
  */
-ISnew.tools.Translit = function( string ) {
+var _ = require('lodash');
+
+var Translit = function( string ) {
   var self = this;
 
   var space = '_';
@@ -23,7 +25,7 @@ ISnew.tools.Translit = function( string ) {
 /*
  * Основной метод.
  */
-ISnew.tools.Translit.prototype.replace = function (string) {
+Translit.prototype.replace = function (string) {
   var self = this;
 
   return _.reduce(string.toLowerCase(), function(test, symbol) {
@@ -36,3 +38,5 @@ ISnew.tools.Translit.prototype.replace = function (string) {
     return test;
   }, '');
 }
+
+module.exports = Translit;

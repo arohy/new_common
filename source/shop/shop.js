@@ -1,25 +1,29 @@
 /**
  * Класс для работы с Магазином??
  */
+var ajaxShop = require('../json/ajax.shop');
+var _Singleton = require('../tools/singleton');
 
-ISnew.Shop = function () {
+var Shop = function () {
   var self = this;
 
-  self.money = new ISnew.Money();
-  self.client = new ISnew.Client(self);
+  self.money = new (require('./money'))();
+  self.client = new (require('./client'))(self);
 
   self._init();
 }
 
-ISnew.Shop.prototype._init = function () {
+Shop.prototype._init = function () {
   var self = this;
 };
 
 /**
  * Отправка сообщений
  */
-ISnew.Shop.prototype.sendMessage = function (message) {
+Shop.prototype.sendMessage = function (message) {
   var self = this;
 
-  return ISnew.json.sendMessage(message);
+  return ajaxShop.message(message);
 };
+
+module.exports = _Singleton(Shop).getInstance();

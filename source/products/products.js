@@ -1,7 +1,15 @@
 /**
  * Централизованная работа с товарами
  */
-ISnew.Products = function () {
+var $ = require('jquery');
+var _ = require('lodash');
+
+var _Storage = require('./storage');
+var _Product = require('../product/product');
+
+var _Singleton = require('../tools/singleton');
+
+var Products = function () {
   var self = this;
 
   // настройки
@@ -10,7 +18,7 @@ ISnew.Products = function () {
   self._products = {};
 
   // массив с актуальными id (которые есть на странице +-)
-  self._storage = new ISnew.ProductsStorage(self);
+  self._storage = new _Storage(self);
 
   self._init();
 };
@@ -18,7 +26,7 @@ ISnew.Products = function () {
 /**
  * Инициализация
  */
-ISnew.Products.prototype._init = function () {
+Products.prototype._init = function () {
   var self = this;
 
   self._getDomId()
@@ -30,7 +38,7 @@ ISnew.Products.prototype._init = function () {
 /**
  * Получаем готовый к употреблению товар
  */
-ISnew.Products.prototype.get = function (id) {
+Products.prototype.get = function (id) {
   var self = this;
 
   id = _.toInteger(id);
@@ -41,7 +49,7 @@ ISnew.Products.prototype.get = function (id) {
 /**
  * Получение списка товаров
  */
-ISnew.Products.prototype.getList = function (idList) {
+Products.prototype.getList = function (idList) {
   var self = this;
 
   idList = _.toArray(idList);
@@ -52,7 +60,7 @@ ISnew.Products.prototype.getList = function (idList) {
 /**
  * Обновление настроек продуктов созданных через
  */
-ISnew.Products.prototype.setConfig = function (settings){
+Products.prototype.setConfig = function (settings){
   var self = this;
 
   self._settings = settings;
@@ -65,7 +73,7 @@ ISnew.Products.prototype.setConfig = function (settings){
 /**
  * Получение списка из id из DOM
  */
-ISnew.Products.prototype._getDomId = function () {
+Products.prototype._getDomId = function () {
   var self = this;
   var result = $.Deferred();
   var _idList = [];
@@ -86,7 +94,7 @@ ISnew.Products.prototype._getDomId = function () {
 /**
  * Получение списка товаров
  */
-ISnew.Products.prototype._getList = function (_idList) {
+Products.prototype._getList = function (_idList) {
   var self = this;
   var result = $.Deferred();
 
@@ -117,7 +125,7 @@ ISnew.Products.prototype._getList = function (_idList) {
 /**
  * Получение информации о товаре
  */
-ISnew.Products.prototype._getOne = function (_id) {
+Products.prototype._getOne = function (_id) {
   var self = this;
   var result = $.Deferred();
 
@@ -135,8 +143,10 @@ ISnew.Products.prototype._getOne = function (_id) {
 /**
  *
  */
-ISnew.Products.prototype._initProduct = function (_productJSON) {
+Products.prototype._initProduct = function (_productJSON) {
   var self = this;
 
-  self._products[_productJSON.id] = new ISnew.Product(_productJSON, self._settings);
+  self._products[_productJSON.id] = new _Product(_productJSON, self._settings);
 };
+
+module.exports = _Singleton(Products).getInstance();

@@ -9,11 +9,23 @@
  */
 
 // TODO: сделать синглтон
-ISnew.EventBus = function () {
+
+var $ = require('jquery');
+var _ = require('lodash');
+
+var _Singleton = require('../tools/singleton');
+
+var EventBus = function () {
   var self = this;
 
+  if (window.EventBus) {
+    return window.EventBus;
+  }
+
   self.eventsList = {};
-  self.logger = new ISnew.EventsLogger();
+  self.logger = new (require('./events.logger')) (self);
+
+  window.EventBus = self;
 
   return;
 };
@@ -21,7 +33,7 @@ ISnew.EventBus = function () {
 /**
  * Публикация события с данными
  */
-ISnew.EventBus.prototype.publish = function (eventId, data) {
+EventBus.prototype.publish = function (eventId, data) {
   var self = this;
 
   self.logger.addListner(eventId);
@@ -32,7 +44,7 @@ ISnew.EventBus.prototype.publish = function (eventId, data) {
 /**
  * Подписаться на событие
  */
-ISnew.EventBus.prototype.subscribe = function (eventId, callback) {
+EventBus.prototype.subscribe = function (eventId, callback) {
   var self = this;
 
   return self._selectEvent(eventId).add(callback);
@@ -41,7 +53,7 @@ ISnew.EventBus.prototype.subscribe = function (eventId, callback) {
 /**
  * Отписаться от события
  */
-ISnew.EventBus.prototype.unsubscribe = function (eventId, callback) {
+EventBus.prototype.unsubscribe = function (eventId, callback) {
   var self = this;
 
   return self._selectEvent(eventId).remove(callback);
@@ -50,7 +62,7 @@ ISnew.EventBus.prototype.unsubscribe = function (eventId, callback) {
 /**
  * Выбор нужного события
  */
-ISnew.EventBus.prototype._selectEvent = function (eventId) {
+EventBus.prototype._selectEvent = function (eventId) {
   var self = this;
   var Event;
 
@@ -66,3 +78,5 @@ ISnew.EventBus.prototype._selectEvent = function (eventId) {
 
   return Event;
 };
+
+module.exports = _Singleton(EventBus).getInstance();

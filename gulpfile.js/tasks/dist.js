@@ -1,14 +1,14 @@
 var gulp = require('gulp');
 
-var plumber = require('gulp-plumber');
-var combine = require('stream-combiner');
-var rigger = require('gulp-rigger');
+var init = require('../utils/browserify');
 
 gulp.task('dist', function () {
-  return gulp.src(['source/*.js'])
-    .pipe(combine(
-      plumber(),
-      rigger(),
-      gulp.dest('./dist')
-    ))
+  init({
+    entry: 'new_common.js',
+    destDir: './dist/',
+    destFile: 'new_common.js',
+    destMinFile: 'new_common.min.js',
+    watch: false,
+    uglify: true,
+  });
 });

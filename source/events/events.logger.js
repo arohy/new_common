@@ -3,8 +3,11 @@
  *
  * Позволяет одной командой перехватывать все события, порождаемые компонентом
  */
-ISnew.EventsLogger = function () {
+var _ = require('lodash');
+
+var EventsLogger = function (_owner) {
   var self = this;
+  self._owner = _owner;
 
   self.loggersList = {};
 };
@@ -12,7 +15,7 @@ ISnew.EventsLogger = function () {
 /**
  * Добавляем прослушку компонента
  */
-ISnew.EventsLogger.prototype.add = function (component) {
+EventsLogger.prototype.add = function (component) {
   var self = this;
 
   self.loggersList[component] = {};
@@ -24,10 +27,10 @@ ISnew.EventsLogger.prototype.add = function (component) {
 /**
  * Проходим по уже существующим событиям и вешаемся на них
  */
-ISnew.EventsLogger.prototype._init = function (component) {
+EventsLogger.prototype._init = function (component) {
   var self = this;
 
-  _.forEach(EventBus.eventsList, function (item, eventName) {
+  _.forEach(self._owner.eventsList, function (item, eventName) {
     self.addListner(eventName)
   });
 
@@ -37,7 +40,7 @@ ISnew.EventsLogger.prototype._init = function (component) {
 /**
  * Вешаем слушателя на событие
  */
-ISnew.EventsLogger.prototype.addListner = function (eventName) {
+EventsLogger.prototype.addListner = function (eventName) {
   var self = this;
   var component = self._component(eventName);
 
@@ -45,8 +48,8 @@ ISnew.EventsLogger.prototype.addListner = function (eventName) {
   if (self._inList(component) && !self._isListen(eventName)) {
     self.loggersList[component][eventName] = true;
 
-    EventBus.subscribe(eventName, function (data) {
-      console.log('LISTNER: ', eventName, data);
+    self._owner.subscribe(eventName, function (data) {
+      console.log('LISTNER: ', eventName, _.cloneDeep(data));
     });
   }
 
@@ -56,7 +59,7 @@ ISnew.EventsLogger.prototype.addListner = function (eventName) {
 /**
  * Проверяем, слушаем ли мы такой компонент?
  */
-ISnew.EventsLogger.prototype._inList = function (component) {
+EventsLogger.prototype._inList = function (component) {
   var self = this;
 
   return _.has(self.loggersList, component) ? true : false;
@@ -65,7 +68,7 @@ ISnew.EventsLogger.prototype._inList = function (component) {
 /**
  * Проверка
  */
-ISnew.EventsLogger.prototype._isListen = function (eventName) {
+EventsLogger.prototype._isListen = function (eventName) {
   var self = this;
   var component = self._component(eventName);
   var status = false;
@@ -80,8 +83,8 @@ ISnew.EventsLogger.prototype._isListen = function (eventName) {
 /**
  * Вытаскиваем название компонента из события
  */
-ISnew.EventsLogger.prototype._component = function (eventName) {
+EventsLogger.prototype._component = function (eventName) {
   return _.last(eventName.split(':'));
 };
 
-EventBus = new ISnew.EventBus();
+module.exports = EventsLogger;

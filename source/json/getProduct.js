@@ -1,12 +1,24 @@
 /*
  * Получение информации о товаре
  */
+var URL = require('../tools/url');
+var $ = require('jquery');
+var _ = require('lodash');
 
-ISnew.json.getProduct = function (id) {
+module.exports = function (id) {
+  var _lang = URL.getKeyValue('lang') || '';
+  var fields = {
+    lang: _lang,
+    format: 'json'
+  };
   var result = $.Deferred();
 
-  $.getJSON('/product_by_id/'+ _.toInteger(id) +'.json', { format: 'json' })
+  $.getJSON('/product_by_id/'+ _.toInteger(id) +'.json', fields)
     .done(function (response) {
+      if (response.product && _lang) {
+        response.product.url += '?lang='+ _lang;
+      }
+
       result.resolve(response.product);
     })
     .fail(function (response) {

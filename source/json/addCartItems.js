@@ -7,9 +7,16 @@
  *
  * Внезапно, если это объект невалидного вида мы все равно получим ответ!!!
  */
+var URL = require('../tools/url');
+var $ = require('jquery');
+var _ = require('lodash');
 
-ISnew.json.addCartItems = function (items, options) {
-  var fields = {};
+module.exports = function (items, options) {
+  var _lang = URL.getKeyValue('lang') || '';
+  var fields = {
+    lang: _lang
+  };
+
   options = options || {};
 
   _.forIn(items, function (quantity, variant_id) {

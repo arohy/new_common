@@ -2,7 +2,12 @@
  * Класс отвечает за взаимодействие верскти с конкретным
  * экземпляром Product()
  */
-ISnew.ProductInstance = function (_owner, $product) {
+var $ = require('jquery');
+var _ = require('lodash');
+
+var EventBus = require('../events/events');
+
+var ProductInstance = function (_owner, $product) {
   var self = this;
 
   self.selectors = {
@@ -38,13 +43,13 @@ ISnew.ProductInstance = function (_owner, $product) {
 /**
  * Инициализация связки
  */
-ISnew.ProductInstance.prototype._init = function () {
+ProductInstance.prototype._init = function () {
   var self = this;
 
   // привязываем нужные объекты
-  self.variants = new ISnew.ProductVariants(self);
+  self.variants = new (require('./tree')) (self);
   self._initQuantity();
-  self.price_kinds = new ISnew.ProductPriceType(self);
+  self.price_kinds = new (require('./priceTypes')) (self);
 
   if (self.$product.data('item-id')) {
     self.type = 'item';
@@ -57,7 +62,7 @@ ISnew.ProductInstance.prototype._init = function () {
 /**
  * Инициализация селектора
  */
-ISnew.ProductInstance.prototype._initOptionSelectors = function () {
+ProductInstance.prototype._initOptionSelectors = function () {
   var self = this;
   var _isActive = _.isObject(self.optionSelector);
 
@@ -70,7 +75,7 @@ ISnew.ProductInstance.prototype._initOptionSelectors = function () {
   if (!_isActive) {
     // У нас нет активных селекторов
     // заряжаем
-    self.optionSelector = new ISnew.OptionSelector(self);
+    self.optionSelector = new (require('./optionSelector')) (self);
   } else {
     // данный селектор активен
     // наверное оти перезаписать настройки
@@ -86,12 +91,12 @@ ISnew.ProductInstance.prototype._initOptionSelectors = function () {
 /**
  * Инициализация счетчиков
  */
-ISnew.ProductInstance.prototype._initQuantity = function () {
+ProductInstance.prototype._initQuantity = function () {
   var self = this;
   var $quantity = self.$product.find('['+ self.selectors.quantity +']');
 
   $quantity.each(function (index) {
-    self.quantity[index] = new ISnew.ProductQuantity(self, this);
+    self.quantity[index] = new (require('./quantity')) (self, this);
   });
 };
 
@@ -99,7 +104,7 @@ ISnew.ProductInstance.prototype._initQuantity = function () {
  * Получаем конкретный экземпляр.
  * Возвращет экземпляр, либо false
  */
-ISnew.ProductInstance.prototype.getInstance = function ($object) {
+ProductInstance.prototype.getInstance = function ($object) {
   var self = this;
   var instance;
 
@@ -124,7 +129,7 @@ ISnew.ProductInstance.prototype.getInstance = function ($object) {
  * максимум - получить линк на quantity, откуда брать актуальную инфу
  * о кол-ве
  */
-ISnew.ProductInstance.prototype._updateStatus = function (status) {
+ProductInstance.prototype._updateStatus = function (status) {
   var self = this;
   var _variant;
   var _quantity;
@@ -194,7 +199,7 @@ ISnew.ProductInstance.prototype._updateStatus = function (status) {
 /**
  * Слушатель на обновление корзины
  */
-ISnew.ProductInstance.prototype._bindUpdateCart = function () {
+ProductInstance.prototype._bindUpdateCart = function () {
   var self = this;
 
   EventBus.subscribe('update_items:insales:cart', function (data) {
@@ -206,3 +211,5 @@ ISnew.ProductInstance.prototype._bindUpdateCart = function () {
     }
   });
 };
+
+module.exports = ProductInstance;

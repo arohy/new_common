@@ -1,8 +1,16 @@
 /*
  * Получение информации о списке товаров
  */
+var URL = require('../tools/url/');
+var $ = require('jquery');
+var _ = require('lodash');
 
-ISnew.json.getProductsList = function (id_array) {
+module.exports = function (id_array) {
+  var _lang = URL.getKeyValue('lang') || '';
+  var fields = {
+    lang: _lang,
+    format: 'json'
+  };
   // указваем, сколько id нужно отправить за раз
   var query_limit = 25;
 
@@ -23,7 +31,7 @@ ISnew.json.getProductsList = function (id_array) {
 
   // собираем задачи
   var promises = $.map(paths, function (path) {
-    return $.ajax(path).then(function (response) {
+    return $.getJSON(path, fields).then(function (response) {
         return response;
       });
   });
@@ -47,6 +55,11 @@ ISnew.json.getProductsList = function (id_array) {
         })
         .flatten()
         .union()
+        .forEach(function (product) {
+          if (product && _lang) {
+            product.url += '?lang='+ _lang;
+          }
+        })
         .value()
     });
 };

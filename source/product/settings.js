@@ -1,7 +1,9 @@
 /**
  * Класс для работы с настройками Продукта
  */
-ISnew.ProductSettings = function (settings, _owner) {
+var _ = require('lodash');
+
+var ProductSettings = function (settings, _owner) {
   var self = this;
 
   self._default = {
@@ -29,7 +31,7 @@ ISnew.ProductSettings = function (settings, _owner) {
 /**
  * Выставляем настройки, делаем немного магии
  */
-ISnew.ProductSettings.prototype._set = function (settings) {
+ProductSettings.prototype._set = function (settings) {
   var self = this;
 
   _.merge(self, self._default, settings);
@@ -40,7 +42,7 @@ ISnew.ProductSettings.prototype._set = function (settings) {
 /**
  * всякие доп проверки
  */
-ISnew.ProductSettings.prototype._patch = function () {
+ProductSettings.prototype._patch = function () {
   var self = this;
 
   _.forEach(self.options, function (templateId, option) {
@@ -55,10 +57,12 @@ ISnew.ProductSettings.prototype._patch = function () {
 /**
  * Жестко ставим настройки из-вне
  */
-ISnew.ProductSettings.prototype.set = function (settings) {
+ProductSettings.prototype.set = function (settings) {
   var self = this;
 
   self._set(settings);
 
   self._owner._init();
 };
+
+module.exports = ProductSettings;

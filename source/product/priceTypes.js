@@ -2,13 +2,15 @@
  * Типы цен
  *
  * @class
- * @name ISnew.ProductPriceType
+ * @name ProductPriceType
  *
  * @param {json} product json с информацией о товаре
- * @param {object} _owner ссылка на родительский класс ISnew.Products
+ * @param {object} _owner ссылка на родительский класс Products
  *
  */
-ISnew.ProductPriceType = function (_owner) {
+var _ = require('lodash');
+
+var ProductPriceType = function (_owner) {
   var self = this;
   self._owner = _owner;
 
@@ -19,7 +21,7 @@ ISnew.ProductPriceType = function (_owner) {
   return self;
 };
 
-ISnew.ProductPriceType.prototype._init = function () {
+ProductPriceType.prototype._init = function () {
   var self = this;
 
   self.price_kinds = self._initPrices(self._owner.product);
@@ -28,7 +30,7 @@ ISnew.ProductPriceType.prototype._init = function () {
 /**
  * Инициализация
  */
-ISnew.ProductPriceType.prototype._initPrices = function (product) {
+ProductPriceType.prototype._initPrices = function (product) {
   var self = this;
   var price_kinds = product.price_kinds;
   var price_types = {};
@@ -41,12 +43,14 @@ ISnew.ProductPriceType.prototype._initPrices = function (product) {
       price: parseFloat(variant.price)
     });
 
-    _.forEach(variant.prices, function (price, index) {
-      price_types[variant.id].push({
-        min_quantity: price_kinds[index].value,
-        price: parseFloat(variant.prices[index])
-      });
-    })
+    if (product.price_kinds.length) {
+      _.forEach(variant.prices, function (price, index) {
+        price_types[variant.id].push({
+          min_quantity: price_kinds[index].value,
+          price: parseFloat(variant.prices[index])
+        });
+      })
+    }
   });
 
   return price_types;
@@ -55,7 +59,7 @@ ISnew.ProductPriceType.prototype._initPrices = function (product) {
 /**
  * Получение актуальной цены за штуку
  */
-ISnew.ProductPriceType.prototype.getPrice = function (options) {
+ProductPriceType.prototype.getPrice = function (options) {
   var self = this;
   var price = 0;
 
@@ -69,3 +73,5 @@ ISnew.ProductPriceType.prototype.getPrice = function (options) {
 
   return price;
 };
+
+module.exports = ProductPriceType;

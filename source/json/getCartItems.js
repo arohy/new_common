@@ -1,10 +1,16 @@
 /*
  * Получение состава корзины
  */
+var URL = require('../tools/url');
+var $ = require('jquery');
 
-ISnew.json.getCartItems = function () {
+module.exports = function () {
   var result = $.Deferred();
   var cookieCart = $.cookie('cart');
+  var _lang = URL.getKeyValue('lang') || '';
+  var fields = {
+    lang: _lang
+  };
 
   /*
    * В куке состав корзины хранится, если там не более 4х РАЗНЫХ модификаций
@@ -16,8 +22,9 @@ ISnew.json.getCartItems = function () {
     result.resolve(order);
     // reject??
   } else {
-    $.getJSON('/cart_items.json')
+    $.getJSON('/cart_items.json', fields)
       .done(function (order) {
+        // url'ов нет
         result.resolve(order);
       })
       .fail(function (response) {
