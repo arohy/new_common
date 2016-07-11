@@ -28753,7 +28753,6 @@ module.exports = function (items, options) {
 },{"../tools/url":54,"jquery":1,"lodash":2}],33:[function(require,module,exports){
 console.warn('Внимание подключена новая версия JS API InSales');
 
-window.$ = window.jQuery = require('jquery');
 window._ = require('lodash');
 
 window.ajaxAPI = require('./json/ajax');
@@ -28767,7 +28766,7 @@ window.Products = require('./products/products');
 window.AjaxSearch = require('./search/search');
 
 window.Site = {};
-},{"./cart/cart":3,"./compare/compare":8,"./events/events":10,"./json/ajax":18,"./products/products":41,"./search/search":43,"./shop/shop":47,"./template/template":48,"jquery":1,"lodash":2}],34:[function(require,module,exports){
+},{"./cart/cart":3,"./compare/compare":8,"./events/events":10,"./json/ajax":18,"./products/products":41,"./search/search":43,"./shop/shop":47,"./template/template":48,"lodash":2}],34:[function(require,module,exports){
 /**
  * Объект отвечающий за работу опшн селектора
  *
