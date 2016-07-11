@@ -1,6 +1,5 @@
 console.warn('Внимание подключена новая версия JS API InSales');
 
-window.$ = window.jQuery = require('jquery');
 window._ = require('lodash');
 
 window.ajaxAPI = require('./json/ajax');
