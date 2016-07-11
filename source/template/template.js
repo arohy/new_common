@@ -1,8 +1,13 @@
 /**
  * Обертка для шаблонизатора
  */
+var $ = require('jquery');
+var _ = require('lodash');
 
-ISnew.Template = function () {
+var _default = require('./templateDefault');
+var _Singleton = require('../tools/singleton');
+
+var Template = function () {
   var self = this;
   self._templateList = {};
 
@@ -12,7 +17,7 @@ ISnew.Template = function () {
 /**
  * Вытаскиваем нужный шаблон
  */
-ISnew.Template.prototype.render = function (data, template_id) {
+Template.prototype.render = function (data, template_id) {
   var self = this;
   var template = self._templateList[template_id];
   var result;
@@ -30,7 +35,7 @@ ISnew.Template.prototype.render = function (data, template_id) {
 /**
  * Складываем шаблоны по местам, подготавливаем для работы
  */
-ISnew.Template.prototype.load = function (template_body, template_id) {
+Template.prototype.load = function (template_body, template_id) {
   var self = this;
 
   self._templateList[template_id] = _.template(template_body);
@@ -41,7 +46,7 @@ ISnew.Template.prototype.load = function (template_body, template_id) {
 /**
  * Автоматический сбор шаблонов в верстке
  */
-ISnew.Template.prototype._init = function () {
+Template.prototype._init = function () {
   var self = this;
 
   //  устанавливаем lock пока не собирем все шаблоны
@@ -76,7 +81,7 @@ ISnew.Template.prototype._init = function () {
   });
 };
 
-ISnew.Template.prototype.has = function (template_id) {
+Template.prototype.has = function (template_id) {
   var self = this;
 
   var _has = false;
@@ -87,3 +92,7 @@ ISnew.Template.prototype.has = function (template_id) {
 
   return _has;
 };
+
+Template.prototype._setDefault = _default;
+
+module.exports = _Singleton(Template).getInstance();

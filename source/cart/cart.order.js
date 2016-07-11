@@ -1,8 +1,9 @@
 /**
  * Класс отвечает за работу и форматирование состава корзины
  */
+var _ = require('lodash');
 
-ISnew.CartOrder = function (_cart) {
+var CartOrder = function (_cart) {
   var self = this;
 
   self._owner = _cart;
@@ -11,7 +12,7 @@ ISnew.CartOrder = function (_cart) {
 /**
  * обновляем состав корзины
  */
-ISnew.CartOrder.prototype.set = function (order) {
+CartOrder.prototype.set = function (order) {
   var self = this;
 
   self._patch(order);
@@ -22,7 +23,7 @@ ISnew.CartOrder.prototype.set = function (order) {
 /**
  * забираем актуальный состав корзины
  */
-ISnew.CartOrder.prototype.get = function () {
+CartOrder.prototype.get = function () {
   var self = this;
 
   return self;
@@ -31,7 +32,7 @@ ISnew.CartOrder.prototype.get = function () {
 /**
  * Формируем инфу о позициях
  */
-ISnew.CartOrder.prototype.getItems = function () {
+CartOrder.prototype.getItems = function () {
   var self = this;
   var items = {};
 
@@ -42,7 +43,7 @@ ISnew.CartOrder.prototype.getItems = function () {
   return items;
 };
 
-ISnew.CartOrder.prototype.getComments = function () {
+CartOrder.prototype.getComments = function () {
   var self = this;
 
   return self.order_line_comments;
@@ -51,7 +52,7 @@ ISnew.CartOrder.prototype.getComments = function () {
 /**
  * Фиксим инфу по корзине
  */
-ISnew.CartOrder.prototype._patch = function (current_order) {
+CartOrder.prototype._patch = function (current_order) {
   var self = this;
 
   self.order_lines = current_order.items;
@@ -77,7 +78,7 @@ ISnew.CartOrder.prototype._patch = function (current_order) {
 /**
  * Добавляем поле с ценой только товаров, без доставки
  */
-ISnew.CartOrder.prototype._itemsPrice = function () {
+CartOrder.prototype._itemsPrice = function () {
   var self = this;
 
   self.items_price = _.reduce(self.order_lines, function (sum, item) {
@@ -91,7 +92,7 @@ ISnew.CartOrder.prototype._itemsPrice = function () {
  * Добавляем цену доставки
  * NOTE: в разных json лежит в разных местах
  */
-ISnew.CartOrder.prototype._deliveryPrice = function (current_order) {
+CartOrder.prototype._deliveryPrice = function (current_order) {
   var self = this;
   var delivery_price = _.toString(current_order.delivery_price) || _.toString(current_order.order.delivery_price);
 
@@ -100,7 +101,7 @@ ISnew.CartOrder.prototype._deliveryPrice = function (current_order) {
   return;
 };
 
-ISnew.CartOrder.prototype._setId = function () {
+CartOrder.prototype._setId = function () {
   var self = this;
 
   _.forEach(self.order_lines, function (item) {
@@ -112,7 +113,7 @@ ISnew.CartOrder.prototype._setId = function () {
 /**
  * Фиксим картинки товаров
  */
-ISnew.CartOrder.prototype._images = function () {
+CartOrder.prototype._images = function () {
   var self = this;
 
   _.forEach(self.order_lines, function (item) {
@@ -121,7 +122,7 @@ ISnew.CartOrder.prototype._images = function () {
   return;
 };
 
-ISnew.CartOrder.prototype.getItemByID = function (id) {
+CartOrder.prototype.getItemByID = function (id) {
   var self = this;
   var _item;
 
@@ -136,3 +137,5 @@ ISnew.CartOrder.prototype.getItemByID = function (id) {
 
   return _item;
 };
+
+module.exports = CartOrder;

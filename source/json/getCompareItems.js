@@ -1,9 +1,10 @@
 /**
  * Добавление товара в сравнение
  */
+var URL = require('../tools/url');
+var $ = require('jquery');
 
-ISnew.json.getCompareItems = function (id) {
-  var URL = new ISnew.tools.URL();
+module.exports = function (id) {
   var _lang = URL.getKeyValue('lang') || '';
   var fields = {
     lang: _lang

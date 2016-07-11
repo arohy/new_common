@@ -2,18 +2,25 @@
  * Главный объект продукта
  *
  * @class
- * @name ISnew.Product
+ * @name Product
  *
  * @param {json} product json с информацией о товаре
  * @param {object} settings конфиг для рендера optionSelector
  *
  */
-ISnew.Product = function (product, settings) {
+var $ = require('jquery');
+var _ = require('lodash');
+
+var Error = require('../tools/error');
+var _Settings = require('./settings');
+var _Instance = require('./productInstance');
+
+var Product = function (product, settings) {
   var self = this;
 
   // Банхамер должен быть на входе
   if (!product) {
-    throw new ISnew.tools.Error('ErrorProduct', 'ошибка в передаче продукта');
+    throw new Error('ErrorProduct', 'ошибка в передаче продукта');
   }
 
   self._selectors = {
@@ -22,7 +29,7 @@ ISnew.Product = function (product, settings) {
 
   _.merge(self, product);
   //  Валидация настроек
-  self.settings = new ISnew.ProductSettings(settings, self);
+  self.settings = new _Settings(settings, self);
 
   self._images = self._getImage(product.images);
 
@@ -32,12 +39,12 @@ ISnew.Product = function (product, settings) {
 /**
  * Инициализация
  */
-ISnew.Product.prototype._init = function (){
+Product.prototype._init = function (){
   var self = this;
 
   // должен быть здесь, чтобы перезапустить при смене настроек.
   // TODO: вынести в отдельный метод, прикруть методы к Классам
-  //self.variants = new ISnew.ProductVariants(self);
+  //self.variants = new ProductVariants(self);
   self._instance = self._initInstance();
 }
 
@@ -52,7 +59,7 @@ ISnew.Product.prototype._init = function (){
  *
  * @return {object} _images объект с изображениями в виде {'image.title': {small_url: 'http//'}}
  */
-ISnew.Product.prototype._getImage = function (images) {
+Product.prototype._getImage = function (images) {
   var self = this;
 
   var _images = {};
@@ -80,12 +87,14 @@ ISnew.Product.prototype._getImage = function (images) {
 /*
  * Инициализация форм()
  */
-ISnew.Product.prototype._initInstance = function () {
+Product.prototype._initInstance = function () {
   var self = this;
 
   self.$product = $('['+ self._selectors.product +'="'+ self.id +'"]');
 
   self.$product.each(function () {
-    new ISnew.ProductInstance(self, $(this));
+    new _Instance(self, $(this));
   });
 };
+
+module.exports = Product;

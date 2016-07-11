@@ -1,4 +1,9 @@
-ISnew.SearchDOM = function (_owner) {
+var $ = require('jquery');
+var _ = require('lodash');
+
+var EventBus = require('../events/events');
+
+var SearchDOM = function (_owner) {
   var self = this;
 
   self._owner = _owner;
@@ -9,7 +14,7 @@ ISnew.SearchDOM = function (_owner) {
   self._init();
 }
 
-ISnew.SearchDOM.prototype._init = function () {
+SearchDOM.prototype._init = function () {
   var self = this;
 
   self._setConfig();
@@ -21,7 +26,7 @@ ISnew.SearchDOM.prototype._init = function () {
 /**
  * Грузим настройки по готовности DOM
  */
-ISnew.SearchDOM.prototype._setConfig = function () {
+SearchDOM.prototype._setConfig = function () {
   var self = this;
 
   $(function () {
@@ -39,7 +44,7 @@ ISnew.SearchDOM.prototype._setConfig = function () {
   });
 };
 
-ISnew.SearchDOM.prototype._getInstance = function ($object) {
+SearchDOM.prototype._getInstance = function ($object) {
   var self = this;
   var $search;
   var _target = $object.data('target');
@@ -56,7 +61,7 @@ ISnew.SearchDOM.prototype._getInstance = function ($object) {
 /**
  * Обработчик ввода символов
  */
-ISnew.SearchDOM.prototype._keyUp = function () {
+SearchDOM.prototype._keyUp = function () {
   var self = this;
 
   $(document).on('keyup', '['+ self.settings.searchSelector +']', function () {
@@ -90,7 +95,7 @@ ISnew.SearchDOM.prototype._keyUp = function () {
 /**
  * Вешаем слушателя на обновление данных из поиска
  */
-ISnew.SearchDOM.prototype._events = function () {
+SearchDOM.prototype._events = function () {
   var self = this;
 
   EventBus.subscribe('update:insales:search', function (data) {
@@ -121,7 +126,7 @@ ISnew.SearchDOM.prototype._events = function () {
 /**
  * Перехватываем клик вне поиска
  */
-ISnew.SearchDOM.prototype._outFocus = function () {
+SearchDOM.prototype._outFocus = function () {
   var self = this;
 
   $(document).on('click', function (event) {
@@ -135,3 +140,5 @@ ISnew.SearchDOM.prototype._outFocus = function () {
     }
   });
 };
+
+module.exports = SearchDOM;

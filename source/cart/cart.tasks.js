@@ -2,7 +2,11 @@
  * Менеджер задач для корзины
  * Занимается контролем за задачами, склейкой и отправкой
  */
-ISnew.CartTasks = function (_owner) {
+var _ = require('lodash');
+
+var EventBus = require('../events/events');
+
+var CartTasks = function (_owner) {
   var self = this;
 
   self._owner = _owner;
@@ -15,7 +19,7 @@ ISnew.CartTasks = function (_owner) {
   self._init();
 };
 
-ISnew.CartTasks.prototype._init = function () {
+CartTasks.prototype._init = function () {
   var self = this;
   var _atStore = localStorage.getItem('cart');
 
@@ -33,7 +37,7 @@ ISnew.CartTasks.prototype._init = function () {
  * Если нет - пинаем оставшуюся очередь, может прилететь только от CART()!!!
  * После получения ответа от сервера.
  */
-ISnew.CartTasks.prototype.send = function (task) {
+CartTasks.prototype.send = function (task) {
   var self = this;
 
 
@@ -49,7 +53,7 @@ ISnew.CartTasks.prototype.send = function (task) {
 /**
  * Добавляем таску в очередь
  */
-ISnew.CartTasks.prototype._add = function (task) {
+CartTasks.prototype._add = function (task) {
   var self = this;
 
   self._taskToWork.push(task);
@@ -61,7 +65,7 @@ ISnew.CartTasks.prototype._add = function (task) {
 /**
  * Пушим очередь на сервер
  */
-ISnew.CartTasks.prototype._push = function () {
+CartTasks.prototype._push = function () {
   var self = this;
   var tasks = self._taskToWork;
   var items_set = self._owner.order.getItems();
@@ -98,7 +102,7 @@ ISnew.CartTasks.prototype._push = function () {
 /**
  * Отсылаем на сервак
  */
-ISnew.CartTasks.prototype._send = function (items_set, task) {
+CartTasks.prototype._send = function (items_set, task) {
   var self = this;
 
   self._owner._update(items_set, task);
@@ -108,7 +112,7 @@ ISnew.CartTasks.prototype._send = function (items_set, task) {
 /**
  * Применяем таски на местность
  */
-ISnew.CartTasks.prototype._task = function (task, current_items) {
+CartTasks.prototype._task = function (task, current_items) {
   var self = this;
   var method = '_'+ task.method;
 
@@ -123,7 +127,7 @@ ISnew.CartTasks.prototype._task = function (task, current_items) {
 /**
  * Действия при успешном обновлении
  */
-ISnew.CartTasks.prototype._done = function (order) {
+CartTasks.prototype._done = function (order) {
   var self = this;
   var data = {};
 
@@ -147,7 +151,7 @@ ISnew.CartTasks.prototype._done = function (order) {
 /**
  * Действия при фейле
  */
-ISnew.CartTasks.prototype._fail = function (response) {
+CartTasks.prototype._fail = function (response) {
   var self = this;
 
   // если не прокатило - заливаем обратно таски
@@ -161,7 +165,7 @@ ISnew.CartTasks.prototype._fail = function (response) {
 /**
  * Действия "всегда"
  */
-ISnew.CartTasks.prototype._always = function () {
+CartTasks.prototype._always = function () {
   var self = this;
   var data = {};
 
@@ -181,7 +185,7 @@ ISnew.CartTasks.prototype._always = function () {
   return;
 };
 
-ISnew.CartTasks.prototype._before = function () {
+CartTasks.prototype._before = function () {
   var self = this;
   var data = {};
 
@@ -193,3 +197,5 @@ ISnew.CartTasks.prototype._before = function () {
   });
   return;
 };
+
+module.exports = CartTasks;

@@ -1,9 +1,11 @@
 /*
  * Получение информации о товаре
  */
+var URL = require('../tools/url');
+var $ = require('jquery');
+var _ = require('lodash');
 
-ISnew.json.getProduct = function (id) {
-  var URL = new ISnew.tools.URL();
+module.exports = function (id) {
   var _lang = URL.getKeyValue('lang') || '';
   var fields = {
     lang: _lang,

@@ -1,7 +1,12 @@
 /**
  * Связка с DOM
  */
-ISnew.CartDOM = function () {
+var $ = require('jquery');
+var _ = require('lodash');
+
+var EventBus = require('../events/events');
+
+var CartDOM = function (_owner) {
   var self = this;
 
   self.options = {
@@ -19,13 +24,15 @@ ISnew.CartDOM = function () {
     reloadOnCoupon: true
   };
 
+  self._owner = _owner;
+
   self._init();
 };
 
 /**
  * Инициализация
  */
-ISnew.CartDOM.prototype._init = function () {
+CartDOM.prototype._init = function () {
   var self = this;
 
   // Прибиваем все обработчики
@@ -38,7 +45,7 @@ ISnew.CartDOM.prototype._init = function () {
   return;
 };
 
-ISnew.CartDOM.prototype.setConfig = function (options) {
+CartDOM.prototype.setConfig = function (options) {
   var self = this;
 
   _.assign(self.options, options);
@@ -49,20 +56,20 @@ ISnew.CartDOM.prototype.setConfig = function (options) {
 /**
  * Добавляем товары из формы
  */
-ISnew.CartDOM.prototype._addItem = function ($button) {
+CartDOM.prototype._addItem = function ($button) {
   var self = this;
   var $form = $button.parents('form:first');
 
   task = self._parseProductForm($form, $button);
 
-  Cart.add(task);
+  self._owner.add(task);
   return;
 };
 
 /**
  * Обработка добавления товара в корзину
  */
-ISnew.CartDOM.prototype._bindAddItem = function () {
+CartDOM.prototype._bindAddItem = function () {
   var self = this;
 
   $(document).on('click', '['+ self.options.add +']', function (event) {
@@ -94,7 +101,7 @@ ISnew.CartDOM.prototype._bindAddItem = function () {
 /**
  *
  */
-ISnew.CartDOM.prototype._quickCheckout = function ($button) {
+CartDOM.prototype._quickCheckout = function ($button) {
   var self = this;
   var $form = $button.parents('form:first');
 
@@ -106,7 +113,7 @@ ISnew.CartDOM.prototype._quickCheckout = function ($button) {
 /**
  * Удаляем один элемент из корзины по клику на кнопке "Удалить"
  */
-ISnew.CartDOM.prototype._deleteItem = function ($button) {
+CartDOM.prototype._deleteItem = function ($button) {
   var self = this;
 
   var task = {
@@ -115,14 +122,14 @@ ISnew.CartDOM.prototype._deleteItem = function ($button) {
   };
 
   // посылаем данные в корзину
-  Cart.delete(task);
+  self._owner.delete(task);
   return;
 };
 
 /**
  * Обработка удаления товара из корзины
  */
-ISnew.CartDOM.prototype._bindDeleteItem = function () {
+CartDOM.prototype._bindDeleteItem = function () {
   var self = this;
 
   // вешаем глобальный обработчик
@@ -146,7 +153,7 @@ ISnew.CartDOM.prototype._bindDeleteItem = function () {
 /**
  * Пересчет корзины из формы
  */
-ISnew.CartDOM.prototype.updateOrder = function ($button) {
+CartDOM.prototype.updateOrder = function ($button) {
   var self = this;
   var $form = $('['+ self.options.form +']');
   var $fields = $form.find('input[name*="cart[quantity]"]');
@@ -163,14 +170,14 @@ ISnew.CartDOM.prototype.updateOrder = function ($button) {
 
   task.items = self._getItems($fields);
 
-  Cart.set(task);
+  self._owner.set(task);
   return;
 };
 
 /**
  * Обновление корзины
  */
-ISnew.CartDOM.prototype._bindUpdateCart = function () {
+CartDOM.prototype._bindUpdateCart = function () {
   var self = this;
   var form = '['+ self.options.form +']';
 
@@ -180,7 +187,6 @@ ISnew.CartDOM.prototype._bindUpdateCart = function () {
       // блочим отправку формы и запускаем обработку
       event.preventDefault();
 
-      self.updateOrder();
       // TODO: удалить
       self.updateOrder($(event.target));
     }
@@ -223,7 +229,7 @@ ISnew.CartDOM.prototype._bindUpdateCart = function () {
 /**
  * Очистить корзину (через форму)
  */
-ISnew.CartDOM.prototype.clearOder = function ($button) {
+CartDOM.prototype.clearOder = function ($button) {
   var self = this;
   var $form = $('['+ self.options.form +']')
   var $fields = $form.find('input[name*="cart[quantity]"]');
@@ -240,14 +246,14 @@ ISnew.CartDOM.prototype.clearOder = function ($button) {
 
   task.items = _.keys(self._getItems($fields));
 
-  Cart.delete(task);
+  self._owner.delete(task);
   return;
 };
 
 /**
  * Обработка полной очистки корзины
  */
-ISnew.CartDOM.prototype._bindClearOrder = function () {
+CartDOM.prototype._bindClearOrder = function () {
   var self = this;
 
   // вешаем глобальный обработчик
@@ -270,7 +276,7 @@ ISnew.CartDOM.prototype._bindClearOrder = function () {
 /**
  * Отправка купона
  */
-ISnew.CartDOM.prototype.setCoupon = function ($form, $button) {
+CartDOM.prototype.setCoupon = function ($form, $button) {
   var self = this;
   var task = {
     items: {},
@@ -279,14 +285,14 @@ ISnew.CartDOM.prototype.setCoupon = function ($form, $button) {
     button: $button
   };
 
-  Cart.setCoupon(task);
+  self._owner.setCoupon(task);
   return;
 };
 
 /**
  * Обработчики работы с купоном
  */
-ISnew.CartDOM.prototype._bindCoupon = function () {
+CartDOM.prototype._bindCoupon = function () {
   var self = this;
 
   // вешаем глобальный обработчик
@@ -327,14 +333,14 @@ ISnew.CartDOM.prototype._bindCoupon = function () {
 /**
  * Вытаскиваем id из строки
  */
-ISnew.CartDOM.prototype._getId = function (string) {
+CartDOM.prototype._getId = function (string) {
   return _.toInteger(string.replace(/\D+/g, ''));
 };
 
 /**
  * Собираем items из $form
  */
-ISnew.CartDOM.prototype._getItems = function ($fields) {
+CartDOM.prototype._getItems = function ($fields) {
   var self = this;
   var items = {};
 
@@ -349,11 +355,11 @@ ISnew.CartDOM.prototype._getItems = function ($fields) {
 /**
  * Lurk for coupon
  */
-ISnew.CartDOM.prototype._getCoupon = function ($form) {
+CartDOM.prototype._getCoupon = function ($form) {
   return $form.find('[name="cart[coupon]"]').val() || false;
 };
 
-ISnew.CartDOM.prototype._unlockButton = function (data, eventName) {
+CartDOM.prototype._unlockButton = function (data, eventName) {
   var self = this;
 
   if (data.action && data.action.button && data.action.method == eventName) {
@@ -363,7 +369,7 @@ ISnew.CartDOM.prototype._unlockButton = function (data, eventName) {
   return;
 };
 
-ISnew.CartDOM.prototype._getComments = function ($form) {
+CartDOM.prototype._getComments = function ($form) {
   var self = this;
   var comments = {};
   var $comments = $form.find('[name*="cart[order_line_comments]"]');
@@ -379,7 +385,7 @@ ISnew.CartDOM.prototype._getComments = function ($form) {
 /**
  * Разбираем форму товара
  */
-ISnew.CartDOM.prototype._parseProductForm = function ($form, $button) {
+CartDOM.prototype._parseProductForm = function ($form, $button) {
   var self = this;
 
   var $fields = $form.find('[name*="variant_ids"]');
@@ -408,3 +414,5 @@ ISnew.CartDOM.prototype._parseProductForm = function ($form, $button) {
 
   return task;
 };
+
+module.exports = CartDOM;

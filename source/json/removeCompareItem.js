@@ -1,9 +1,11 @@
 /*
  * Удаление товара из сравнения
  */
+var URL = require('../tools/url');
+var $ = require('jquery');
+var _ = require('lodash');
 
-ISnew.json.removeCompareItem = function (id) {
-  var URL = new ISnew.tools.URL();
+module.exports = function (id) {
   var _lang = URL.getKeyValue('lang') || '';
   var fields = {
     lang: _lang,
