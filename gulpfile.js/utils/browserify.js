@@ -30,9 +30,9 @@ var minimization = function (b, options) {
     .pipe(buffer)
     .pipe(uglify)
     .pipe(rename, options.destMinFile)
-    .pipe(sourcemaps.init, { loadMaps: true })
+    //.pipe(sourcemaps.init, { loadMaps: true })
       // Add transformation tasks to the pipeline here.
-    .pipe(sourcemaps.write, './')
+    //.pipe(sourcemaps.write, './')
     .pipe(gulp.dest, options.destDir)();
 }
 
@@ -40,7 +40,7 @@ var minimization = function (b, options) {
 var build = function (options) {
   var b = browserify({
     entries: './source/' + options.entry,
-    debug: true,
+    debug: false,
     cache: {},
     packageCache: {},
   });
