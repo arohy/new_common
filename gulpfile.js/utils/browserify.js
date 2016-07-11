@@ -13,6 +13,8 @@ var sourcemaps = require('gulp-sourcemaps');
 var gulpif = require('gulp-if');
 var lazypipe = require('lazypipe');
 
+var uglify = require('gulp-uglify');
+
 /**
  * entry - base file
  * destDir - destination target Dir
@@ -23,12 +25,14 @@ var lazypipe = require('lazypipe');
  */
 
 // Мумификация,
-var minimization = function (options) {
+var minimization = function (b, options) {
   return lazypipe()
+    .pipe(buffer)
+    .pipe(uglify)
     .pipe(rename, options.destMinFile)
-    .pipe(sourcemaps.init, { loadMaps: true })
+    //.pipe(sourcemaps.init, { loadMaps: true })
       // Add transformation tasks to the pipeline here.
-    .pipe(sourcemaps.write, './')
+    //.pipe(sourcemaps.write, './')
     .pipe(gulp.dest, options.destDir)();
 }
 
@@ -36,16 +40,10 @@ var minimization = function (options) {
 var build = function (options) {
   var b = browserify({
     entries: './source/' + options.entry,
-    debug: true,
+    debug: false,
     cache: {},
     packageCache: {},
   });
-
-  if (options.uglify) {
-    b.transform({
-      global: true
-    }, uglifyify);
-  }
 
   if (options.watch) {
     b.plugin(watchify)
@@ -63,8 +61,7 @@ function _bundle (b, options) {
     .on('error', gutil.log.bind(gutil, 'Browserify Error'))
     .pipe(source(options.entry))
     .pipe(gulp.dest(options.destDir))
-    .pipe(buffer())
-    .pipe(gulpif(options.uglify, minimization(options)));
+    .pipe(gulpif(options.uglify, minimization(b, options)));
 };
 
 module.exports = build;
