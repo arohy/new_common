@@ -38,7 +38,7 @@ CartQuickCheckout.prototype._init = function () {
   $(function () {
     self.$modal = $(self.selectors.modal);
     self.$message = $(self.msgModal);
-    if (!self.$message.length) {
+    if (self.$modal.length && !self.$message.length) {
       self.$message = $('<div id="insales-quick-checkout-msg" class="m-modal m-modal--msg">\n<div class="m-modal-wrapper">\n<button class="button m-button m-modal-close" data-modal="close"></button>\n<div class="m-modal-msg center"></div>\n</div>\n</div>');
       self.$message.appendTo($('body'));
     }
