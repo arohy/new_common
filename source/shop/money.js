@@ -47,9 +47,9 @@ Money.prototype.format = function (amount) {
   value[0] = value[0].replace(patern, '$1'+ self.options.delimiter);
 
   if (self.options.show_price_without_cents) {
-    value = value[0];
-  } else {
     value = value.join(self.options.separator);
+  } else {
+    value = value[0];
   }
 
   value = self.options.format.replace('%n', value).replace('%u', self.options.unit);
