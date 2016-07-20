@@ -1,8 +1,28 @@
-var URL = require('../tools/url');
-var $ = require('jquery');
-var _ = require('lodash');
+/**
+ * @module ajaxAPI/client/get
+ * @alias ajaxAPI/shop/client
+ *
+ * @description
+ * Получение информации о посетителе сайта
+ *
+ * @return {JSON}
+ * Если пользователь залогинен, получим json с акутальной информацией о покупателе
+ * { status: "ok", client: { // информация о покупателе }}
+ *
+ * В случае, если пользователь не залогинен, получим
+ * { status: "error", message: "Not authorized", url: "/client_account/session/new" }
+ *
+ * @example
+ * ajaxAPI.shop.client()
+ *  .done(function (onDone) { console.log('onDone: ', onDone) })
+ *  .fail(function (onFail) { console.log('onFail: ', onFail) })
+ */
 
 module.exports = function (){
+  var URL = require('../tools/url');
+  var $ = require('jquery');
+  var _ = require('lodash');
+
   var _lang = URL.getKeyValue('lang') || '';
   var fields = {
     lang: _lang
