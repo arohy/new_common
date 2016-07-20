@@ -2,7 +2,7 @@
  *
  */
 module.exports = {
-  get: require ('./getCompareItems'),
-  add: require ('./addCompareItem'),
-  remove: require ('./removeCompareItem'),
+  get: require ('./compare/get'),
+  add: require ('./compare/add'),
+  remove: require ('./compare/remove'),
 };
