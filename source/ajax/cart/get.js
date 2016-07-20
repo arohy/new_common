@@ -1,10 +1,20 @@
-/*
- * Получение состава корзины
+/**
+ * @module ajaxAPI/cart/get
+ *
+ * @description Получение состава корзины
+ *
+ * @return {$.Deferred} $.promise
+ *
+ * @example
+ * ajaxAPI.cart.get()
+ *  .done(function (onDone) { console.log('onDone:', onDone) })
+ *  .fail(function (onFail) { console.log('onFail:', onFail) });
  */
-var URL = require('../tools/url');
-var $ = require('jquery');
 
 module.exports = function () {
+  var URL = require('../tools/url');
+  var $ = require('jquery');
+
   var result = $.Deferred();
   var cookieCart = $.cookie('cart');
   var _lang = URL.getKeyValue('lang') || '';
