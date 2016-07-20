@@ -2,13 +2,32 @@
  * @module ajaxAPI/cart/update
  * @description
  * Обновление состава корзины.
+ * Позволяет:
+ * - обновить состав корзины
+ * - удалить несколько позиций
+ * - добавить несколько позиций
+ * - изменить кол-во товаров позиции
+ * - установить комментарии к позициям
  *
  * @param {Object} items - набор пар {variant_id: quantity, ...}. Если quantity = 0, то позиция удаляется из корзины, в противном случае устанавливается указанное кол-во
  * @param {Object} options - дополнительные поля: comments, coupon
+ * @param {Object} options.comments - объект с комментариями вида {variant_id: comment, ...}
+ * @param {string} options.coupon - название купона
  *
  * @return {$.Deferred} $.promise
  *
  * @example
+ * var items = {
+ *   123456: 1,
+ *   123457: 3,
+ *   123450: 100
+ * };
+ *
+ * var options = {
+ *   comments: { 123456: 'Ваш комментарий' },
+ *   coupon: 'test'
+ * }
+ *
  * ajaxAPI.cart.update(items, optins)
  *  .done(function (onDone) { console.log('onDone: ', onDone) })
  *  .fail(function (onFail) { console.log('onFail: ', onFail) });

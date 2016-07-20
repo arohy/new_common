@@ -5,7 +5,12 @@
  * Оформление заказа с указанием способа оплаты и доставки. Важно - все поля обязательны для заполнения.
  *
  * @param {Object} client - объект с полями {email: почта, name: имя, phone: телефон}
- * @param {Object} order - объект с полями {delivery: id способа доставки, payment: id способа оплаты}
+ * @param {string} client.email - почта
+ * @param {string} client.name - ФИО
+ * @param {string} client.phone - телефон
+ * @param {Object} order - объект с обязательными полями
+ * @param {number} order.delivery - id способа доставки
+ * @param {number} order.payment - id способа оплаты
  *
  * @return {$.Deferred} $.promise
  *
