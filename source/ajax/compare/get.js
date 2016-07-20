@@ -1,10 +1,21 @@
 /**
- * Добавление товара в сравнение
+ * @module ajaxAPI/compare/get
+ *
+ * @description
+ * Получение списка сравнения
+ *
+ * @return {$.Deferred} $.promise
+ *
+ * @example
+ * ajaxAPI.compare.get()
+ *  .done(function (onDone) { console.log('onDone: ', onDone) })
+ *  .fail(function (onFail) { console.log('onFail: ', onFail) });
  */
-var URL = require('../tools/url');
-var $ = require('jquery');
 
 module.exports = function (id) {
+  var URL = require('../tools/url');
+  var $ = require('jquery');
+
   var _lang = URL.getKeyValue('lang') || '';
   var fields = {
     lang: _lang
