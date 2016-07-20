@@ -1,4 +1,4 @@
 module.exports = {
-  order: require ('./makeOrder'),
-  quick: require ('./makeQuickCheckout'),
+  order: require ('./checkout/order'),
+  quick: require ('./checkout/quick'),
 };
