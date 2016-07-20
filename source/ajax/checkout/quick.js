@@ -1,11 +1,24 @@
 /**
+ * @module ajaxAPI/checkout/quick
+ *
+ * @description
  * Оформление заказа
+ *
+ * @param {Object} formData - объект сериализованной формы
+ *
+ * @return {$.Deferred} $.promise
+ *
+ * @example
+ * ajaxAPI.checkout.quick(form.serialize())
+ *  .done(function (onDone) { console.log('onDone: ', onDone) })
+ *  .fail(function (onFail) { console.log('onFail: ', onFail) });
  */
-var URL = require('../tools/url');
-var $ = require('jquery');
-var _ = require ('lodash');
 
 module.exports = function (formData) {
+  var URL = require('../tools/url');
+  var $ = require('jquery');
+  var _ = require('lodash');
+
   var result = $.Deferred();
   var _lang = URL.getKeyValue('lang') || '';
   var iframe;
