@@ -1,4 +1,4 @@
 module.exports = {
-  message: require ('./sendMessage'),
-  client: require ('./getClientInfo'),
+  message: require ('./message/send'),
+  client: require ('./client/get'),
 }
