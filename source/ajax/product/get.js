@@ -1,11 +1,24 @@
-/*
+/**
+ * @module ajaxAPI/product/get
+ *
+ * @description
  * Получение информации о товаре
+ *
+ * @param {number} id - id товара
+ *
+ * @return {$.Deferred} $.promise
+ *
+ * @example
+ * ajaxAPI.product.get(123456)
+ *  .done(function (onDone) { console.log('onDone: ', onDone) })
+ *  .fail(function (onFail) { console.log('onFail: ', onFail) });
  */
-var URL = require('../tools/url');
-var $ = require('jquery');
-var _ = require('lodash');
 
 module.exports = function (id) {
+  var URL = require('../tools/url');
+  var $ = require('jquery');
+  var _ = require('lodash');
+
   var _lang = URL.getKeyValue('lang') || '';
   var fields = {
     lang: _lang,

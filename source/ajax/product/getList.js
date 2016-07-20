@@ -1,11 +1,24 @@
-/*
- * Получение информации о списке товаров
+/**
+ * @module ajaxAPI/product/getList
+ *
+ * @description
+ * Получение информации о списке товаров.
+ *
+ * Важно! Отсутствует поле "подробное описание".
+ *
+ * @param {array} ids - список id товаров, за раз моно получить информацию не более чем о 100 товарах
+ *
+ * @example
+ * ajaxAPI.product.getList([123456,123457,123458,123459])
+ *  .done(function (onDone) {console.log('onDone: ', onDone) })
+ *  .fail(function (onFail) {console.log('onFail: ', onFail) });
  */
-var URL = require('../tools/url/');
-var $ = require('jquery');
-var _ = require('lodash');
 
 module.exports = function (id_array) {
+  var URL = require('../tools/url/');
+  var $ = require('jquery');
+  var _ = require('lodash');
+
   var _lang = URL.getKeyValue('lang') || '';
   var fields = {
     lang: _lang,
