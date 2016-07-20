@@ -1,11 +1,19 @@
 /**
- * Обновление корзины
+ * @module ajaxAPI/cart/update
+ * @description
+ * Обновление состава корзины.
+ *
+ * @param {Object} items - набор пар {variant_id: quantity, ...}. Если quantity = 0, то позиция удаляется из корзины, в противном случае устанавливается указанное кол-во
+ * @param {Object} options - дополнительные поля: comments, coupon
+ *
+ * @return {$.Deferred} $.promise
  */
-var URL = require('../tools/url');
-var $ = require('jquery');
-var _ = require('lodash');
 
 module.exports = function (items, options) {
+  var URL = require('../tools/url');
+  var $ = require('jquery');
+  var _ = require('lodash');
+
   var _lang = URL.getKeyValue('lang') || '';
   var fields = {
     lang: _lang,
