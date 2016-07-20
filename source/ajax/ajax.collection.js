@@ -1,3 +1,3 @@
 module.exports = {
-  get: require ('./getCollection'),
+  get: require ('./collection/get'),
 }
