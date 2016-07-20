@@ -7,6 +7,11 @@
  * @param {Object} options - дополнительные поля: comments, coupon
  *
  * @return {$.Deferred} $.promise
+ *
+ * @example
+ * ajaxAPI.cart.update(items, optins)
+ *  .done(function (onDone) { console.log('onDone: ', onDone) })
+ *  .fail(function (onFail) { console.log('onFail: ', onFail) });
  */
 
 module.exports = function (items, options) {

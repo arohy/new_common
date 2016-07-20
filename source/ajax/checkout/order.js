@@ -1,11 +1,25 @@
 /**
- * Оформление заказа
+ * @module axajAPI/checkout/order
+ *
+ * @description
+ * Оформление заказа с указанием способа оплаты и доставки. Важно - все поля обязательны для заполнения.
+ *
+ * @param {Object} client - объект с полями {email: почта, name: имя, phone: телефон}
+ * @param {Object} order - объект с полями {delivery: id способа доставки, payment: id способа оплаты}
+ *
+ * @return {$.Deferred} $.promise
+ *
+ * @example
+ * ajaxAPI.checkout.order(client, order)
+ *  .done(function (onDone) { console.log('onDone: ', onDone) })
+ *  .fail(function (onFail) { console.log('onFail: ', onFail) });
  */
-var URL = require('../tools/url');
-var $ = require('jquery');
-var _ = require('lodash');
 
 module.exports = function (client, order) {
+  var URL = require('../tools/url');
+  var $ = require('jquery');
+  var _ = require('lodash');
+
   var result = $.Deferred();
   var _lang = URL.getKeyValue('lang') || '';
   var checkout = {
