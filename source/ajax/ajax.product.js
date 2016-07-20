@@ -1,4 +1,4 @@
 module.exports = {
-  get: require ('./getProduct'),
-  getList: require ('./getProductsList'),
+  get: require ('./product/get'),
+  getList: require ('./product/getList'),
 };
