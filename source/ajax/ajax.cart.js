@@ -1,9 +1,9 @@
 /**
- * ajaxAPI.cart
+ * @module ajaxAPI/cart
  */
 module.exports = {
-  add: require ('./addCartItems'),
-  update: require ('./updateCartItems'),
-  get: require ('./getCartItems'),
-  remove: require ('./removeCartItem'),
+  add: require ('./cart/add'),
+  update: require ('./cart/update'),
+  get: require ('./cart/get'),
+  remove: require ('./cart/remove'),
 };
