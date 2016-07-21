@@ -1,5 +1,6 @@
 /**
- * @module ajaxAPI/cart/add
+ * @memberof module:ajaxAPI/cart
+ * @alias add
  *
  * @description
  * Добавление товара в корзину.

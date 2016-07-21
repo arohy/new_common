@@ -1,6 +1,6 @@
 /**
- * @module ajaxAPI/message/send
- * @alias ajaxAPI/shop/message
+ * @memberof module:ajaxAPI/shop
+ * @alias message
  *
  * @description
  * Отпаравка сообщений

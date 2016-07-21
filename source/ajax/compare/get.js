@@ -1,5 +1,6 @@
 /**
- * @module ajaxAPI/compare/get
+ * @memberof module:ajaxAPI/compare
+ * @alias get
  *
  * @description
  * Получение списка сравнения

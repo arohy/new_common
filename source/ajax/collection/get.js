@@ -1,5 +1,6 @@
 /**
- * @module ajaxAPI/collection/get
+ * @memberof module:ajaxAPI/collection
+ * @alias get
  *
  * @description
  * Получение информации о коллекции

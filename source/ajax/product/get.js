@@ -1,6 +1,7 @@
 /**
- * @module ajaxAPI/product/get
- *
+ * @memberof module:ajaxAPI/product
+ * @alias get
+
  * @description
  * Получение информации о товаре
  *

@@ -1,5 +1,8 @@
 /**
+ * @module ajaxAPI/compare
  *
+ * @description
+ * Ajax-обертки для работы со сравнением
  */
 module.exports = {
   get: require ('./compare/get'),

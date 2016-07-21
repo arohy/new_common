@@ -1,5 +1,6 @@
 /**
- * @module ajaxAPI/cart/get
+ * @memberof module:ajaxAPI/cart
+ * @alias get
  *
  * @description Получение состава корзины
  *

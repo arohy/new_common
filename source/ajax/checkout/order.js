@@ -1,5 +1,6 @@
 /**
- * @module ajaxAPI/checkout/order
+ * @memberof module:ajaxAPI/checkout
+ * @alias order
  *
  * @description
  * Оформление заказа с указанием способа оплаты и доставки. Важно - все поля обязательны для заполнения.

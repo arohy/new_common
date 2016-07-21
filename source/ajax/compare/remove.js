@@ -1,5 +1,6 @@
 /**
- * @module ajaxAPI/compare/remove
+ * @memberof module:ajaxAPI/compare
+ * @alias remove
  *
  * @description
  * Удаление товара из сравнения

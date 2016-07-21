@@ -1,5 +1,6 @@
 /**
- * @module ajaxAPI/product/getList
+ * @memberof module:ajaxAPI/product
+ * @alias getList
  *
  * @description
  * Получение информации о списке товаров.

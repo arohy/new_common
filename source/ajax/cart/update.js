@@ -1,5 +1,7 @@
 /**
- * @module ajaxAPI/cart/update
+ * @memberof module:ajaxAPI/cart
+ * @alias update
+ *
  * @description
  * Обновление состава корзины.
  * Позволяет:

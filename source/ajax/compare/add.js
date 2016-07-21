@@ -1,5 +1,6 @@
 /**
- * @module ajaxAPI/compare/add
+ * @memberof module:ajaxAPI/compare
+ * @alias add
  *
  * @description
  * Добавление товара в сравнение

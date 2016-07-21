@@ -1,5 +1,6 @@
 /**
- * @module ajaxAPI/checkout/quick
+ * @memberof module:ajaxAPI/checkout
+ * @alias quick
  *
  * @description
  * Оформление заказа

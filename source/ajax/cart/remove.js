@@ -1,5 +1,7 @@
 /**
- * @module ajaxAPI/cart/remove
+ * @memberof module:ajaxAPI/cart
+ * @alias remove
+ *
  * @description Удаление товара из корзины.
  *
  * @param {Number} variant_id - id модификации

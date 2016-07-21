@@ -1,6 +1,6 @@
 /**
- * @module ajaxAPI/client/get
- * @alias ajaxAPI/shop/client
+ * @memberof module:ajaxAPI/shop
+ * @alias client
  *
  * @description
  * Получение информации о посетителе сайта
