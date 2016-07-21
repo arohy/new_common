@@ -1,5 +1,8 @@
 /**
- * производим транслитерацию строки
+ * @module tools/translit
+ *
+ * @description
+ * Производим транслитерацию строки
  */
 var _ = require('lodash');
 
@@ -22,8 +25,11 @@ var Translit = function( string ) {
   };
 };
 
-/*
+/**
  * Основной метод.
+ * @param {string} string - строка для транслитерации
+ *
+ * @return {string} Транслитеровання строка
  */
 Translit.prototype.replace = function (string) {
   var self = this;

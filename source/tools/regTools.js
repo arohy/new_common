@@ -1,3 +1,11 @@
+/**
+ * @module tools/RegTools
+ *
+ * @desc
+ * вспомогательный модуль для работы с регулярками и строками, которые будут использоваться как шаблоны
+ */
+
+/** @private */
 var _ = require('lodash');
 
 var RegTools = function () {
@@ -6,6 +14,15 @@ var RegTools = function () {
   self._toEscape = /[|\\{}()[\]^$+*?.]/g;
 }
 
+/**
+ * @param {string} string - Строка для экранирования
+ *
+ * @description
+ * Делаем экранирование спецсимволов во входной строке, чтобы при дальнейшем использовании в качестве шаблона не ломался парсер регулярок
+ *
+ * @example
+ * RegTools.escape('\[]') -> '\\\[\]'
+ */
 RegTools.prototype.escape = function (string) {
   var self = this;
 
