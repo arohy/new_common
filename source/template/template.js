@@ -1,12 +1,19 @@
-/**
- * Обертка для шаблонизатора
- */
+ /** @private */
 var $ = require('jquery');
+/** @private */
 var _ = require('lodash');
 
+/** @private */
 var _default = require('./templateDefault');
+/** @private */
 var _Singleton = require('../tools/singleton');
 
+/**
+ * @class
+ *
+ * @description
+ * Обертка для шаблонизатора
+ */
 var Template = function () {
   var self = this;
   self._templateList = {};
@@ -15,7 +22,13 @@ var Template = function () {
 };
 
 /**
- * Вытаскиваем нужный шаблон
+ * Генерация фрагмента нужного шаблона с данными
+ * @method
+ *
+ * @param {Object} data - информация для шаблонизатора
+ * @param {string} template_id - названи
+ *
+ * @returm {string|boolean} html|false
  */
 Template.prototype.render = function (data, template_id) {
   var self = this;
@@ -33,7 +46,11 @@ Template.prototype.render = function (data, template_id) {
 };
 
 /**
- * Складываем шаблоны по местам, подготавливаем для работы
+ * Загрузка нового шаблона в список
+ * @method
+ *
+ * @param {string} template_body - верстка шаблона
+ * @param {string} template_id - название шаблона
  */
 Template.prototype.load = function (template_body, template_id) {
   var self = this;
@@ -44,7 +61,10 @@ Template.prototype.load = function (template_body, template_id) {
 };
 
 /**
- * Автоматический сбор шаблонов в верстке
+ * Инициализация. Собирает все имеющиеся в DOM шаблоны и подключает их
+ *
+ * @method
+ * @private
  */
 Template.prototype._init = function () {
   var self = this;
@@ -58,6 +78,7 @@ Template.prototype._init = function () {
   //  вытаскиваем дефолтный шаблон
   self._setDefault();
 
+  // ориентируемся на куски <script data-template-id="same-tamplete" />
   $(function () {
     var $templates = $('[data-template-id]');
 
@@ -81,6 +102,10 @@ Template.prototype._init = function () {
   });
 };
 
+/**
+ * @method
+ * @private
+ */
 Template.prototype.has = function (template_id) {
   var self = this;
 
