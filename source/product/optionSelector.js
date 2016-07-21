@@ -1,4 +1,4 @@
-/**
+/*
  * Объект отвечающий за работу опшн селектора
  *
  * @class
@@ -30,7 +30,7 @@ var OptionSelector = function (_owner) {
   self._init();
 };
 
-/**
+/*
  * Инициализация
  *
  * @param {json} product json с информацией о товаре
@@ -72,7 +72,7 @@ OptionSelector.prototype._init = function () {
   return;
 };
 
-/**
+/*
  * Основная обертка
  */
 OptionSelector.prototype._renderSelector = function () {
@@ -98,7 +98,7 @@ OptionSelector.prototype._renderSelector = function () {
   }
 };
 
-/**
+/*
  * Рендер разметки
  */
 OptionSelector.prototype._renderOption = function (option) {
@@ -114,7 +114,7 @@ OptionSelector.prototype._renderOption = function (option) {
   return Template.render(option, renderType);
 };
 
-/**
+/*
  * инитим события
  */
 OptionSelector.prototype._bindEvents = function () {
@@ -132,7 +132,7 @@ OptionSelector.prototype._bindEvents = function () {
   self._bindUpdateVariant();
 };
 
-/**
+/*
  * Навешиваем свой дефолтный слушатель для обновления рендера
  */
 OptionSelector.prototype._bindUpdateVariant = function () {
@@ -157,7 +157,7 @@ OptionSelector.prototype._bindUpdateVariant = function () {
   });
 };
 
-/**
+/*
  * Слушаем изменения в нативном селекте
  */
 OptionSelector.prototype._bindSetVariant = function () {

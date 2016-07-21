@@ -1,14 +1,16 @@
-/**
- * Cart
- */
-
+/** @private */
 var _ = require('lodash');
-
+/** @private */
 var ajax = require('../json/ajax.cart');
-
+/** @private */
 var EventBus = require('../events/events');
+/** @private */
 var _Singleton = require('../tools/singleton');
 
+/**
+ * @class
+ * Cart
+ */
 var Cart = function () {
   var self = this;
 
@@ -21,10 +23,10 @@ var Cart = function () {
 };
 
 /**
- * Получить с сервера состав корзины
+ * Инициализация. Создаем первичную таску
+ * @method
+ * @private
  */
-// TODO: изменить на нормальныйую логику после нормолизации ответов json
-// TODO: может не надо? у нас теперь появляется нормальный таск манагер :)
 Cart.prototype.init = function () {
   var self = this;
   var task = {
@@ -34,6 +36,9 @@ Cart.prototype.init = function () {
   self.tasks.send(task);
 };
 
+/**
+ * @todo WTF?!?!
+ */
 Cart.prototype._get = function () {
   var self = this;
   var current_items = {};
@@ -43,8 +48,12 @@ Cart.prototype._get = function () {
 
 /**
  * Добавить в корзину заданное кол-во товаров
+ * @method
  *
- * на вход - объект. смотреть доку
+ * @param {Object} task - задача
+ * @param {Object} tesk.items - { variant_id: quantity, ... }
+ * @param {Object} test.comments - { variant_id: comment, ...}
+ * @param {string} test.coupon - название купона
  */
 Cart.prototype.add = function (task) {
   var self = this;
@@ -55,6 +64,16 @@ Cart.prototype.add = function (task) {
   self.tasks.send(task);
 };
 
+/**
+ * Обработчик задачи добавления товара
+ * @method
+ * @private
+ *
+ * @param {Object} task - исходная задача
+ * @param {Object} current_items - актуальное состояние корзины
+ *
+ * @return {Object} current_items - пропатченный состав корзины
+ */
 Cart.prototype._add_items = function (task, current_items) {
   var self = this;
 
@@ -69,7 +88,12 @@ Cart.prototype._add_items = function (task, current_items) {
 
 /**
  * Удадить из корзины заданное кол-во товаров
- * на вход - объект с парами variant_id: quantity
+ * @method
+ *
+ * @param {Object} task - задача
+ * @param {Object} tesk.items - { variant_id: quantity, ... }
+ * @param {Object} test.comments - { variant_id: comment, ...}
+ * @param {string} test.coupon - название купона
  */
 Cart.prototype.remove = function (task) {
   var self = this;
@@ -80,6 +104,16 @@ Cart.prototype.remove = function (task) {
   self.tasks.send(task);
 };
 
+/**
+ * Основной обработчик удаления
+ * @method
+ * @private
+ *
+ * @param {Object} task - выполняемая задача
+ * @param {Object} current_items - актуальный состав
+ *
+ * @return {Object} current_items - пропатченный состав корзины
+ */
 Cart.prototype._remove_items = function (task, current_items) {
   var self = this;
 
@@ -94,7 +128,12 @@ Cart.prototype._remove_items = function (task, current_items) {
 
 /**
  * Устанавливает кол-во товаров в корзине для каждой позиции
- * на вход - объект с парами variant_id: quantity
+ * @method
+ *
+ * @param {Object} task - задача
+ * @param {Object} tesk.items - { variant_id: quantity, ... }
+ * @param {Object} test.comments - { variant_id: comment, ...}
+ * @param {string} test.coupon - название купона
  */
 Cart.prototype.set = function (task) {
   var self = this;
@@ -104,6 +143,15 @@ Cart.prototype.set = function (task) {
   self.tasks.send(task);
 };
 
+/**
+ * Основной обработчик set_items
+ * @method
+ *
+ * @param {Object} task - выполняемая задача
+ * @param {Object} current_items - актуальный список товаров
+ *
+ * @return {Object} current_items - пропатченный список товаров
+ */
 Cart.prototype._set_items = function (task, current_items) {
   var self = this;
 
@@ -116,7 +164,10 @@ Cart.prototype._set_items = function (task, current_items) {
 
 /**
  * Удалить позиции из корзины
- * на вход - массив с variant_id
+ * @method
+ *
+ * @param {Object} task
+ * @param {Object} task.items - [variant_id, ...]
  */
 Cart.prototype.delete = function (task) {
   var self = this;
@@ -126,6 +177,16 @@ Cart.prototype.delete = function (task) {
   self.tasks.send(task);
 };
 
+/**
+ * Обработчик удаления
+ * @method
+ * @private
+ *
+ * @param {Object} task - выполняемая задача
+ * @param {Object} current_items - актуальный состав корзины
+ *
+ * @return {Object} current_items - пропаченный состав корзины
+ */
 Cart.prototype._delete_items = function (task, current_items) {
   var self = this;
 
@@ -141,6 +202,7 @@ Cart.prototype._delete_items = function (task, current_items) {
 
 /**
  * Полностью очистить корзину
+ * @method
  */
 Cart.prototype.clear = function (task) {
   var self = this;
@@ -150,6 +212,16 @@ Cart.prototype.clear = function (task) {
   self.tasks.send(task);
 };
 
+/**
+ * Обработчик очистки корзины
+ * @method
+ * @private
+ *
+ * @param {Object} task - выполняеая задача
+ * @param {Object} current_items - актуальный состав
+ *
+ * @return {Object} current_items - пропатченнный состав корзины, вида {variant_id: 0, variant_id: 0, ...}
+ */
 Cart.prototype._clear_items = function (task, current_items) {
   var self = this;
 
@@ -162,6 +234,9 @@ Cart.prototype._clear_items = function (task, current_items) {
 
 /**
  * Добавление товаров в корзину для "Заказа в один клик"
+ * @method
+ *
+ * @param {}
  */
 Cart.prototype.add_checkout = function (task) {
   var self = this;
@@ -171,6 +246,11 @@ Cart.prototype.add_checkout = function (task) {
   self.tasks.send(task);
 };
 
+/**
+ * Обработчик
+ * @method
+ * @private
+ */
 Cart.prototype._add_checkout = function (task, current_items) {
   var self = this;
 
@@ -185,6 +265,9 @@ Cart.prototype._add_checkout = function (task, current_items) {
 
 /**
  * Устанавливаем купон
+ * @method
+ *
+ * @param {Object} task
  */
 Cart.prototype.setCoupon = function (task) {
   var self = this;
@@ -195,6 +278,11 @@ Cart.prototype.setCoupon = function (task) {
   self.tasks.send(task);
 };
 
+/**
+ * Обработчик
+ * @method
+ * @private
+ */
 Cart.prototype._set_coupon = function (task, current_items) {
   var self = this;
 
