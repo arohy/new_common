@@ -1,8 +1,13 @@
-/**
- * Класс для работы с валютой.
- */
+/** @private */
 var _ = require('lodash');
 
+/**
+ * @memberof Shop
+ * @class
+ *
+ * @description
+ * Класс для работы с валютой.
+ */
 var Money = function () {
   var self = this;
 
@@ -10,7 +15,12 @@ var Money = function () {
 };
 
 /**
- * Разбиралка настроек
+ * Инициалиация
+ * @method
+ * @private
+ *
+ * @todo
+ * Получить json для автоматического получения настроек, и сделать их автоматическое применение
  */
 Money.prototype._init = function () {
   var self = this;
@@ -18,6 +28,11 @@ Money.prototype._init = function () {
   return;
 };
 
+/**
+ * Разбор настроек
+ * @method
+ * @private
+ */
 Money.prototype._set = function (params) {
   var self = this;
 
@@ -26,12 +41,26 @@ Money.prototype._set = function (params) {
   return;
 };
 
+/**
+ * Вызов применения настроек
+ * @method
+ *
+ * @param {Object} params - Объект с настройками валюты, в ликвид '{{ money_with_currency_format }}'
+ */
 Money.prototype.set = function (params) {
   var self = this;
 
   self._set(params);
 };
 
+/**
+ * Форматирование входной строки к виду, согласно настройкам БО
+ * @method
+ *
+ * @param {string|number} amount - строка или число, которое надо отформатировать в валюту
+ *
+ * @return {string} Строка, содержащая результат форматирования
+ */
 Money.prototype.format = function (amount) {
   var self = this;
   var value = amount;

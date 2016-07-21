@@ -1,9 +1,14 @@
-/**
- * Класс для работы с Магазином??
- */
+/** @private */
 var ajaxShop = require('../json/ajax.shop');
+/** @private */
 var _Singleton = require('../tools/singleton');
 
+/**
+ * @class
+ *
+ * @description
+ * Класс для работы с вспомогательным функционалом магазинв
+ */
 var Shop = function () {
   var self = this;
 
@@ -13,12 +18,18 @@ var Shop = function () {
   self._init();
 }
 
+/**
+ * Иницализация
+ * @private
+ */
 Shop.prototype._init = function () {
   var self = this;
 };
 
 /**
  * Отправка сообщений
+ *
+ * @method
  */
 Shop.prototype.sendMessage = function (message) {
   var self = this;
