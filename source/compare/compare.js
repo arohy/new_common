@@ -32,11 +32,11 @@ var Compare = function (options) {
  * @param {Object} task - задача
  * @param {number} task.item - id товара, добавляемого в сравнение
  *
- * @fires before:insales:compare
- * @fires overload:insales:compare
- * @fires in_list:insales:compare
- * @fires add_item:insales:compare
- * @fires always:insales:compare
+ * @fires before:insales:compares
+ * @fires overload:insales:compares
+ * @fires in_list:insales:compares
+ * @fires add_item:insales:compares
+ * @fires always:insales:compares
  *
  * @example
  * Compare.add({ item: 123456 });
@@ -83,10 +83,10 @@ Compare.prototype.add = function (task) {
  * @param {Object} task - задача
  * @param {number} task.item - id товара, добавляемого в сравнение
  *
- * @fires before:insales:compare
- * @fires remove_item:insales:compare
- * @fires update_items:insales:compare
- * @fires always:insales:compare
+ * @fires before:insales:compares
+ * @fires remove_item:insales:compares
+ * @fires update_items:insales:compares
+ * @fires always:insales:compares
  *
  * @example
  * Compare.remove({item: 123456});
@@ -114,9 +114,9 @@ Compare.prototype.remove = function (task) {
  * Обновляем состояние сравнения
  * @method
  *
- * @fires before:insales:compare
- * @fires update_items:insales:compare
- * @fires always:insales:compare
+ * @fires before:insales:compares
+ * @fires update_items:insales:compares
+ * @fires always:insales:compares
  *
  * @example
  * Compare.update();
@@ -185,10 +185,10 @@ Compare.prototype._events = function (task) {
   var self = this;
   var data = self;
   data.action = task;
-  EventBus.publish(task.method +':insales:compares', data);
+  EventBus.publish(task.method +':insales:comparess', data);
 
   if (data.action.method != 'update_items' && data.action.method != 'overload') {
-    EventBus.publish('update_items:insales:compares', data);
+    EventBus.publish('update_items:insales:comparess', data);
   }
 };
 
@@ -198,7 +198,7 @@ Compare.prototype._events = function (task) {
  * @private
  */
 Compare.prototype._before = function (task) {
-  EventBus.publish('before:insales:compares', task);
+  EventBus.publish('before:insales:comparess', task);
 };
 
 /**
@@ -207,7 +207,7 @@ Compare.prototype._before = function (task) {
  * @private
  */
 Compare.prototype._always = function (task) {
-  EventBus.publish('always:insales:compares', task);
+  EventBus.publish('always:insales:comparess', task);
 };
 
 module.exports = _Singleton(Compare).getInstance();

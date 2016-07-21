@@ -1,10 +1,16 @@
-/**
- * DOM + Compare
- */
+/** @private */
 var $ = require('jquery');
-
+/** @private */
 var EventBus = require('../events/events');
 
+/**
+ * @class
+ * @memberof Compare
+ * @private
+ *
+ * @description
+ * DOM + Compare
+ */
 var CompareDOM = function (_owner) {
   var self = this;
   self._owner = _owner;
@@ -12,14 +18,23 @@ var CompareDOM = function (_owner) {
   self._init();
 }
 
+/**
+ * Инициализация
+ * @method
+ * @private
+ */
 CompareDOM.prototype._init = function () {
   var self = this;
 
   self.options = {
+    /** @default */
     add: 'data-compare-add',
+    /** @default */
     delete: 'data-compare-delete',
 
+    /** @default */
     disabled: 'disabled',
+    /** @default */
     inProcess: 'inProcess'
   };
 
@@ -29,6 +44,10 @@ CompareDOM.prototype._init = function () {
 
 /**
  * Обработчик добавления
+ * @method
+ * @private
+ *
+ * @listens always:insales:compares
  */
 CompareDOM.prototype._bindAddItem = function () {
   var self = this;
@@ -53,6 +72,10 @@ CompareDOM.prototype._bindAddItem = function () {
 
 /**
  * Основаня логика добавления товара в сравнение по кнопке
+ * @method
+ * @private
+ *
+ * @param {Object} $button - jQuery-нода кнопки
  */
 CompareDOM.prototype._addItem = function ($button) {
   var self = this;
@@ -67,6 +90,10 @@ CompareDOM.prototype._addItem = function ($button) {
 
 /**
  * Обработчик удаления
+ * @method
+ * @private
+ *
+ * @listens always:insales:compares
  */
 CompareDOM.prototype._bindDelteItem = function () {
   var self = this;
@@ -90,6 +117,10 @@ CompareDOM.prototype._bindDelteItem = function () {
 
 /**
  * Основаня логика удаления товара из сравнения по кнопке
+ * @method
+ * @private
+ *
+ * @param {Object} $button - jQuery-нода кнопки
  */
 CompareDOM.prototype._deleteItem = function ($button) {
   var self = this;
