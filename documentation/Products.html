@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Class: Compare</title>
+    <title>JSDoc: Class: Products</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Class: Compare</h1>
+    <h1 class="page-title">Class: Products</h1>
 
     
 
@@ -27,7 +27,7 @@
 
 <header>
     <h2>
-    Compare
+    Products
     </h2>
     
 </header>
@@ -39,7 +39,7 @@
     
         
 <dt>
-    <h4 class="name" id="Compare"><span class="type-signature"></span>new Compare<span class="signature">()</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="Products"><span class="type-signature"></span>new Products<span class="signature">()</span><span class="type-signature"></span></h4>
 
     
 </dt>
@@ -47,7 +47,7 @@
 
     
     <div class="description">
-        Сравнение товаров
+        Централизованная работа с товарами
     </div>
     
 
@@ -80,7 +80,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="compare.js.html">compare/compare.js</a>, <a href="compare.js.html#line15">line 15</a>
+        <a href="products.js.html">products/products.js</a>, <a href="products.js.html#line17">line 17</a>
     </li></ul></dd>
     
 
@@ -128,7 +128,7 @@
         <dl>
             
 <dt>
-    <h4 class="name" id="add"><span class="type-signature"></span>add<span class="signature">(task)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="get"><span class="type-signature"></span>get<span class="signature">(id)</span><span class="type-signature"></span></h4>
 
     
 </dt>
@@ -136,7 +136,7 @@
 
     
     <div class="description">
-        Добавляем товар
+        Получаем готовый к употреблению товар
     </div>
     
 
@@ -170,49 +170,7 @@
 
         <tr>
             
-                <td class="name"><code>task</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">задача
-                <h6>Properties</h6>
-                
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>item</code></td>
+                <td class="name"><code>id</code></td>
             
 
             <td class="type">
@@ -228,13 +186,7 @@
 
             
 
-            <td class="description last">id товара, добавляемого в сравнение</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-            </td>
+            <td class="description last">id товара</td>
         </tr>
 
     
@@ -265,96 +217,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="compare.js.html">compare/compare.js</a>, <a href="compare.js.html#line44">line 44</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-    
-
-    
-    <h5>Fires:</h5>
-    <ul>
-        <li>before:insales:compares</li>
-    
-        <li>overload:insales:compares</li>
-    
-        <li>event:in_list:insales:compares</li>
-    
-        <li>event:add_item:insales:compares</li>
-    
-        <li>always:insales:compares</li>
-    </ul>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-        <h5>Example</h5>
-        
-    <pre class="prettyprint"><code>Compare.add({ item: 123456 });</code></pre>
-
-    
-</dd>
-
-        
-            
-<dt>
-    <h4 class="name" id="getCompare"><span class="type-signature"></span>getCompare<span class="signature">()</span><span class="type-signature"></span></h4>
-
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        Получение текущего состояния Сравнения
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-<dl class="details">
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="compare.js.html">compare/compare.js</a>, <a href="compare.js.html#line139">line 139</a>
+        <a href="products.js.html">products/products.js</a>, <a href="products.js.html#line52">line 52</a>
     </li></ul></dd>
     
 
@@ -379,17 +242,12 @@
     
 
     
-        <h5>Example</h5>
-        
-    <pre class="prettyprint"><code>Compare.getCompare();</code></pre>
-
-    
 </dd>
 
         
             
 <dt>
-    <h4 class="name" id="remove"><span class="type-signature"></span>remove<span class="signature">(task)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="getList"><span class="type-signature"></span>getList<span class="signature">(idList)</span><span class="type-signature"></span></h4>
 
     
 </dt>
@@ -397,7 +255,7 @@
 
     
     <div class="description">
-        Удаляем товар из сравнения
+        Получение списка товаров
     </div>
     
 
@@ -431,13 +289,13 @@
 
         <tr>
             
-                <td class="name"><code>task</code></td>
+                <td class="name"><code>idList</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">Object</span>
+<span class="param-type">Array</span>
 
 
             
@@ -447,9 +305,86 @@
 
             
 
-            <td class="description last">задача
-                <h6>Properties</h6>
-                
+            <td class="description last">массив, состоящий из id товаров</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+    
+
+    
+<dl class="details">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="products.js.html">products/products.js</a>, <a href="products.js.html#line66">line 66</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="setConfig"><span class="type-signature"></span>setConfig<span class="signature">(settings)</span><span class="type-signature"></span></h4>
+
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Обновление настроек продуктов созданных через
+    </div>
+    
+
+    
+
+    
+
+    
+        <h5>Parameters:</h5>
+        
 
 <table class="params">
     <thead>
@@ -473,13 +408,13 @@
 
         <tr>
             
-                <td class="name"><code>item</code></td>
+                <td class="name"><code>settings</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">number</span>
+<span class="param-type">Object</span>
 
 
             
@@ -489,13 +424,7 @@
 
             
 
-            <td class="description last">id товара, добавляемого в сравнение</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-            </td>
+            <td class="description last">объект с применяемыми настройками. Применяется для всехэкземпляров на странице</td>
         </tr>
 
     
@@ -526,7 +455,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="compare.js.html">compare/compare.js</a>, <a href="compare.js.html#line94">line 94</a>
+        <a href="products.js.html">products/products.js</a>, <a href="products.js.html#line80">line 80</a>
     </li></ul></dd>
     
 
@@ -541,17 +470,6 @@
     
 
     
-    <h5>Fires:</h5>
-    <ul>
-        <li>before:insales:compares</li>
-    
-        <li>event:remove_item:insales:compares</li>
-    
-        <li>event:update_items:insales:compares</li>
-    
-        <li>always:insales:compares</li>
-    </ul>
-    
 
     
 
@@ -560,96 +478,6 @@
     
 
     
-
-    
-        <h5>Example</h5>
-        
-    <pre class="prettyprint"><code>Compare.remove({item: 123456});</code></pre>
-
-    
-</dd>
-
-        
-            
-<dt>
-    <h4 class="name" id="update"><span class="type-signature"></span>update<span class="signature">()</span><span class="type-signature"></span></h4>
-
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        Обновляем состояние сравнения
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-<dl class="details">
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="compare.js.html">compare/compare.js</a>, <a href="compare.js.html#line124">line 124</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-    
-
-    
-    <h5>Fires:</h5>
-    <ul>
-        <li>before:insales:compares</li>
-    
-        <li>event:update_items:insales:compares</li>
-    
-        <li>always:insales:compares</li>
-    </ul>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-        <h5>Example</h5>
-        
-    <pre class="prettyprint"><code>Compare.update();</code></pre>
 
     
 </dd>
