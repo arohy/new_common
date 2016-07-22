@@ -61,7 +61,7 @@ OptionSelector.prototype._init = function () {
     self.$nativeSelect.after('<div class="option-selector" '+ self.selectors.optionSelector +'/>');
   }
 
-  self.$optionSelector = self.$product.find('['+ self.selectors.optionSelector +']');
+  self.$optionSelector = self.$product.find('['+ self.selectors.optionSelector +']').html('');
 
   self.$nativeSelect.hide();
 

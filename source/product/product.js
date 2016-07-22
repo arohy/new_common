@@ -45,7 +45,7 @@ Product.prototype._init = function (){
   // должен быть здесь, чтобы перезапустить при смене настроек.
   // TODO: вынести в отдельный метод, прикруть методы к Классам
   //self.variants = new ProductVariants(self);
-  self._instance = self._initInstance();
+  self._initInstance();
 }
 
 // ====================================================================================
@@ -90,10 +90,11 @@ Product.prototype._getImage = function (images) {
 Product.prototype._initInstance = function () {
   var self = this;
 
+  self._instance = {};
   self.$product = $('['+ self._selectors.product +'="'+ self.id +'"]');
 
-  self.$product.each(function () {
-    new _Instance(self, $(this));
+  self.$product.each(function (index) {
+    self._instance[index] = new _Instance(self, $(this));
   });
 };
 

@@ -28838,7 +28838,7 @@ OptionSelector.prototype._init = function () {
     self.$nativeSelect.after('<div class="option-selector" '+ self.selectors.optionSelector +'/>');
   }
 
-  self.$optionSelector = self.$product.find('['+ self.selectors.optionSelector +']');
+  self.$optionSelector = self.$product.find('['+ self.selectors.optionSelector +']').html('');
 
   self.$nativeSelect.hide();
 
@@ -29116,7 +29116,7 @@ Product.prototype._init = function (){
   // должен быть здесь, чтобы перезапустить при смене настроек.
   // TODO: вынести в отдельный метод, прикруть методы к Классам
   //self.variants = new ProductVariants(self);
-  self._instance = self._initInstance();
+  self._initInstance();
 }
 
 // ====================================================================================
@@ -29161,10 +29161,11 @@ Product.prototype._getImage = function (images) {
 Product.prototype._initInstance = function () {
   var self = this;
 
+  self._instance = {};
   self.$product = $('['+ self._selectors.product +'="'+ self.id +'"]');
 
-  self.$product.each(function () {
-    new _Instance(self, $(this));
+  self.$product.each(function (index) {
+    self._instance[index] = new _Instance(self, $(this));
   });
 };
 
@@ -29238,7 +29239,7 @@ ProductInstance.prototype._initOptionSelectors = function () {
   var self = this;
   var _isActive = _.isObject(self.optionSelector);
 
-  self._hasSelector = self.$product.find('['+ self.selectors.nativeSelect +']').length;
+  self._hasSelector = self.$product.find('['+ self.selectors.nativeSelect +']').length ? true : false;
 
   if (!self._hasSelector) {
     return false;
@@ -30188,7 +30189,7 @@ ProductVariants.prototype.getFilterOption = function (level) {
       if (self._owner.settings.filtered) {
         value.disabled = true;
       }else{
-        delete option.values[index];
+        _.unset(option.values, value.position);
       }
     }
   });
