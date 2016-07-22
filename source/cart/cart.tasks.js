@@ -1,11 +1,16 @@
+/** @private */
+var _ = require('lodash');
+/** @private */
+var EventBus = require('../events/events');
+
 /**
  * Менеджер задач для корзины
  * Занимается контролем за задачами, склейкой и отправкой
+ * @memberof Cart
+ * @class
+ *
+ * @private
  */
-var _ = require('lodash');
-
-var EventBus = require('../events/events');
-
 var CartTasks = function (_owner) {
   var self = this;
 
@@ -19,6 +24,11 @@ var CartTasks = function (_owner) {
   self._init();
 };
 
+/**
+ * Инициализация
+ * @method
+ * @private
+ */
 CartTasks.prototype._init = function () {
   var self = this;
   var _atStore = localStorage.getItem('cart');
@@ -36,6 +46,7 @@ CartTasks.prototype._init = function () {
  *
  * Если нет - пинаем оставшуюся очередь, может прилететь только от CART()!!!
  * После получения ответа от сервера.
+ * @method
  */
 CartTasks.prototype.send = function (task) {
   var self = this;
@@ -52,6 +63,8 @@ CartTasks.prototype.send = function (task) {
 
 /**
  * Добавляем таску в очередь
+ * @method
+ * @private
  */
 CartTasks.prototype._add = function (task) {
   var self = this;
@@ -64,6 +77,8 @@ CartTasks.prototype._add = function (task) {
 
 /**
  * Пушим очередь на сервер
+ * @method
+ * @private
  */
 CartTasks.prototype._push = function () {
   var self = this;
@@ -101,6 +116,8 @@ CartTasks.prototype._push = function () {
 
 /**
  * Отсылаем на сервак
+ * @method
+ * @private
  */
 CartTasks.prototype._send = function (items_set, task) {
   var self = this;
@@ -111,6 +128,8 @@ CartTasks.prototype._send = function (items_set, task) {
 
 /**
  * Применяем таски на местность
+ * @method
+ * @private
  */
 CartTasks.prototype._task = function (task, current_items) {
   var self = this;
@@ -126,6 +145,8 @@ CartTasks.prototype._task = function (task, current_items) {
 
 /**
  * Действия при успешном обновлении
+ * @method
+ * @private
  */
 CartTasks.prototype._done = function (order) {
   var self = this;
@@ -150,6 +171,8 @@ CartTasks.prototype._done = function (order) {
 
 /**
  * Действия при фейле
+ * @method
+ * @private
  */
 CartTasks.prototype._fail = function (response) {
   var self = this;
@@ -164,6 +187,8 @@ CartTasks.prototype._fail = function (response) {
 
 /**
  * Действия "всегда"
+ * @method
+ * @private
  */
 CartTasks.prototype._always = function () {
   var self = this;
@@ -185,6 +210,10 @@ CartTasks.prototype._always = function () {
   return;
 };
 
+/**
+ * @method
+ * @private
+ */
 CartTasks.prototype._before = function () {
   var self = this;
   var data = {};
