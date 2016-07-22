@@ -1,8 +1,11 @@
-/**
- * Класс отвечает за работу и форматирование состава корзины
- */
+/** @private */
 var _ = require('lodash');
 
+/**
+ * @memberof Cart
+ * @class
+ * Класс отвечает за работу и форматирование состава корзины
+ */
 var CartOrder = function (_cart) {
   var self = this;
 
@@ -10,7 +13,11 @@ var CartOrder = function (_cart) {
 };
 
 /**
- * обновляем состав корзины
+ * Обновляем состав корзины
+ * @method
+ * @private
+ *
+ * @param {Object} order - объект с ответом от платформы
  */
 CartOrder.prototype.set = function (order) {
   var self = this;
@@ -21,7 +28,8 @@ CartOrder.prototype.set = function (order) {
 };
 
 /**
- * забираем актуальный состав корзины
+ * Забираем актуальный состав корзины
+ * @method
  */
 CartOrder.prototype.get = function () {
   var self = this;
@@ -30,7 +38,8 @@ CartOrder.prototype.get = function () {
 };
 
 /**
- * Формируем инфу о позициях
+ * Забираем информацию только о позициях
+ * @method
  */
 CartOrder.prototype.getItems = function () {
   var self = this;
@@ -43,6 +52,10 @@ CartOrder.prototype.getItems = function () {
   return items;
 };
 
+/**
+ * Забираем комментарии
+ * @method
+ */
 CartOrder.prototype.getComments = function () {
   var self = this;
 
@@ -51,6 +64,10 @@ CartOrder.prototype.getComments = function () {
 
 /**
  * Фиксим инфу по корзине
+ * @method
+ * @private
+ *
+ * @param {Object} current_order - текущий состав корзины, ответ от платформы
  */
 CartOrder.prototype._patch = function (current_order) {
   var self = this;
@@ -77,6 +94,8 @@ CartOrder.prototype._patch = function (current_order) {
 
 /**
  * Добавляем поле с ценой только товаров, без доставки
+ * @method
+ * @private
  */
 CartOrder.prototype._itemsPrice = function () {
   var self = this;
@@ -90,7 +109,10 @@ CartOrder.prototype._itemsPrice = function () {
 
 /**
  * Добавляем цену доставки
- * NOTE: в разных json лежит в разных местах
+ * @method
+ * @private
+ *
+ * @todo разрулить момент, что в разных json лежит в разных местах
  */
 CartOrder.prototype._deliveryPrice = function (current_order) {
   var self = this;
@@ -101,6 +123,11 @@ CartOrder.prototype._deliveryPrice = function (current_order) {
   return;
 };
 
+/**
+ * Вытаскиваем наружу id
+ * @method
+ * @private
+ */
 CartOrder.prototype._setId = function () {
   var self = this;
 
@@ -112,6 +139,8 @@ CartOrder.prototype._setId = function () {
 
 /**
  * Фиксим картинки товаров
+ * @method
+ * @private
  */
 CartOrder.prototype._images = function () {
   var self = this;
@@ -122,6 +151,12 @@ CartOrder.prototype._images = function () {
   return;
 };
 
+/**
+ * Вытаскиваем информацию о позиции по id
+ * @method
+ *
+ * @param {number} id - id варианта
+ */
 CartOrder.prototype.getItemByID = function (id) {
   var self = this;
   var _item;

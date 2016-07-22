@@ -1,27 +1,39 @@
-/**
- * CuickCheckout
- */
+/** @private */
 var $ = require('jquery');
+/** @private */
 var _ = require('lodash');
 
+/** @private */
 var ajax = require('../json/ajax.checkout');
+/** @private */
 var EventBus = require('../events/events');
 
+/**
+ * @memberof Cart
+ * @class
+ * Обработчик для "Заказа в один клик"
+ */
 var CartQuickCheckout = function (_owner) {
   var self = this;
 
   self._owner = _owner;
 
   self.selectors = {
+    /** @default */
     disabled: 'disabled',
-
+    /** @default */
     open: 'data-quick-checkout',
-
+    /** @default */
     sendButton: '.m-modal-button--checkout',
+    /** @default */
     closeButton: '.m-modal-close',
+    /** @default */
     errors: '.m-modal-errors',
+    /** @default */
     form: '#quick_checkout_form',
+    /** @default */
     modal: '.m-modal--checkout',
+    /** @default */
     msgModal: '#insales-quick-checkout-msg',
   };
 
@@ -30,6 +42,11 @@ var CartQuickCheckout = function (_owner) {
   return;
 };
 
+/**
+ * Инициализация
+ * @method
+ * @private
+ */
 CartQuickCheckout.prototype._init = function () {
   var self = this;
 

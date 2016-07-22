@@ -38,6 +38,8 @@ Cart.prototype.init = function () {
 
 /**
  * @todo WTF?!?!
+ * @method
+ * @private
  */
 Cart.prototype._get = function () {
   var self = this;
@@ -146,6 +148,7 @@ Cart.prototype.set = function (task) {
 /**
  * Основной обработчик set_items
  * @method
+ * @private
  *
  * @param {Object} task - выполняемая задача
  * @param {Object} current_items - актуальный список товаров
@@ -166,8 +169,8 @@ Cart.prototype._set_items = function (task, current_items) {
  * Удалить позиции из корзины
  * @method
  *
- * @param {Object} task
- * @param {Object} task.items - [variant_id, ...]
+ * @param {Object} task - задача
+ * @param {Array} task.items - [variant_id, ...]
  */
 Cart.prototype.delete = function (task) {
   var self = this;
@@ -235,6 +238,7 @@ Cart.prototype._clear_items = function (task, current_items) {
 /**
  * Добавление товаров в корзину для "Заказа в один клик"
  * @method
+ * @private
  *
  * @param {}
  */
@@ -267,7 +271,8 @@ Cart.prototype._add_checkout = function (task, current_items) {
  * Устанавливаем купон
  * @method
  *
- * @param {Object} task
+ * @param {Object} task - задача
+ * @param {string} test.coupon - название купона
  */
 Cart.prototype.setCoupon = function (task) {
   var self = this;
@@ -291,6 +296,8 @@ Cart.prototype._set_coupon = function (task, current_items) {
 
 /**
  * Получить состав корзины
+ * @method
+ * @deprecated c 0.6.0. Использовать Cart.order.get();
  */
 Cart.prototype.getOrder = function () {
   var self = this;
@@ -299,7 +306,12 @@ Cart.prototype.getOrder = function () {
 };
 
 /**
- * Обновление состава корзины
+ * Обновление состава корзины. Основной способ изменеия состава. Все остальные таски забрасывают сюда
+ * @method
+ * @private
+ *
+ * @param {Object} items
+ * @param {Object} task
  */
 Cart.prototype._update = function (items, task) {
   var self = this;
@@ -320,6 +332,7 @@ Cart.prototype._update = function (items, task) {
 
 /**
  * Установка настроек для корзины
+ * @method
  */
 Cart.prototype.setConfig = function (settings) {
   var self = this;
@@ -329,6 +342,11 @@ Cart.prototype.setConfig = function (settings) {
   return;
 };
 
+/**
+ * Заглушка для "Купить в один клик" из бандла
+ * @method
+ * @private
+ */
 Cart.prototype.addItem = function () {
   return;
 };
