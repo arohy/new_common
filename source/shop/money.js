@@ -4,6 +4,7 @@ var _ = require('lodash');
 /**
  * @memberof Shop
  * @class
+ * @alias Shop.money
  *
  * @description
  * Класс для работы с валютой.

@@ -8,6 +8,7 @@ var ajaxShop = require('../json/ajax.shop');
 /**
  * @memberof Shop
  * @class
+ * @alias Shop.client
  *
  * @description
  * Класс для работы с клиентом сайта
