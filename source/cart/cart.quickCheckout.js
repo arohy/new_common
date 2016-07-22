@@ -77,6 +77,9 @@ CartQuickCheckout.prototype._init = function () {
 
 /**
  * Открытие модалки
+ * @method
+ *
+ * @param {Object} $modal - jQuery-нода модалкик
  */
 CartQuickCheckout.prototype.openModal = function ($modal) {
   var self = this;
@@ -92,6 +95,9 @@ CartQuickCheckout.prototype.openModal = function ($modal) {
 
 /**
  * Закрытие модалки
+ * @method
+ *
+ * @param {Object} $modal - jQuery-нода модалкик
  */
 CartQuickCheckout.prototype.closeModal = function ($modal) {
   var self = this;
@@ -105,6 +111,7 @@ CartQuickCheckout.prototype.closeModal = function ($modal) {
 
 /**
  * Запуск добавления товаров, отправка формы
+ * @method
  */
 CartQuickCheckout.prototype.send = function () {
   var self = this;
@@ -125,6 +132,10 @@ CartQuickCheckout.prototype.send = function () {
 
 /**
  * Обработчик открытия модалки
+ * @method
+ * @private
+ *
+ * @fires add_disabled:insales:quick_checkout
  */
 CartQuickCheckout.prototype._bindOpenModal = function () {
   var self = this;
