@@ -28577,6 +28577,14 @@ module.exports = function (client, order) {
     checkout['client['+ field +']'] = value;
   });
 
+  _.forIn(order.shipping_address, function (value, field) {
+    checkout['shipping_address['+ field +']'] = value;
+  });
+
+  if (order.comment) {
+    checkout['order[comment]'] = order.comment;
+  }
+
   $.post('/fast_checkout.json', checkout)
     .done(function (response) {
       if (response.status == 'ok') {
