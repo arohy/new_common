@@ -66,7 +66,7 @@ ProductInstance.prototype._initOptionSelectors = function () {
   var self = this;
   var _isActive = _.isObject(self.optionSelector);
 
-  self._hasSelector = self.$product.find('['+ self.selectors.nativeSelect +']').length;
+  self._hasSelector = self.$product.find('['+ self.selectors.nativeSelect +']').length ? true : false;
 
   if (!self._hasSelector) {
     return false;
