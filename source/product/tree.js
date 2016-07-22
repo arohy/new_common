@@ -437,7 +437,7 @@ ProductVariants.prototype.getFilterOption = function (level) {
       if (self._owner.settings.filtered) {
         value.disabled = true;
       }else{
-        delete option.values[index];
+        _.unset(option.values, value.position);
       }
     }
   });
