@@ -9,9 +9,10 @@ var ajax = require('../json/ajax.checkout');
 var EventBus = require('../events/events');
 
 /**
+ * Обработчик для "Заказа в один клик"
  * @memberof Cart
  * @class
- * Обработчик для "Заказа в один клик"
+ * @alias Cart.quickCheckout
  */
 var CartQuickCheckout = function (_owner) {
   var self = this;

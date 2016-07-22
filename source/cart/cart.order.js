@@ -2,9 +2,10 @@
 var _ = require('lodash');
 
 /**
+ * Класс отвечает за работу и форматирование состава корзины
  * @memberof Cart
  * @class
- * Класс отвечает за работу и форматирование состава корзины
+ * @alias Cart.order
  */
 var CartOrder = function (_cart) {
   var self = this;
