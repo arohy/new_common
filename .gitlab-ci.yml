@@ -1,0 +1,63 @@
+
+# nodejs версии 4.x будет уже установлен на виртуалке
+# отдельно ставить не нужно
+
+before_script:
+  - nodejs --version
+
+# нужно всё собирать за одну стадию (коммитить результаты в той-же стадии что и собираем),
+# т.к. GitLab может запустить несколько параллельных сборок и мы закоммитим не те результаты
+stages:
+  - build
+
+build_job:
+  stage: build
+
+  # Разные варианты ограничить сборку.
+  #
+  # only:
+  #   - tags
+  #   - triggers
+  #
+  # only:
+  #   - /^issue-.*$/
+  # except:
+  #   - branches
+  #
+  # only:
+  #   - branches@gitlab-org/gitlab-ce
+  # except:
+  #   - master@gitlab-org/gitlab-ce
+
+  artifacts:
+    paths:
+      - dist/
+  script:
+    - npm install
+    - npm install gulp-cli
+    - npm install gulp
+    - npm install gulp-rename
+    # сборка
+    - node_modules/gulp/bin/gulp.js dist
+    # что поменялось?
+    - git status
+    # получаем репозиторий для результатов
+    - RESULTS_REPO_REL_PATH=../common-js-builded-repo
+    - RESULTS_REPO=$CI_PROJECT_DIR/$RESULTS_REPO_REL_PATH
+    - test -d $RESULTS_REPO || git clone git@gitlab.insales.ru:common-js/common-js-builded.git $RESULTS_REPO_REL_PATH
+    - cd $RESULTS_REPO
+    - git fetch
+    - git reset --hard origin/master
+    - git clean -fdx
+    # копируем собранные файлы, включаем в имя хэш коммита
+    - cp $CI_PROJECT_DIR/dist/new_common.js     $RESULTS_REPO/common.$CI_BUILD_REF.js
+    - cp $CI_PROJECT_DIR/dist/new_common.min.js $RESULTS_REPO/common.min.$CI_BUILD_REF.js
+    # копируем собранные файлы, включаем в имя бранча или тэга
+    - test -z "$CI_BUILD_REF_NAME" || cp $CI_PROJECT_DIR/dist/new_common.js     $RESULTS_REPO/common.$CI_BUILD_REF_NAME.js
+    - test -z "$CI_BUILD_REF_NAME" || cp $CI_PROJECT_DIR/dist/new_common.min.js $RESULTS_REPO/common.min.$CI_BUILD_REF_NAME.js
+    # коммитим и пушим результаты
+    - cd $RESULTS_REPO
+    - git add .
+    - git status
+    - "git commit -m 'CI build results' || echo 'probably nothing to commit'"
+    - git push origin master
