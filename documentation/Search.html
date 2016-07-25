@@ -40,7 +40,7 @@
 			<li class="dropdown">
 				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
 				<ul class="dropdown-menu ">
-					<li><a href="Cart.html">Cart</a></li><li><a href="Cart.order.html">Cart.order</a></li><li><a href="Cart.quickCheckout.html">Cart.quickCheckout</a></li><li><a href="Cart.ui.html">Cart.ui</a></li><li><a href="Compare.html">Compare</a></li><li><a href="EventBus.html">EventBus</a></li><li><a href="Product.html">Product</a></li><li><a href="ProductPriceType.html">ProductPriceType</a></li><li><a href="Products.html">Products</a></li><li><a href="Products.storage.html">Products.storage</a></li><li><a href="ProductVariants.html">ProductVariants</a></li><li><a href="Search.html">Search</a></li><li><a href="Shop.html">Shop</a></li><li><a href="Shop.client.html">Shop.client</a></li><li><a href="Shop.money.html">Shop.money</a></li><li><a href="Template.html">Template</a></li>
+					<li><a href="Cart.html">Cart</a></li><li><a href="Cart.order.html">Cart.order</a></li><li><a href="Cart.quickCheckout.html">Cart.quickCheckout</a></li><li><a href="Cart.ui.html">Cart.ui</a></li><li><a href="Compare.html">Compare</a></li><li><a href="EventBus.html">EventBus</a></li><li><a href="Product.html">Product</a></li><li><a href="ProductPriceType.html">ProductPriceType</a></li><li><a href="Products.html">Products</a></li><li><a href="Products.storage.html">Products.storage</a></li><li><a href="ProductVariants.html">ProductVariants</a></li><li><a href="Search.html">Search</a></li><li><a href="Search.ui.html">Search.ui</a></li><li><a href="Shop.html">Shop</a></li><li><a href="Shop.client.html">Shop.client</a></li><li><a href="Shop.money.html">Shop.money</a></li><li><a href="Template.html">Template</a></li>
 				</ul>
 			</li>
 			
@@ -104,7 +104,7 @@
 
     
     <div class="description">
-        Live search
+        Живой поиск по сайту
     </div>
     
 
@@ -177,6 +177,13 @@
 
     
 
+    
+        <h3 class="subsection-title">Classes</h3>
+
+        <dl>
+            <dt><a href="Search.ui.html">ui</a></dt>
+            <dd></dd>
+        </dl>
     
 
     
@@ -192,7 +199,7 @@
             
 <hr>
 <dt>
-    <h4 class="name" id="_get"><span class="type-signature"></span>_get()</h4>
+    <h4 class="name" id="setConfig"><span class="type-signature"></span>setConfig(settings)</h4>
     
     
 </dt>
@@ -200,89 +207,7 @@
 
     
     <div class="description">
-        Что-то забираем
-{
-  query: string
-  input: jquery(input)
-}
-    </div>
-    
-
-    
-
-    
-
-    
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt>
-    <h4 class="name" id="_init"><span class="type-signature"></span>_init(options)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        Настройка
+        Обновляем настройки
     </div>
     
 
@@ -317,13 +242,13 @@
 
         <tr>
             
-                <td class="name"><code>options</code></td>
+                <td class="name"><code>settings</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">object</span>
+<span class="param-type">Object</span>
 
 
 
@@ -334,253 +259,13 @@
 
             
 
-            <td class="description last">конфигурация поиска</td>
+            <td class="description last">объект с настройками</td>
         </tr>
 
     
     </tbody>
 </table>
 
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt>
-    <h4 class="name" id="_patch"><span class="type-signature"></span>_patch()</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        приводим в общий порядок список поиска
-    </div>
-    
-
-    
-
-    
-
-    
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt>
-    <h4 class="name" id="_setData"><span class="type-signature"></span>_setData()</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        Параметры запросов
-
-Тащим поля из настроек магазина и текущей локали
-account_id: Site.account.id,
-locale: Site.language.locale,
-fields: [ 'price_min', 'price_min_available' ],
-hide_items_out_of_stock: Site.account.hide_items
-    </div>
-    
-
-    
-
-    
-
-    
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt>
-    <h4 class="name" id="setConfig"><span class="type-signature"></span>setConfig()</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        Обновляем настройки
-    </div>
-    
-
-    
-
-    
-
-    
     
 
     
@@ -686,7 +371,7 @@ hide_items_out_of_stock: Site.account.hide_items
 <span class="jsdoc-message">
 	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a>
 	
-		on 2016-07-25T15:37:44+03:00
+		on 2016-07-25T16:08:34+03:00
 	
 	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
 </span>
