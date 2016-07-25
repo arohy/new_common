@@ -1,15 +1,21 @@
+/** @private */
+var $ = require('jquery');
+/** @private */
+var _ = require('lodash');
+/** @private */
+var ajax = require('../json/ajax.product');
+/** @private */
+var URL = require('../tools/url');
+/** @private */
+var EventBus = require('../events/events');
+
 /**
  * Класс Хранилища json Товаров
  * управляет всем процессом получения и хранения json'ов
+ * @class
+ * @memberof Products
+ * @alias storage
  */
-var $ = require('jquery');
-var _ = require('lodash');
-
-var ajax = require('../json/ajax.product');
-var URL = require('../tools/url');
-
-var EventBus = require('../events/events');
-
 var ProductsStorage = function (_owner) {
   var self = this;
 
@@ -28,8 +34,10 @@ var ProductsStorage = function (_owner) {
   self._init();
 }
 
+
 /**
  * Инициализация
+ * @private
  */
 ProductsStorage.prototype._init = function () {
   var self = this;
@@ -42,6 +50,9 @@ ProductsStorage.prototype._init = function () {
 
 /**
  * Отдаем json'ы товаров и хранилища
+ * @param {Array} _idList - массив id товаров, информация по которым нам нужнв
+ *
+ * @return {Object} Список с информацией по указанным товарам
  */
 ProductsStorage.prototype.getProducts = function (_idList) {
   var self = this;
@@ -70,6 +81,7 @@ ProductsStorage.prototype.getProducts = function (_idList) {
 
 /**
  * Получение сохраненных товаров
+ * @private
  */
 ProductsStorage.prototype._loadJSON = function () {
   var self = this;
@@ -90,6 +102,7 @@ ProductsStorage.prototype._loadJSON = function () {
 
 /**
  * Сохранение товаров
+ * @private
  */
 ProductsStorage.prototype._saveJSON = function () {
   var self = this;
@@ -102,6 +115,9 @@ ProductsStorage.prototype._saveJSON = function () {
 
 /**
  * Обновление базы )
+ * @private
+ *
+ * @param {Object} _JSONs- объект с текущим списком товаров
  */
 ProductsStorage.prototype._updateJSON = function (_JSONs) {
   var self = this;
@@ -120,6 +136,7 @@ ProductsStorage.prototype._updateJSON = function (_JSONs) {
 
 /**
  * Проверяем актуальность записей
+ * @private
  */
 ProductsStorage.prototype._checkAlive = function () {
   var self = this;
