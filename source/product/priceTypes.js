@@ -1,15 +1,16 @@
+/** @private */
+var _ = require('lodash');
+
 /**
  * Типы цен
  *
  * @class
- * @name ProductPriceType
+ * @memberof ProductInstance
+ * @alias price_kinds
  *
- * @param {json} product json с информацией о товаре
  * @param {object} _owner ссылка на родительский класс Products
  *
  */
-var _ = require('lodash');
-
 var ProductPriceType = function (_owner) {
   var self = this;
   self._owner = _owner;
@@ -21,6 +22,10 @@ var ProductPriceType = function (_owner) {
   return self;
 };
 
+/**
+ * Инициализация
+ * @private
+ */
 ProductPriceType.prototype._init = function () {
   var self = this;
 
@@ -28,7 +33,8 @@ ProductPriceType.prototype._init = function () {
 };
 
 /**
- * Инициализация
+ * Сборка цен
+ * @private
  */
 ProductPriceType.prototype._initPrices = function (product) {
   var self = this;
@@ -58,6 +64,11 @@ ProductPriceType.prototype._initPrices = function (product) {
 
 /**
  * Получение актуальной цены за штуку
+ * @param {Object} options - параметры товара
+ * @param {number} options.variantId
+ * @param {number} options.quantity
+ *
+ * @return {number} price
  */
 ProductPriceType.prototype.getPrice = function (options) {
   var self = this;

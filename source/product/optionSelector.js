@@ -1,24 +1,22 @@
-/*
+/** @private */
+var $ = require('jquery');
+/** @private */
+var _ = require('lodash');
+
+/** @private */
+var Error = require('../tools/error');
+/** @private */
+var EventBus = require('../events/events');
+
+/**
  * Объект отвечающий за работу опшн селектора
  *
  * @class
- * @name OptionSelector
+ * @memberof ProductInstance
  *
- * @param {jQuery Object} $product - ссылка на форму
- * @param {object} _product ссылка на родительский класс Products
- *
- * @property {object} selector в объекте хранятся названия селекторов
- * @property {object} $product опорный DOM-узел, который описывает товар
- * @property {object} $nativeSelect нативный селект который выводим через liquid
- * @property {object} $optionSelector контейнер куда происходит рендер селекторов опций
+ * @property {Object} _owner
  *
  */
-var $ = require('jquery');
-var _ = require('lodash');
-
-var Error = require('../tools/error');
-var EventBus = require('../events/events');
-
 var OptionSelector = function (_owner) {
   var self = this;
 
@@ -30,12 +28,9 @@ var OptionSelector = function (_owner) {
   self._init();
 };
 
-/*
+/**
  * Инициализация
- *
- * @param {json} product json с информацией о товаре
- * @param {object} _product ссылка на родительский класс Products
- *
+ * @private
  */
 OptionSelector.prototype._init = function () {
   var self = this;
@@ -72,8 +67,9 @@ OptionSelector.prototype._init = function () {
   return;
 };
 
-/*
+/**
  * Основная обертка
+ * @private
  */
 OptionSelector.prototype._renderSelector = function () {
   var self = this;
@@ -98,8 +94,9 @@ OptionSelector.prototype._renderSelector = function () {
   }
 };
 
-/*
+/**
  * Рендер разметки
+ * @private
  */
 OptionSelector.prototype._renderOption = function (option) {
   var self = this;
@@ -114,8 +111,9 @@ OptionSelector.prototype._renderOption = function (option) {
   return Template.render(option, renderType);
 };
 
-/*
- * инитим события
+/**
+ * Прибиваем события
+ * @private
  */
 OptionSelector.prototype._bindEvents = function () {
   var self = this;
@@ -132,8 +130,9 @@ OptionSelector.prototype._bindEvents = function () {
   self._bindUpdateVariant();
 };
 
-/*
+/**
  * Навешиваем свой дефолтный слушатель для обновления рендера
+ * @private
  */
 OptionSelector.prototype._bindUpdateVariant = function () {
   var self = this;
@@ -157,8 +156,9 @@ OptionSelector.prototype._bindUpdateVariant = function () {
   });
 };
 
-/*
+/**
  * Слушаем изменения в нативном селекте
+ * @private
  */
 OptionSelector.prototype._bindSetVariant = function () {
   var self = this;
@@ -180,7 +180,10 @@ OptionSelector.prototype._bindSetVariant = function () {
   });
 };
 
-//  Слушаем изменения в селекторах модификаций
+/**
+ * Слушаем изменения в селекторах модификаций
+ * @private
+ */
 OptionSelector.prototype._bindOptionTriggers = function () {
   var self = this;
 

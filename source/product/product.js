@@ -1,20 +1,25 @@
+/** @private */
+var $ = require('jquery');
+/** @private */
+var _ = require('lodash');
+
+/** @private */
+var Error = require('../tools/error');
+/** @private */
+var _Settings = require('./settings');
+/** @private */
+var _Instance = require('./productInstance');
+
 /**
  * Главный объект продукта
  *
  * @class
- * @name Product
  *
  * @param {json} product json с информацией о товаре
  * @param {object} settings конфиг для рендера optionSelector
  *
+ * @todo Превратить в справочник всей подготовленной информации по товару
  */
-var $ = require('jquery');
-var _ = require('lodash');
-
-var Error = require('../tools/error');
-var _Settings = require('./settings');
-var _Instance = require('./productInstance');
-
 var Product = function (product, settings) {
   var self = this;
 
@@ -38,6 +43,7 @@ var Product = function (product, settings) {
 
 /**
  * Инициализация
+ * @private
  */
 Product.prototype._init = function (){
   var self = this;
@@ -54,8 +60,9 @@ Product.prototype._init = function (){
 
 /**
  * Получаем объект с изображениями где ключом является название изображения
+ * @private
  *
- * @param  {array} images массив изображений продукта (product.images)
+ * @param {array} images массив изображений продукта (product.images)
  *
  * @return {object} _images объект с изображениями в виде {'image.title': {small_url: 'http//'}}
  */
@@ -84,8 +91,9 @@ Product.prototype._getImage = function (images) {
   return _images;
 }
 
-/*
- * Инициализация форм()
+/**
+ * Инициализация оберток [data-product-id] с инициализацией всех дочерних элементов
+ * @private
  */
 Product.prototype._initInstance = function () {
   var self = this;

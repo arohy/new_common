@@ -1,26 +1,22 @@
+/** @private */
+var _ = require('lodash');
+
+/** @private */
+var URL = require('../tools/url');
+/** @private */
+var _Translit = require('../tools/translit');
+/** @private */
+var Translit = new _Translit();
+
 /**
  * Конструктор объета по работе с вариантами продукта
  * @class
- * @name ProductVariants
- *
- * @example
- * self.variants = new ProductVariants(_owner);
  *
  * @param  {object} _owner родительский объект класса Product
  *
- * @property {array} variants массив модификаций продукта
- * @property {object} images картики продукта в виде {'title': {small_url: 'http//'}}
- * @property {number} urlVariant id варианта из урла
- * @property {object} options все опции продукта со всеми своими значениями
- * @property {object} tree дерево вариантов
- *
+ * @example
+ * self.variants = new ProductVariants(_owner);
  */
-var _ = require('lodash');
-
-var URL = require('../tools/url');
-var _Translit = require('../tools/translit');
-var Translit = new _Translit();
-
 var ProductVariants = function (_owner) {
   var self = this;
 
