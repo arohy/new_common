@@ -1,13 +1,12 @@
-/**
- * @module tools/RegTools
- *
- * @desc
- * вспомогательный модуль для работы с регулярками и строками, которые будут использоваться как шаблоны
- */
-
 /** @private */
 var _ = require('lodash');
 
+/**
+ * @module tools/RegTools
+ *
+ * @description
+ * вспомогательный модуль для работы с регулярками и строками, которые будут использоваться как шаблоны
+ */
 var RegTools = function () {
   var self = this;
 
@@ -15,6 +14,7 @@ var RegTools = function () {
 }
 
 /**
+ * @memberof module:tools/RegTools
  * @param {string} string - Строка для экранирования
  *
  * @description

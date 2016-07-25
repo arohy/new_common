@@ -1,10 +1,12 @@
-/**
- * Тул для разбора url.
- */
+/** @private */
 var _ = require('lodash');
-
+/** @private */
 var _Singleton = require('../tools/singleton');
 
+/**
+ * Тул для разбора url.
+ * @module tools/url
+ */
 var URL = function () {
   var self = this;
 
@@ -13,6 +15,8 @@ var URL = function () {
 
 /**
  * Разбор урла
+ * @method
+ * @private
  */
 URL.prototype._init = function () {
   var self = this;
@@ -34,6 +38,10 @@ URL.prototype._init = function () {
 
 /**
  * Вытаскиваем значение ключа
+ * @memberof module:tools/url
+ * @method {string} key - имя ключа
+ *
+ * @return {string|boolean} Возвращает значение или false
  */
 URL.prototype.getKeyValue = function (key) {
   var self = this;
