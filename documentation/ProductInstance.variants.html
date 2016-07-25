@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width">
-	<title>Documentation Class: EventBus</title>
+	<title>Documentation Class: variants</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -70,13 +70,15 @@
 		<div id="main">
 			
 
-	<h1 class="page-title">Class: EventBus</h1>
+	<h1 class="page-title">Class: variants</h1>
 <section>
 
 <header>
     
         <h2>
-        EventBus
+            <span class="ancestors"><a href="ProductInstance.html">ProductInstance</a>.</span>
+        
+        variants
         </h2>
         
     
@@ -89,7 +91,7 @@
         
 <hr>
 <dt>
-    <h4 class="name" id="EventBus"><span class="type-signature"></span>new EventBus()</h4>
+    <h4 class="name" id="variants"><span class="type-signature"></span>new variants(_owner)</h4>
     
     
 </dt>
@@ -97,7 +99,7 @@
 
     
     <div class="description">
-        Шина событий. Построена на $.Callbacks;
+        Конструктор объекта по работе с вариантами продукта
     </div>
     
 
@@ -106,6 +108,56 @@
     
 
     
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>_owner</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">родительский объект класса Product</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
     
 
     
@@ -159,6 +211,12 @@
     
 
     
+
+    
+        <h5>Example</h5>
+        
+    <pre class="sunlight-highlight-javascript">self.variants = new ProductVariants(_owner);</pre>
+
 
     
 </dd>
@@ -185,7 +243,7 @@
             
 <hr>
 <dt>
-    <h4 class="name" id=".logger.add"><span class="type-signature">&lt;static> </span>logger.add(component)</h4>
+    <h4 class="name" id="getFilterOption"><span class="type-signature"></span>getFilterOption(level)</h4>
     
     
 </dt>
@@ -193,7 +251,7 @@
 
     
     <div class="description">
-        Добавление логера для компонента
+        Фильтрация опций по доступности в выбанном варианте
     </div>
     
 
@@ -228,13 +286,13 @@
 
         <tr>
             
-                <td class="name"><code>component</code></td>
+                <td class="name"><code>level</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">string</span>
+<span class="param-type">number</span>
 
 
 
@@ -245,7 +303,7 @@
 
             
 
-            <td class="description last">имя помпонента, который хотим прослушать</td>
+            <td class="description last">уровень опции в дереве (self.tree)</td>
         </tr>
 
     
@@ -305,12 +363,30 @@
     
 
     
-
+    <h5>Returns:</h5>
     
-        <h5>Example</h5>
-        
-    <pre class="sunlight-highlight-javascript">EventBus.logger.add</pre>
+            
+<div class="param-desc">
+    option опция готовая для рендера, в значениях опции проставлен value.disabled или удалены не относящиеся к варианту значения в зависимости от настроек продукта (self._owner.settings.filtered);
+</div>
 
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">object</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
 
     
 </dd>
@@ -319,7 +395,7 @@
             
 <hr>
 <dt>
-    <h4 class="name" id="publish"><span class="type-signature"></span>publish(eventId, data)</h4>
+    <h4 class="name" id="getFirst"><span class="type-signature"></span>getFirst(leaf)</h4>
     
     
 </dt>
@@ -327,7 +403,7 @@
 
     
     <div class="description">
-        Публикация события с данными
+        Получить первый элемент на уровне
     </div>
     
 
@@ -362,248 +438,16 @@
 
         <tr>
             
-                <td class="name"><code>eventId</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">имя события</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>data</code></td>
+                <td class="name"><code>leaf</code></td>
             
 
             <td class="type">
             
                 
 <span class="param-type">Object</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">объект с передаваемой информацией
-                <h6 class="method-params-label method-subparams-label">Properties</h6>
-                
-
-<table class="params table table-striped">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>action</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Onject</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">объект со вспомогательной информаций, содержит исходное состояние, ссылку на узел, который вызвал собтие, что пытались сделать и т.д.</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-            </td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-        <h5>Example</h5>
-        
-    <pre class="sunlight-highlight-javascript">EventBus.publish(&#x27;test_event&#x27;, {isTest: true, title: &#x27;Test&#x27;, status: &#x27;ok&#x27;});</pre>
-
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt>
-    <h4 class="name" id="subscribe"><span class="type-signature"></span>subscribe(eventId, callback)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        Подписаться на событие
-    </div>
-    
-
-    
-
-    
-
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>eventId</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">имя события</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>callback</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">function</span>
 |
 
-<span class="param-type">string</span>
+<span class="param-type">Array</span>
 
 
 
@@ -614,7 +458,7 @@
 
             
 
-            <td class="description last">функция, которая должна отработать при вызове события eventId. входной параметр - data</td>
+            <td class="description last">список значений с одного уровня</td>
         </tr>
 
     
@@ -676,19 +520,13 @@
     
 
     
-        <h5>Example</h5>
-        
-    <pre class="sunlight-highlight-javascript">EventBus.subscribe(&#x27;test_event&#x27;, function (data) { console.log(data) });</pre>
-
-
-    
 </dd>
 
         
             
 <hr>
 <dt>
-    <h4 class="name" id="unsubscribe"><span class="type-signature"></span>unsubscribe(eventId, callback)</h4>
+    <h4 class="name" id="getLevel"><span class="type-signature"></span>getLevel(level)</h4>
     
     
 </dt>
@@ -696,7 +534,7 @@
 
     
     <div class="description">
-        Отписаться от события
+        Получить значения с уровня
     </div>
     
 
@@ -731,13 +569,13 @@
 
         <tr>
             
-                <td class="name"><code>eventId</code></td>
+                <td class="name"><code>level</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">string</span>
+<span class="param-type">number</span>
 
 
 
@@ -748,20 +586,124 @@
 
             
 
-            <td class="description last">имя события, от которого соьираемся отписаться</td>
+            <td class="description last">номер уровня, откуда забираем значения</td>
         </tr>
 
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="getOption"><span class="type-signature"></span>getOption(index)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Получить опцию
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
     
 
         <tr>
             
-                <td class="name"><code>callback</code></td>
+                <td class="name"><code>index</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">string</span>
+<span class="param-type">number</span>
 
 
 
@@ -772,7 +714,365 @@
 
             
 
-            <td class="description last">handle функции, которую хотим отключить от шины</td>
+            <td class="description last">номер уровня</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="getVariant"><span class="type-signature"></span>getVariant()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Получаем выбранный вариант
+    </div>
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="getVariantById"><span class="type-signature"></span>getVariantById(_id)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Получаем выбранный вариант
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>_id</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">id варианта</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    variant - объект, описывющий нужный вариант
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Object</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="setVariant"><span class="type-signature"></span>setVariant(variant_id)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Устанавливаем вариант
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>variant_id</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">id варианта</td>
         </tr>
 
     
