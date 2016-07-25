@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width">
-	<title>Documentation Class: EventBus</title>
+	<title>Documentation Module: ajaxAPI/cart</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -77,15 +77,10 @@
 		<div id="main">
 			
 
-	<h1 class="page-title">Class: EventBus</h1>
+	<h1 class="page-title">Module: ajaxAPI/cart</h1>
 <section>
 
 <header>
-    
-        <h2>
-        EventBus
-        </h2>
-        
     
 </header>
 
@@ -94,28 +89,10 @@
     <div class="container-overview">
     
         
-<hr>
-<dt>
-    <h4 class="name" id="EventBus"><span class="type-signature"></span>new EventBus()</h4>
-    
-    
-</dt>
-<dd>
+            <div class="description">Ajax-обертки для работы с корзиной</div>
+        
 
-    
-    <div class="description">
-        Шина событий. Построена на $.Callbacks;
-    </div>
-    
-
-    
-
-    
-
-    
-    
-
-    
+        
 <dl class="details">
     
 
@@ -155,21 +132,7 @@
 </dl>
 
 
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dd>
-
+        
     
     </div>
 
@@ -192,7 +155,7 @@
             
 <hr>
 <dt>
-    <h4 class="name" id=".logger.add"><span class="type-signature">&lt;static> </span>logger.add(component)</h4>
+    <h4 class="name" id=".add"><span class="type-signature">&lt;static> </span>add(items, options)</h4>
     
     
 </dt>
@@ -200,7 +163,7 @@
 
     
     <div class="description">
-        Добавление логера для компонента
+        Добавление товара в корзину.
     </div>
     
 
@@ -235,165 +198,7 @@
 
         <tr>
             
-                <td class="name"><code>component</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">имя помпонента, который хотим прослушать</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-        <h5>Example</h5>
-        
-    <pre class="sunlight-highlight-javascript">EventBus.logger.add</pre>
-
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt>
-    <h4 class="name" id="publish"><span class="type-signature"></span>publish(eventId, data)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        Публикация события с данными
-    </div>
-    
-
-    
-
-    
-
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>eventId</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">имя события</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>data</code></td>
+                <td class="name"><code>items</code></td>
             
 
             <td class="type">
@@ -410,7 +215,31 @@
 
             
 
-            <td class="description last">объект с передаваемой информацией
+            <td class="description last">объект с добавляемыми модификациями и их кол-вом {variant_id: quantity, ...}</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">объект с дополнительными полями: comments, coupon
                 <h6 class="method-params-label method-subparams-label">Properties</h6>
                 
 
@@ -436,13 +265,13 @@
 
         <tr>
             
-                <td class="name"><code>action</code></td>
+                <td class="name"><code>comments</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">Onject</span>
+<span class="param-type">Object</span>
 
 
 
@@ -453,7 +282,31 @@
 
             
 
-            <td class="description last">объект со вспомогательной информаций, содержит исходное состояние, ссылку на узел, который вызвал собтие, что пытались сделать и т.д.</td>
+            <td class="description last">объект с комментариями вида {variant_id: comment, ...}</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>coupon</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">название купона</td>
         </tr>
 
     
@@ -520,11 +373,48 @@
     
 
     
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    $.post()
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">$.ajax</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
 
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">EventBus.publish(&#x27;test_event&#x27;, {isTest: true, title: &#x27;Test&#x27;, status: &#x27;ok&#x27;});</pre>
+    <pre class="sunlight-highlight-javascript">var items = {
+  123456: 1,
+  123457: 3,
+  123450: 100
+};
+
+var options = {
+  comments: { 123456: &#x27;Ваш комментарий&#x27; },
+  coupon: &#x27;test&#x27;
+}
+
+ajaxAPI.cart.add(items, options)
+ .done(function (onDone) { console.log (&#x27;onDone: &#x27;, onDone) })
+ .fail(function (onFail) { console.log (&#x27;onFail:&#x27;, onFail) });</pre>
 
 
     
@@ -534,7 +424,7 @@
             
 <hr>
 <dt>
-    <h4 class="name" id="subscribe"><span class="type-signature"></span>subscribe(eventId, callback)</h4>
+    <h4 class="name" id=".get"><span class="type-signature">&lt;static> </span>get()</h4>
     
     
 </dt>
@@ -542,7 +432,117 @@
 
     
     <div class="description">
-        Подписаться на событие
+        Получение состава корзины
+    </div>
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    $.promise
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">$.Deferred</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+        <h5>Example</h5>
+        
+    <pre class="sunlight-highlight-javascript">ajaxAPI.cart.get()
+ .done(function (onDone) { console.log(&#x27;onDone:&#x27;, onDone) })
+ .fail(function (onFail) { console.log(&#x27;onFail:&#x27;, onFail) });</pre>
+
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id=".remove"><span class="type-signature">&lt;static> </span>remove(variant_id)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Удаление товара из корзины.
     </div>
     
 
@@ -577,13 +577,13 @@
 
         <tr>
             
-                <td class="name"><code>eventId</code></td>
+                <td class="name"><code>variant_id</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">string</span>
+<span class="param-type">Number</span>
 
 
 
@@ -594,34 +594,7 @@
 
             
 
-            <td class="description last">имя события</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>callback</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">function</span>
-|
-
-<span class="param-type">string</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">функция, которая должна отработать при вызове события eventId. входной параметр - data</td>
+            <td class="description last">id модификации</td>
         </tr>
 
     
@@ -681,11 +654,37 @@
     
 
     
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    $.post
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">$.ajax</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
 
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">EventBus.subscribe(&#x27;test_event&#x27;, function (data) { console.log(data) });</pre>
+    <pre class="sunlight-highlight-javascript">ajaxAPI.cart.remove(123123)
+ .done(function (onDone) { console.log(&#x27;onDone: &#x27;, onDone) })
+ .fail(function (onFail) { console.log(&#x27;onFail: &#x27;, onFail) });</pre>
 
 
     
@@ -695,7 +694,7 @@
             
 <hr>
 <dt>
-    <h4 class="name" id="unsubscribe"><span class="type-signature"></span>unsubscribe(eventId, callback)</h4>
+    <h4 class="name" id=".update"><span class="type-signature">&lt;static> </span>update(items, options)</h4>
     
     
 </dt>
@@ -703,7 +702,13 @@
 
     
     <div class="description">
-        Отписаться от события
+        Обновление состава корзины.
+Позволяет:
+- обновить состав корзины
+- удалить несколько позиций
+- добавить несколько позиций
+- изменить кол-во товаров позиции
+- установить комментарии к позициям
     </div>
     
 
@@ -738,13 +743,13 @@
 
         <tr>
             
-                <td class="name"><code>eventId</code></td>
+                <td class="name"><code>items</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">string</span>
+<span class="param-type">Object</span>
 
 
 
@@ -755,14 +760,81 @@
 
             
 
-            <td class="description last">имя события, от которого соьираемся отписаться</td>
+            <td class="description last">набор пар {variant_id: quantity, ...}. Если quantity = 0, то позиция удаляется из корзины, в противном случае устанавливается указанное кол-во</td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>callback</code></td>
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">дополнительные поля: comments, coupon
+                <h6 class="method-params-label method-subparams-label">Properties</h6>
+                
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>comments</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">объект с комментариями вида {variant_id: comment, ...}</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>coupon</code></td>
             
 
             <td class="type">
@@ -779,7 +851,14 @@
 
             
 
-            <td class="description last">handle функции, которую хотим отключить от шины</td>
+            <td class="description last">название купона</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+            </td>
         </tr>
 
     
@@ -839,6 +918,49 @@
     
 
     
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    $.promise
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">$.Deferred</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+        <h5>Example</h5>
+        
+    <pre class="sunlight-highlight-javascript">var items = {
+  123456: 1,
+  123457: 3,
+  123450: 100
+};
+
+var options = {
+  comments: { 123456: &#x27;Ваш комментарий&#x27; },
+  coupon: &#x27;test&#x27;
+}
+
+ajaxAPI.cart.update(items, optins)
+ .done(function (onDone) { console.log(&#x27;onDone: &#x27;, onDone) })
+ .fail(function (onFail) { console.log(&#x27;onFail: &#x27;, onFail) });</pre>
+
 
     
 </dd>

@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width">
-	<title>Documentation Class: EventBus</title>
+	<title>Documentation Module: ajaxAPI/checkout</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -77,15 +77,10 @@
 		<div id="main">
 			
 
-	<h1 class="page-title">Class: EventBus</h1>
+	<h1 class="page-title">Module: ajaxAPI/checkout</h1>
 <section>
 
 <header>
-    
-        <h2>
-        EventBus
-        </h2>
-        
     
 </header>
 
@@ -94,28 +89,10 @@
     <div class="container-overview">
     
         
-<hr>
-<dt>
-    <h4 class="name" id="EventBus"><span class="type-signature"></span>new EventBus()</h4>
-    
-    
-</dt>
-<dd>
+            <div class="description">Ajax-обертки для работы с оформлением заказа</div>
+        
 
-    
-    <div class="description">
-        Шина событий. Построена на $.Callbacks;
-    </div>
-    
-
-    
-
-    
-
-    
-    
-
-    
+        
 <dl class="details">
     
 
@@ -155,21 +132,7 @@
 </dl>
 
 
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dd>
-
+        
     
     </div>
 
@@ -192,7 +155,7 @@
             
 <hr>
 <dt>
-    <h4 class="name" id=".logger.add"><span class="type-signature">&lt;static> </span>logger.add(component)</h4>
+    <h4 class="name" id=".order"><span class="type-signature">&lt;static> </span>order(client, order)</h4>
     
     
 </dt>
@@ -200,7 +163,7 @@
 
     
     <div class="description">
-        Добавление логера для компонента
+        Оформление заказа с указанием способа оплаты и доставки. Важно - все поля обязательны для заполнения.
     </div>
     
 
@@ -235,165 +198,7 @@
 
         <tr>
             
-                <td class="name"><code>component</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">имя помпонента, который хотим прослушать</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-        <h5>Example</h5>
-        
-    <pre class="sunlight-highlight-javascript">EventBus.logger.add</pre>
-
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt>
-    <h4 class="name" id="publish"><span class="type-signature"></span>publish(eventId, data)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        Публикация события с данными
-    </div>
-    
-
-    
-
-    
-
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>eventId</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">имя события</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>data</code></td>
+                <td class="name"><code>client</code></td>
             
 
             <td class="type">
@@ -410,7 +215,7 @@
 
             
 
-            <td class="description last">объект с передаваемой информацией
+            <td class="description last">объект с полями {email: почта, name: имя, phone: телефон}
                 <h6 class="method-params-label method-subparams-label">Properties</h6>
                 
 
@@ -436,13 +241,13 @@
 
         <tr>
             
-                <td class="name"><code>action</code></td>
+                <td class="name"><code>email</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">Onject</span>
+<span class="param-type">string</span>
 
 
 
@@ -453,7 +258,153 @@
 
             
 
-            <td class="description last">объект со вспомогательной информаций, содержит исходное состояние, ссылку на узел, который вызвал собтие, что пытались сделать и т.д.</td>
+            <td class="description last">почта</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>name</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">ФИО</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>phone</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">телефон</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+            </td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>order</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">объект с обязательными полями
+                <h6 class="method-params-label method-subparams-label">Properties</h6>
+                
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>delivery</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">id способа доставки</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>payment</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">id способа оплаты</td>
         </tr>
 
     
@@ -520,11 +471,37 @@
     
 
     
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    $.promise
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">$.Deferred</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
 
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">EventBus.publish(&#x27;test_event&#x27;, {isTest: true, title: &#x27;Test&#x27;, status: &#x27;ok&#x27;});</pre>
+    <pre class="sunlight-highlight-javascript">ajaxAPI.checkout.order(client, order)
+ .done(function (onDone) { console.log(&#x27;onDone: &#x27;, onDone) })
+ .fail(function (onFail) { console.log(&#x27;onFail: &#x27;, onFail) });</pre>
 
 
     
@@ -534,7 +511,7 @@
             
 <hr>
 <dt>
-    <h4 class="name" id="subscribe"><span class="type-signature"></span>subscribe(eventId, callback)</h4>
+    <h4 class="name" id=".quick"><span class="type-signature">&lt;static> </span>quick(formData)</h4>
     
     
 </dt>
@@ -542,7 +519,7 @@
 
     
     <div class="description">
-        Подписаться на событие
+        Оформление заказа
     </div>
     
 
@@ -577,13 +554,13 @@
 
         <tr>
             
-                <td class="name"><code>eventId</code></td>
+                <td class="name"><code>formData</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">string</span>
+<span class="param-type">Object</span>
 
 
 
@@ -594,34 +571,7 @@
 
             
 
-            <td class="description last">имя события</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>callback</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">function</span>
-|
-
-<span class="param-type">string</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">функция, которая должна отработать при вызове события eventId. входной параметр - data</td>
+            <td class="description last">объект сериализованной формы</td>
         </tr>
 
     
@@ -681,164 +631,38 @@
     
 
     
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    $.promise
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">$.Deferred</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
 
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">EventBus.subscribe(&#x27;test_event&#x27;, function (data) { console.log(data) });</pre>
+    <pre class="sunlight-highlight-javascript">ajaxAPI.checkout.quick(form.serialize())
+ .done(function (onDone) { console.log(&#x27;onDone: &#x27;, onDone) })
+ .fail(function (onFail) { console.log(&#x27;onFail: &#x27;, onFail) });</pre>
 
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt>
-    <h4 class="name" id="unsubscribe"><span class="type-signature"></span>unsubscribe(eventId, callback)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        Отписаться от события
-    </div>
-    
-
-    
-
-    
-
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>eventId</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">имя события, от которого соьираемся отписаться</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>callback</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">handle функции, которую хотим отключить от шины</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
 
     
 </dd>
