@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width">
-	<title>Documentation Class: quickCheckout</title>
+	<title>Documentation Class: ProductQuantity</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -40,7 +40,7 @@
 			<li class="dropdown">
 				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
 				<ul class="dropdown-menu ">
-					<li><a href="Cart.html">Cart</a></li><li><a href="Cart.order.html">Cart.order</a></li><li><a href="Cart.quickCheckout.html">Cart.quickCheckout</a></li><li><a href="Cart.ui.html">Cart.ui</a></li><li><a href="Compare.html">Compare</a></li><li><a href="EventBus.html">EventBus</a></li><li><a href="Product.html">Product</a></li><li><a href="Product.settings.html">Product.settings</a></li><li><a href="ProductInstance.html">ProductInstance</a></li><li><a href="ProductInstance.OptionSelector.html">ProductInstance.OptionSelector</a></li><li><a href="ProductInstance.price_kinds.html">ProductInstance.price_kinds</a></li><li><a href="ProductInstance.quantity.html">ProductInstance.quantity</a></li><li><a href="Products.html">Products</a></li><li><a href="Products.storage.html">Products.storage</a></li><li><a href="ProductVariants.html">ProductVariants</a></li><li><a href="Search.html">Search</a></li><li><a href="Search.ui.html">Search.ui</a></li><li><a href="Shop.html">Shop</a></li><li><a href="Shop.client.html">Shop.client</a></li><li><a href="Shop.money.html">Shop.money</a></li><li><a href="Template.html">Template</a></li>
+					<li><a href="Cart.html">Cart</a></li><li><a href="Cart.order.html">Cart.order</a></li><li><a href="Cart.quickCheckout.html">Cart.quickCheckout</a></li><li><a href="Cart.ui.html">Cart.ui</a></li><li><a href="Compare.html">Compare</a></li><li><a href="EventBus.html">EventBus</a></li><li><a href="Product.html">Product</a></li><li><a href="Product.settings.html">Product.settings</a></li><li><a href="ProductInstance.html">ProductInstance</a></li><li><a href="ProductInstance.OptionSelector.html">ProductInstance.OptionSelector</a></li><li><a href="ProductInstance.price_kinds.html">ProductInstance.price_kinds</a></li><li><a href="ProductQuantity.html">ProductQuantity</a></li><li><a href="Products.html">Products</a></li><li><a href="Products.storage.html">Products.storage</a></li><li><a href="ProductVariants.html">ProductVariants</a></li><li><a href="Search.html">Search</a></li><li><a href="Search.ui.html">Search.ui</a></li><li><a href="Shop.html">Shop</a></li><li><a href="Shop.client.html">Shop.client</a></li><li><a href="Shop.money.html">Shop.money</a></li><li><a href="Template.html">Template</a></li>
 				</ul>
 			</li>
 			
@@ -70,15 +70,13 @@
 		<div id="main">
 			
 
-	<h1 class="page-title">Class: quickCheckout</h1>
+	<h1 class="page-title">Class: ProductQuantity</h1>
 <section>
 
 <header>
     
         <h2>
-            <span class="ancestors"><a href="Cart.html">Cart</a>.</span>
-        
-        quickCheckout
+        ProductQuantity
         </h2>
         
     
@@ -91,7 +89,7 @@
         
 <hr>
 <dt>
-    <h4 class="name" id="quickCheckout"><span class="type-signature"></span>new quickCheckout()</h4>
+    <h4 class="name" id="ProductQuantity"><span class="type-signature"></span>new ProductQuantity()</h4>
     
     
 </dt>
@@ -99,7 +97,7 @@
 
     
     <div class="description">
-        Обработчик для "Заказа в один клик"
+        Класс для работы с полем кол-во товара
     </div>
     
 
@@ -187,7 +185,7 @@
             
 <hr>
 <dt>
-    <h4 class="name" id="closeModal"><span class="type-signature"></span>closeModal($modal)</h4>
+    <h4 class="name" id="_bindEvents"><span class="type-signature"></span>_bindEvents()</h4>
     
     
 </dt>
@@ -195,7 +193,7 @@
 
     
     <div class="description">
-        Закрытие модалки
+        Биндим события
     </div>
     
 
@@ -204,56 +202,6 @@
     
 
     
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>$modal</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">jQuery-нода модалкик</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
     
 
     
@@ -315,7 +263,7 @@
             
 <hr>
 <dt>
-    <h4 class="name" id="openModal"><span class="type-signature"></span>openModal($modal)</h4>
+    <h4 class="name" id="_bindQuantityButtons"><span class="type-signature"></span>_bindQuantityButtons()</h4>
     
     
 </dt>
@@ -323,7 +271,7 @@
 
     
     <div class="description">
-        Открытие модалки
+        Слушаем нажатия на кнопки +-
     </div>
     
 
@@ -332,56 +280,6 @@
     
 
     
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>$modal</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">jQuery-нода модалкик</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
     
 
     
@@ -443,7 +341,7 @@
             
 <hr>
 <dt>
-    <h4 class="name" id="send"><span class="type-signature"></span>send()</h4>
+    <h4 class="name" id="_bindQuantityInput"><span class="type-signature"></span>_bindQuantityInput()</h4>
     
     
 </dt>
@@ -451,7 +349,790 @@
 
     
     <div class="description">
-        Запуск добавления товаров, отправка формы
+        Слушаем поле.
+    </div>
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="_changeQuantity"><span class="type-signature"></span>_changeQuantity()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Добавляем значение по клику на кнопку
+    </div>
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="_check"><span class="type-signature"></span>_check()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Проверка
+    </div>
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="_getConfig"><span class="type-signature"></span>_getConfig()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Забираем data- из поля ввода
+data-quantity - '' или id variant
+data-step - шаг
+data-min - минимальное
+    </div>
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="_getInstance"><span class="type-signature"></span>_getInstance()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Вытаскиваем эекземпляр класса
+    </div>
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="_getQuantity"><span class="type-signature"></span>_getQuantity()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Забираем текущее значение
+    </div>
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="_init"><span class="type-signature"></span>_init()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Инициализаций
+    </div>
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="_setQuantity"><span class="type-signature"></span>_setQuantity()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Устанвливаем новое значение при изменении поля
+    </div>
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="_update"><span class="type-signature"></span>_update()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Обновляем мир
+    </div>
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="get"><span class="type-signature"></span>get()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Получение текущего количества и прочей инфы
+    </div>
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="setVariant"><span class="type-signature"></span>setVariant()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Указываем вариант, с которым работаем ???
     </div>
     
 
@@ -565,7 +1246,7 @@
 <span class="jsdoc-message">
 	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a>
 	
-		on 2016-07-25T17:42:51+03:00
+		on 2016-07-25T17:35:22+03:00
 	
 	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
 </span>

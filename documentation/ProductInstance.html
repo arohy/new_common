@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width">
-	<title>Documentation Class: quickCheckout</title>
+	<title>Documentation Class: ProductInstance</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -70,15 +70,13 @@
 		<div id="main">
 			
 
-	<h1 class="page-title">Class: quickCheckout</h1>
+	<h1 class="page-title">Class: ProductInstance</h1>
 <section>
 
 <header>
     
         <h2>
-            <span class="ancestors"><a href="Cart.html">Cart</a>.</span>
-        
-        quickCheckout
+        ProductInstance
         </h2>
         
     
@@ -91,7 +89,7 @@
         
 <hr>
 <dt>
-    <h4 class="name" id="quickCheckout"><span class="type-signature"></span>new quickCheckout()</h4>
+    <h4 class="name" id="ProductInstance"><span class="type-signature"></span>new ProductInstance()</h4>
     
     
 </dt>
@@ -99,7 +97,7 @@
 
     
     <div class="description">
-        Обработчик для "Заказа в один клик"
+        Класс отвечает за работу всех помпонентов товара
     </div>
     
 
@@ -172,6 +170,19 @@
 
     
 
+    
+        <h3 class="subsection-title">Classes</h3>
+
+        <dl>
+            <dt><a href="ProductInstance.OptionSelector.html">OptionSelector</a></dt>
+            <dd></dd>
+        
+            <dt><a href="ProductInstance.price_kinds.html">price_kinds</a></dt>
+            <dd></dd>
+        
+            <dt><a href="ProductInstance.quantity.html">quantity</a></dt>
+            <dd></dd>
+        </dl>
     
 
     
@@ -187,7 +198,7 @@
             
 <hr>
 <dt>
-    <h4 class="name" id="closeModal"><span class="type-signature"></span>closeModal($modal)</h4>
+    <h4 class="name" id="getInstance"><span class="type-signature"></span>getInstance($object)</h4>
     
     
 </dt>
@@ -195,7 +206,7 @@
 
     
     <div class="description">
-        Закрытие модалки
+        Получаем конкретный экземпляр.
     </div>
     
 
@@ -230,7 +241,7 @@
 
         <tr>
             
-                <td class="name"><code>$modal</code></td>
+                <td class="name"><code>$object</code></td>
             
 
             <td class="type">
@@ -247,7 +258,7 @@
 
             
 
-            <td class="description last">jQuery-нода модалкик</td>
+            <td class="description last"></td>
         </tr>
 
     
@@ -307,212 +318,33 @@
     
 
     
-
+    <h5>Returns:</h5>
     
-</dd>
-
-        
             
-<hr>
-<dt>
-    <h4 class="name" id="openModal"><span class="type-signature"></span>openModal($modal)</h4>
-    
-    
-</dt>
-<dd>
+<div class="param-desc">
+    Возвращет экземпляр, либо false
+</div>
 
-    
-    <div class="description">
-        Открытие модалки
-    </div>
-    
 
-    
 
-    
-
-    
-    
-        <h5>Parameters:</h5>
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
         
-
-<table class="params table table-striped">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>$modal</code></td>
-            
-
-            <td class="type">
-            
-                
 <span class="param-type">Object</span>
+|
+
+<span class="param-type">boolean</span>
 
 
 
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">jQuery-нода модалкик</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
+    </dd>
 </dl>
 
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dd>
 
         
-            
-<hr>
-<dt>
-    <h4 class="name" id="send"><span class="type-signature"></span>send()</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        Запуск добавления товаров, отправка формы
-    </div>
-    
-
-    
-
-    
-
-    
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
 
     
 </dd>
