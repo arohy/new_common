@@ -12,9 +12,9 @@ stages:
 
 build_job:
   stage: build
-  only:
-    - tags
-    - /^master$/
+  #only:
+    #- tags
+    #- /^master$/
   artifacts:
     paths:
       - dist/
@@ -26,24 +26,24 @@ build_job:
     # сборка
     - node_modules/gulp/bin/gulp.js dist
     # что поменялось?
-    - git status
+    #- git status
     # получаем репозиторий для результатов
-    - RESULTS_REPO_REL_PATH=../common-js-builded-repo
-    - RESULTS_REPO=$CI_PROJECT_DIR/$RESULTS_REPO_REL_PATH
-    - test -d $RESULTS_REPO || git clone git@gitlab.insales.ru:common-js/common-js-builded.git $RESULTS_REPO_REL_PATH
-    - cd $RESULTS_REPO
-    - git fetch
-    - git reset --hard origin/master
-    - git clean -fdx
+    #- RESULTS_REPO_REL_PATH=../common-js-builded-repo
+    #- RESULTS_REPO=$CI_PROJECT_DIR/$RESULTS_REPO_REL_PATH
+    #- test -d $RESULTS_REPO || git clone git@gitlab.insales.ru:common-js/common-js-builded.git $RESULTS_REPO_REL_PATH
+    #- cd $RESULTS_REPO
+    #- git fetch
+    #- git reset --hard origin/master
+    #- git clean -fdx
     # копируем собранные файлы, включаем в имя хэш коммита
-    - cp $CI_PROJECT_DIR/dist/new_common.js     $RESULTS_REPO/common.$CI_BUILD_REF.js
-    - cp $CI_PROJECT_DIR/dist/new_common.min.js $RESULTS_REPO/common.min.$CI_BUILD_REF.js
+    #- cp $CI_PROJECT_DIR/dist/new_common.js     $RESULTS_REPO/common.$CI_BUILD_REF.js
+    #- cp $CI_PROJECT_DIR/dist/new_common.min.js $RESULTS_REPO/common.min.$CI_BUILD_REF.js
     # копируем собранные файлы, включаем в имя бранча или тэга
-    - test -z "$CI_BUILD_REF_NAME" || cp $CI_PROJECT_DIR/dist/new_common.js     $RESULTS_REPO/common.$CI_BUILD_REF_NAME.js
-    - test -z "$CI_BUILD_REF_NAME" || cp $CI_PROJECT_DIR/dist/new_common.min.js $RESULTS_REPO/common.min.$CI_BUILD_REF_NAME.js
+    #- test -z "$CI_BUILD_REF_NAME" || cp $CI_PROJECT_DIR/dist/new_common.js     $RESULTS_REPO/common.$CI_BUILD_REF_NAME.js
+    #- test -z "$CI_BUILD_REF_NAME" || cp $CI_PROJECT_DIR/dist/new_common.min.js $RESULTS_REPO/common.min.$CI_BUILD_REF_NAME.js
     # коммитим и пушим результаты
-    - cd $RESULTS_REPO
-    - git add .
-    - git status
-    - "git commit -m 'CI build results' || echo 'probably nothing to commit'"
-    - git push origin master
+    #- cd $RESULTS_REPO
+    #- git add .
+    #- git status
+    #- "git commit -m 'CI build results' || echo 'probably nothing to commit'"
+    #- git push origin master
