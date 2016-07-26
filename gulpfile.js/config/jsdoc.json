@@ -1,5 +1,9 @@
 {
   "opts": {
     "destination": "documentation"
+  },
+  "templates": {
+    "includeDate": false,
+    "theme": "readable"
   }
 }
