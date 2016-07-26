@@ -20,6 +20,9 @@ build_job:
       - dist/
   script:
     - npm install
+    #- npm install gulp-cli
+    #- npm install gulp
+    #- npm install gulp-rename
     # сборка
     - node_modules/gulp/bin/gulp.js dist
     # что поменялось?
