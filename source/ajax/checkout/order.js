@@ -1,3 +1,10 @@
+/** @private */
+var URL = require('../../tools/url');
+/** @private */
+var $ = require('jquery');
+/** @private */
+var _ = require('lodash');
+
 /**
  * @memberof module:ajaxAPI/checkout
  * @alias order
@@ -22,10 +29,6 @@
  */
 
 module.exports = function (client, order) {
-  var URL = require('../../tools/url');
-  var $ = require('jquery');
-  var _ = require('lodash');
-
   var result = $.Deferred();
   var _lang = URL.getKeyValue('lang') || '';
   var checkout = {

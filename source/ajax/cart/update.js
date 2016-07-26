@@ -1,3 +1,10 @@
+/** @private */
+var URL = require('../../tools/url');
+/** @private */
+var $ = require('jquery');
+/** @private */
+var _ = require('lodash');
+
 /**
  * @memberof module:ajaxAPI/cart
  * @alias update
@@ -36,10 +43,6 @@
  */
 
 module.exports = function (items, options) {
-  var URL = require('../../tools/url');
-  var $ = require('jquery');
-  var _ = require('lodash');
-
   var _lang = URL.getKeyValue('lang') || '';
   var fields = {
     lang: _lang,

@@ -1,3 +1,8 @@
+/** @private */
+var URL = require('../../tools/url');
+/** @private */
+var $ = require('jquery');
+
 /**
  * @memberof module:ajaxAPI/cart
  * @alias get
@@ -13,9 +18,6 @@
  */
 
 module.exports = function () {
-  var URL = require('../../tools/url');
-  var $ = require('jquery');
-
   var result = $.Deferred();
   var cookieCart = $.cookie('cart');
   var _lang = URL.getKeyValue('lang') || '';

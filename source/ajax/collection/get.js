@@ -1,3 +1,10 @@
+/** @private */
+var URL = require('../../tools/url');
+/** @private */
+var $ = require('jquery');
+/** @private */
+var _ = require('lodash');
+
 /**
  * @memberof module:ajaxAPI/collection
  * @alias get
@@ -31,10 +38,6 @@
  */
 
 module.exports = function () {
-  var URL = require('../../tools/url');
-  var $ = require('jquery');
-  var _ = require('lodash');
-
   var path = '/collection/'+ _.toString(arguments[0]) +'.json';
   var _lang = URL.getKeyValue('lang') || '';
   var fields = {

@@ -1,3 +1,8 @@
+/** @private */
+var URL = require('../../tools/url');
+/** @private */
+var $ = require('jquery');
+
 /**
  * @memberof module:ajaxAPI/compare
  * @alias get
@@ -14,9 +19,6 @@
  */
 
 module.exports = function (id) {
-  var URL = require('../../tools/url');
-  var $ = require('jquery');
-
   var _lang = URL.getKeyValue('lang') || '';
   var fields = {
     lang: _lang
