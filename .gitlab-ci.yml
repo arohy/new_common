@@ -12,23 +12,9 @@ stages:
 
 build_job:
   stage: build
-
-  # Разные варианты ограничить сборку.
-  #
-  # only:
-  #   - tags
-  #   - triggers
-  #
-  # only:
-  #   - /^issue-.*$/
-  # except:
-  #   - branches
-  #
-  # only:
-  #   - branches@gitlab-org/gitlab-ce
-  # except:
-  #   - master@gitlab-org/gitlab-ce
-
+  only:
+    - tags
+    - /^master$/
   artifacts:
     paths:
       - dist/
