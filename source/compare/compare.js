@@ -185,10 +185,10 @@ Compare.prototype._events = function (task) {
   var self = this;
   var data = self;
   data.action = task;
-  EventBus.publish(task.method +':insales:comparess', data);
+  EventBus.publish(task.method +':insales:compares', data);
 
   if (data.action.method != 'update_items' && data.action.method != 'overload') {
-    EventBus.publish('update_items:insales:comparess', data);
+    EventBus.publish('update_items:insales:compares', data);
   }
 };
 
@@ -198,7 +198,7 @@ Compare.prototype._events = function (task) {
  * @private
  */
 Compare.prototype._before = function (task) {
-  EventBus.publish('before:insales:comparess', task);
+  EventBus.publish('before:insales:compares', task);
 };
 
 /**
@@ -207,7 +207,7 @@ Compare.prototype._before = function (task) {
  * @private
  */
 Compare.prototype._always = function (task) {
-  EventBus.publish('always:insales:comparess', task);
+  EventBus.publish('always:insales:compares', task);
 };
 
 module.exports = _Singleton(Compare).getInstance();

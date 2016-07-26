@@ -49,6 +49,9 @@ module.exports = function (items, options) {
 
   options = options || {};
 
+  /**
+   * @todo исправить! сюда могут прилетать и дробные числа
+   */
   _.forIn(items, function (quantity, variant_id) {
     fields['cart[quantity]['+ variant_id +']'] = _.toInteger(quantity);
   });
