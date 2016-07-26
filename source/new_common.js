@@ -2,7 +2,7 @@ console.warn('Внимание подключена новая версия JS A
 
 window._ = require('lodash');
 
-window.ajaxAPI = require('./json/ajax');
+window.ajaxAPI = require('./ajax/ajax');
 window.Template = require('./template/template');
 window.EventBus = require('./events/events');
 
