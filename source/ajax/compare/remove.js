@@ -16,7 +16,7 @@
  */
 
 module.exports = function (id) {
-  var URL = require('../tools/url');
+  var URL = require('../../tools/url');
   var $ = require('jquery');
   var _ = require('lodash');
 

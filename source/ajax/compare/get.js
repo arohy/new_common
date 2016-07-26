@@ -14,7 +14,7 @@
  */
 
 module.exports = function (id) {
-  var URL = require('../tools/url');
+  var URL = require('../../tools/url');
   var $ = require('jquery');
 
   var _lang = URL.getKeyValue('lang') || '';

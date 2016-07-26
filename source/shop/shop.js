@@ -1,5 +1,5 @@
 /** @private */
-var ajaxShop = require('../json/ajax.shop');
+var ajaxShop = require('../ajax/ajax.shop');
 /** @private */
 var _Singleton = require('../tools/singleton');
 

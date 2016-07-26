@@ -2,7 +2,7 @@
 var _ = require('lodash');
 
 /** @private */
-var ajax = require('../json/ajax.compare');
+var ajax = require('../ajax/ajax.compare');
 /** @private */
 var EventBus = require('../events/events');
 /** @private */

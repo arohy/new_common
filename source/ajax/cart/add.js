@@ -29,7 +29,7 @@
  *  .fail(function (onFail) { console.log ('onFail:', onFail) });
  */
 module.exports = function (items, options) {
-  var URL = require('../tools/url');
+  var URL = require('../../tools/url');
   var $ = require('jquery');
   var _ = require('lodash');
 

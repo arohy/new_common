@@ -4,7 +4,7 @@ var $ = require('jquery');
 var _ = require('lodash');
 
 /** @private */
-var ajax = require('../json/ajax.checkout');
+var ajax = require('../ajax/ajax.checkout');
 /** @private */
 var EventBus = require('../events/events');
 

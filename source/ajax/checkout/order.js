@@ -22,7 +22,7 @@
  */
 
 module.exports = function (client, order) {
-  var URL = require('../tools/url');
+  var URL = require('../../tools/url');
   var $ = require('jquery');
   var _ = require('lodash');
 

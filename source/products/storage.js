@@ -3,7 +3,7 @@ var $ = require('jquery');
 /** @private */
 var _ = require('lodash');
 /** @private */
-var ajax = require('../json/ajax.product');
+var ajax = require('../ajax/ajax.product');
 /** @private */
 var URL = require('../tools/url');
 /** @private */

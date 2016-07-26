@@ -1,7 +1,7 @@
 /** @private */
 var _ = require('lodash');
 /** @private */
-var ajax = require('../json/ajax.cart');
+var ajax = require('../ajax/ajax.cart');
 /** @private */
 var EventBus = require('../events/events');
 /** @private */

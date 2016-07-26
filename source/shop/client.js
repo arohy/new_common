@@ -3,7 +3,7 @@ var $ = require('jquery');
 /** @private */
 var _ = require('lodash');
 /** @private */
-var ajaxShop = require('../json/ajax.shop');
+var ajaxShop = require('../ajax/ajax.shop');
 
 /**
  * @memberof Shop
