@@ -1,12 +1,14 @@
-/**
- * Класс отвечает за взаимодействие верскти с конкретным
- * экземпляром Product()
- */
+/** @private */
 var $ = require('jquery');
+/** @private */
 var _ = require('lodash');
-
+/** @private */
 var EventBus = require('../events/events');
 
+/**
+ * Класс отвечает за работу всех помпонентов товара
+ * @class
+ */
 var ProductInstance = function (_owner, $product) {
   var self = this;
 
@@ -42,6 +44,7 @@ var ProductInstance = function (_owner, $product) {
 
 /**
  * Инициализация связки
+ * @private
  */
 ProductInstance.prototype._init = function () {
   var self = this;
@@ -61,6 +64,7 @@ ProductInstance.prototype._init = function () {
 
 /**
  * Инициализация селектора
+ * @private
  */
 ProductInstance.prototype._initOptionSelectors = function () {
   var self = this;
@@ -90,6 +94,7 @@ ProductInstance.prototype._initOptionSelectors = function () {
 
 /**
  * Инициализация счетчиков
+ * @private
  */
 ProductInstance.prototype._initQuantity = function () {
   var self = this;
@@ -102,7 +107,9 @@ ProductInstance.prototype._initQuantity = function () {
 
 /**
  * Получаем конкретный экземпляр.
- * Возвращет экземпляр, либо false
+ * @param {Object} $object
+ *
+ * @return {Object|boolean} Возвращет экземпляр, либо false
  */
 ProductInstance.prototype.getInstance = function ($object) {
   var self = this;
@@ -125,9 +132,11 @@ ProductInstance.prototype.getInstance = function ($object) {
 
 /**
  * Обновление состояния
- * Должна сама забирать всю информацию из компонентов и обновлять
+ * @todo Должна сама забирать всю информацию из компонентов и обновлять
  * максимум - получить линк на quantity, откуда брать актуальную инфу
  * о кол-ве
+ *
+ * @private
  */
 ProductInstance.prototype._updateStatus = function (status) {
   var self = this;
@@ -198,6 +207,7 @@ ProductInstance.prototype._updateStatus = function (status) {
 
 /**
  * Слушатель на обновление корзины
+ * @private
  */
 ProductInstance.prototype._bindUpdateCart = function () {
   var self = this;

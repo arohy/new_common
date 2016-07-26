@@ -1,5 +1,6 @@
 /**
  * Тул для вывода ошибок.
+ * @private
  */
 var Error = function (name, message) {
   var self = this;

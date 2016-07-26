@@ -1,14 +1,19 @@
-/**
- * Централизованная работа с товарами
- */
+/** @private */
 var $ = require('jquery');
+/** @private */
 var _ = require('lodash');
-
+/** @private */
 var _Storage = require('./storage');
+/** @private */
 var _Product = require('../product/product');
-
+/** @private */
 var _Singleton = require('../tools/singleton');
 
+/**
+ * Централизованная работа с товарами
+ * @class
+ *
+ */
 var Products = function () {
   var self = this;
 
@@ -25,6 +30,9 @@ var Products = function () {
 
 /**
  * Инициализация
+ * @method
+ *
+ * @private
  */
 Products.prototype._init = function () {
   var self = this;
@@ -37,6 +45,9 @@ Products.prototype._init = function () {
 
 /**
  * Получаем готовый к употреблению товар
+ * @method
+ *
+ * @param {number} id - id товара
  */
 Products.prototype.get = function (id) {
   var self = this;
@@ -48,6 +59,9 @@ Products.prototype.get = function (id) {
 
 /**
  * Получение списка товаров
+ * @method
+ *
+ * @param {Array} idList - массив, состоящий из id товаров
  */
 Products.prototype.getList = function (idList) {
   var self = this;
@@ -59,6 +73,9 @@ Products.prototype.getList = function (idList) {
 
 /**
  * Обновление настроек продуктов созданных через
+ * @method
+ *
+ * @param {Object} settings - объект с применяемыми настройками. Применяется для всехэкземпляров на странице
  */
 Products.prototype.setConfig = function (settings){
   var self = this;
@@ -72,6 +89,8 @@ Products.prototype.setConfig = function (settings){
 
 /**
  * Получение списка из id из DOM
+ * @method
+ * @private
  */
 Products.prototype._getDomId = function () {
   var self = this;
@@ -93,6 +112,8 @@ Products.prototype._getDomId = function () {
 
 /**
  * Получение списка товаров
+ * @method
+ * @private
  */
 Products.prototype._getList = function (_idList) {
   var self = this;
@@ -124,6 +145,8 @@ Products.prototype._getList = function (_idList) {
 
 /**
  * Получение информации о товаре
+ * @method
+ * @private
  */
 Products.prototype._getOne = function (_id) {
   var self = this;
@@ -141,7 +164,8 @@ Products.prototype._getOne = function (_id) {
 };
 
 /**
- *
+ * @method
+ * @private
  */
 Products.prototype._initProduct = function (_productJSON) {
   var self = this;

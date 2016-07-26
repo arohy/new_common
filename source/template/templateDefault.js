@@ -1,5 +1,7 @@
 /**
  * прибиваем дефолтный селект для вывода опций
+ * @memberof Template
+ * @private
  */
 
 var defaultTemplates = function () {

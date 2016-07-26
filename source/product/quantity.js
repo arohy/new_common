@@ -1,11 +1,17 @@
-/**
- * Класс для работы с полем кол-во товара
- */
+/** @private */
 var $ = require('jquery');
+/** @private */
 var _ = require('lodash');
 
+/** @private */
 var EventBus = require('../events/events');
 
+/**
+ * Класс для работы с полем кол-во товара
+ * @class
+ * @memberof ProductInstance
+ * @alias quantity
+ */
 var ProductQuantity = function (_owner, _quantityNode) {
   var self = this;
 
@@ -38,6 +44,7 @@ var ProductQuantity = function (_owner, _quantityNode) {
 
 /**
  * Инициализаций
+ * @private
  */
 ProductQuantity.prototype._init = function () {
   var self = this;
@@ -84,6 +91,8 @@ ProductQuantity.prototype._init = function () {
  * data-quantity - '' или id variant
  * data-step - шаг
  * data-min - минимальное
+ *
+ * @private
  */
 ProductQuantity.prototype._getConfig = function () {
   var self = this;
@@ -100,6 +109,7 @@ ProductQuantity.prototype._getConfig = function () {
 
 /**
  * Забираем текущее значение
+ * @private
  */
 ProductQuantity.prototype._getQuantity = function () {
   var self = this;
@@ -123,6 +133,7 @@ ProductQuantity.prototype.setVariant = function (variant) {
 
 /**
  * Получение текущего количества и прочей инфы
+ * @private
  */
 ProductQuantity.prototype.get = function () {
   var self = this;
@@ -137,8 +148,9 @@ ProductQuantity.prototype.get = function () {
 };
 
 /**
-* Добавляем значение по клику на кнопку
-*/
+ * Добавляем значение по клику на кнопку
+ * @private
+ */
 ProductQuantity.prototype._changeQuantity = function (value) {
   var self = this;
 
@@ -149,6 +161,7 @@ ProductQuantity.prototype._changeQuantity = function (value) {
 
 /**
  * Устанвливаем новое значение при изменении поля
+ * @private
  */
 ProductQuantity.prototype._setQuantity = function () {
   var self = this;
@@ -160,6 +173,7 @@ ProductQuantity.prototype._setQuantity = function () {
 
 /**
  * Проверка
+ * @private
  */
 ProductQuantity.prototype._check = function () {
   var self = this;
@@ -188,6 +202,7 @@ ProductQuantity.prototype._check = function () {
 
 /**
  * Обновляем мир
+ * @private
  */
 ProductQuantity.prototype._update = function () {
   var self = this;
@@ -206,6 +221,7 @@ ProductQuantity.prototype._update = function () {
 
 /**
  * Вытаскиваем эекземпляр класса
+ * @private
  */
 ProductQuantity.prototype._getInstance = function ($selector) {
   var self = this;
@@ -224,6 +240,7 @@ ProductQuantity.prototype._getInstance = function ($selector) {
 
 /**
  * Биндим события
+ * @private
  */
 ProductQuantity.prototype._bindEvents = function () {
   var self = this;
@@ -241,6 +258,7 @@ ProductQuantity.prototype._bindEvents = function () {
 
 /**
  * Слушаем нажатия на кнопки +-
+ * @private
  */
 ProductQuantity.prototype._bindQuantityButtons = function () {
   var self = this;
@@ -257,6 +275,7 @@ ProductQuantity.prototype._bindQuantityButtons = function () {
 
 /**
  * Слушаем поле.
+ * @private
  */
 ProductQuantity.prototype._bindQuantityInput = function () {
   var self = this;
@@ -281,6 +300,10 @@ ProductQuantity.prototype._bindQuantityInput = function () {
     });
 };
 
+/**
+ * Чиним значения
+ * @private
+ */
 ProductQuantity.prototype._fixValue = function (_value) {
   var self = this;
 

@@ -1,4 +1,4 @@
 var gulp = require('gulp');
 
-gulp.task('default', ['browserify-watch'], function () {
+gulp.task('default', ['dev-watch'], function () {
 });

@@ -1,8 +1,16 @@
-/**
- * Класс для работы с настройками Продукта
- */
+/** @private */
 var _ = require('lodash');
 
+/**
+ * Класс для работы с настройками Продукта
+ *
+ * @class
+ * @memberof Product
+ * @alias Product.settings
+ *
+ * @param {Object} settings
+ * @param {Object} _owner
+ */
 var ProductSettings = function (settings, _owner) {
   var self = this;
 
@@ -30,6 +38,7 @@ var ProductSettings = function (settings, _owner) {
 
 /**
  * Выставляем настройки, делаем немного магии
+ * @private
  */
 ProductSettings.prototype._set = function (settings) {
   var self = this;
@@ -41,6 +50,7 @@ ProductSettings.prototype._set = function (settings) {
 
 /**
  * всякие доп проверки
+ * @private
  */
 ProductSettings.prototype._patch = function () {
   var self = this;
@@ -56,6 +66,7 @@ ProductSettings.prototype._patch = function () {
 
 /**
  * Жестко ставим настройки из-вне
+ * @param {Object} settings
  */
 ProductSettings.prototype.set = function (settings) {
   var self = this;

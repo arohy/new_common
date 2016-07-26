@@ -1,10 +1,18 @@
+/** @private */
+var $ = require('jquery');
+/** @private */
+var _ = require('lodash');
+/** @private */
+var ajaxShop = require('../ajax/ajax.shop');
+
 /**
+ * @memberof Shop
+ * @class
+ * @alias Shop.client
+ *
+ * @description
  * Класс для работы с клиентом сайта
  */
-var $ = require('jquery');
-var _ = require('lodash');
-var ajaxShop = require('../json/ajax.shop');
-
 var Client = function (_owner) {
   var self = this;
 
@@ -15,6 +23,9 @@ var Client = function (_owner) {
 
 /**
  * Инициализация
+ * @method
+ *
+ * @private
  */
 Client.prototype._init = function () {
   var self = this;
@@ -24,6 +35,9 @@ Client.prototype._init = function () {
 
 /**
  * Забираем инфу с сервера
+ * @method
+ *
+ * @private
  */
 Client.prototype._get = function () {
   var self = this;
@@ -44,6 +58,7 @@ Client.prototype._get = function () {
 
 /**
  * Обновление данных
+ * @method
  */
 Client.prototype.get = function () {
   var self = this;

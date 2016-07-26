@@ -1,11 +1,17 @@
-/**
- * Связка с DOM
- */
+/** @private */
 var $ = require('jquery');
+/** @private */
 var _ = require('lodash');
-
+/** @private */
 var EventBus = require('../events/events');
 
+/**
+ * Связка с DOM
+ * @memberof Cart
+ * @class
+ *
+ * @alias Cart.ui
+ */
 var CartDOM = function (_owner) {
   var self = this;
 
@@ -31,6 +37,8 @@ var CartDOM = function (_owner) {
 
 /**
  * Инициализация
+ * @method
+ * @private
  */
 CartDOM.prototype._init = function () {
   var self = this;
@@ -45,6 +53,11 @@ CartDOM.prototype._init = function () {
   return;
 };
 
+/**
+ * Установка настроек
+ * @method
+ * @private
+ */
 CartDOM.prototype.setConfig = function (options) {
   var self = this;
 
@@ -55,6 +68,10 @@ CartDOM.prototype.setConfig = function (options) {
 
 /**
  * Добавляем товары из формы
+ * @method
+ * @private
+ *
+ * @param {jQuery-Object} $button - кнопка
  */
 CartDOM.prototype._addItem = function ($button) {
   var self = this;
@@ -68,6 +85,8 @@ CartDOM.prototype._addItem = function ($button) {
 
 /**
  * Обработка добавления товара в корзину
+ * @method
+ * @private
  */
 CartDOM.prototype._bindAddItem = function () {
   var self = this;
@@ -99,7 +118,8 @@ CartDOM.prototype._bindAddItem = function () {
 };
 
 /**
- *
+ * @method
+ * @private
  */
 CartDOM.prototype._quickCheckout = function ($button) {
   var self = this;
@@ -112,6 +132,8 @@ CartDOM.prototype._quickCheckout = function ($button) {
 
 /**
  * Удаляем один элемент из корзины по клику на кнопке "Удалить"
+ * @method
+ * @private
  */
 CartDOM.prototype._deleteItem = function ($button) {
   var self = this;
@@ -128,6 +150,8 @@ CartDOM.prototype._deleteItem = function ($button) {
 
 /**
  * Обработка удаления товара из корзины
+ * @method
+ * @private
  */
 CartDOM.prototype._bindDeleteItem = function () {
   var self = this;
@@ -152,6 +176,9 @@ CartDOM.prototype._bindDeleteItem = function () {
 
 /**
  * Пересчет корзины из формы
+ * @method
+ *
+ * @param {jQuery} [$button] - Конпка, которая вызвала все это, необъязательный параметр
  */
 CartDOM.prototype.updateOrder = function ($button) {
   var self = this;
@@ -176,6 +203,8 @@ CartDOM.prototype.updateOrder = function ($button) {
 
 /**
  * Обновление корзины
+ * @method
+ * @private
  */
 CartDOM.prototype._bindUpdateCart = function () {
   var self = this;
@@ -228,6 +257,7 @@ CartDOM.prototype._bindUpdateCart = function () {
 
 /**
  * Очистить корзину (через форму)
+ * @method
  */
 CartDOM.prototype.clearOder = function ($button) {
   var self = this;
@@ -252,6 +282,8 @@ CartDOM.prototype.clearOder = function ($button) {
 
 /**
  * Обработка полной очистки корзины
+ * @method
+ * @private
  */
 CartDOM.prototype._bindClearOrder = function () {
   var self = this;
@@ -275,6 +307,9 @@ CartDOM.prototype._bindClearOrder = function () {
 
 /**
  * Отправка купона
+ * @method
+ *
+ * @param {jQuery} $form - форма, из которой тянем поле с купоном
  */
 CartDOM.prototype.setCoupon = function ($form, $button) {
   var self = this;
@@ -291,6 +326,8 @@ CartDOM.prototype.setCoupon = function ($form, $button) {
 
 /**
  * Обработчики работы с купоном
+ * @method
+ * @private
  */
 CartDOM.prototype._bindCoupon = function () {
   var self = this;
@@ -332,6 +369,8 @@ CartDOM.prototype._bindCoupon = function () {
 
 /**
  * Вытаскиваем id из строки
+ * @method
+ * @private
  */
 CartDOM.prototype._getId = function (string) {
   return _.toInteger(string.replace(/\D+/g, ''));
@@ -339,6 +378,8 @@ CartDOM.prototype._getId = function (string) {
 
 /**
  * Собираем items из $form
+ * @method
+ * @private
  */
 CartDOM.prototype._getItems = function ($fields) {
   var self = this;
@@ -354,6 +395,8 @@ CartDOM.prototype._getItems = function ($fields) {
 
 /**
  * Lurk for coupon
+ * @method
+ * @private
  */
 CartDOM.prototype._getCoupon = function ($form) {
   return $form.find('[name="cart[coupon]"]').val() || false;
@@ -369,6 +412,10 @@ CartDOM.prototype._unlockButton = function (data, eventName) {
   return;
 };
 
+/**
+ * @method
+ * @private
+ */
 CartDOM.prototype._getComments = function ($form) {
   var self = this;
   var comments = {};
@@ -384,6 +431,8 @@ CartDOM.prototype._getComments = function ($form) {
 
 /**
  * Разбираем форму товара
+ * @method
+ * @private
  */
 CartDOM.prototype._parseProductForm = function ($form, $button) {
   var self = this;

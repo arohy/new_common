@@ -1,27 +1,40 @@
-/**
- * CuickCheckout
- */
+/** @private */
 var $ = require('jquery');
+/** @private */
 var _ = require('lodash');
 
-var ajax = require('../json/ajax.checkout');
+/** @private */
+var ajax = require('../ajax/ajax.checkout');
+/** @private */
 var EventBus = require('../events/events');
 
+/**
+ * Обработчик для "Заказа в один клик"
+ * @memberof Cart
+ * @class
+ * @alias Cart.quickCheckout
+ */
 var CartQuickCheckout = function (_owner) {
   var self = this;
 
   self._owner = _owner;
 
   self.selectors = {
+    /** @default */
     disabled: 'disabled',
-
+    /** @default */
     open: 'data-quick-checkout',
-
+    /** @default */
     sendButton: '.m-modal-button--checkout',
+    /** @default */
     closeButton: '.m-modal-close',
+    /** @default */
     errors: '.m-modal-errors',
+    /** @default */
     form: '#quick_checkout_form',
+    /** @default */
     modal: '.m-modal--checkout',
+    /** @default */
     msgModal: '#insales-quick-checkout-msg',
   };
 
@@ -30,6 +43,11 @@ var CartQuickCheckout = function (_owner) {
   return;
 };
 
+/**
+ * Инициализация
+ * @method
+ * @private
+ */
 CartQuickCheckout.prototype._init = function () {
   var self = this;
 
@@ -60,6 +78,9 @@ CartQuickCheckout.prototype._init = function () {
 
 /**
  * Открытие модалки
+ * @method
+ *
+ * @param {Object} $modal - jQuery-нода модалкик
  */
 CartQuickCheckout.prototype.openModal = function ($modal) {
   var self = this;
@@ -75,6 +96,9 @@ CartQuickCheckout.prototype.openModal = function ($modal) {
 
 /**
  * Закрытие модалки
+ * @method
+ *
+ * @param {Object} $modal - jQuery-нода модалкик
  */
 CartQuickCheckout.prototype.closeModal = function ($modal) {
   var self = this;
@@ -88,6 +112,7 @@ CartQuickCheckout.prototype.closeModal = function ($modal) {
 
 /**
  * Запуск добавления товаров, отправка формы
+ * @method
  */
 CartQuickCheckout.prototype.send = function () {
   var self = this;
@@ -108,6 +133,10 @@ CartQuickCheckout.prototype.send = function () {
 
 /**
  * Обработчик открытия модалки
+ * @method
+ * @private
+ *
+ * @fires add_disabled:insales:quick_checkout
  */
 CartQuickCheckout.prototype._bindOpenModal = function () {
   var self = this;
@@ -138,6 +167,11 @@ CartQuickCheckout.prototype._bindOpenModal = function () {
 
 /**
  * Отправка формы из модалки
+ * @method
+ * @private
+ *
+ * @fires before:insales:quick_checkout
+ * @fires always:insales:quick_checkout
  */
 CartQuickCheckout.prototype._send = function () {
   var self = this;
@@ -176,7 +210,11 @@ CartQuickCheckout.prototype._send = function () {
 };
 
 /**
- * Все ок
+ * Отрабатываем случай, что у нас все ок
+ * @method
+ * @private
+ *
+ * @fires success:insales:quick_checkout
  */
 CartQuickCheckout.prototype._success = function (task) {
   var self = this;
@@ -190,7 +228,11 @@ CartQuickCheckout.prototype._success = function (task) {
 };
 
 /**
- * Прилетели ошибки
+ * При отправки формы пришли ошибки
+ * @method
+ * @private
+ *
+ * @fires errors:insales:quick_checkout
  */
 CartQuickCheckout.prototype._errors = function (task) {
   var self = this;
@@ -206,6 +248,8 @@ CartQuickCheckout.prototype._errors = function (task) {
 
 /**
  * Обработчики закрытия модалки
+ * @method
+ * @private
  */
 CartQuickCheckout.prototype._bindCloseModal = function () {
   var self = this;
@@ -241,7 +285,9 @@ CartQuickCheckout.prototype._bindCloseModal = function () {
 };
 
 /**
- * Обработка отправки
+ * Перехватываем события DOM для отправки формы
+ * @method
+ * @private
  */
 CartQuickCheckout.prototype._bindSend = function () {
   var self = this;
@@ -269,6 +315,10 @@ CartQuickCheckout.prototype._bindSend = function () {
 
 /**
  * Разбор формы модалки
+ * @method
+ * @private
+ *
+ * @param {Object} $button - jQuery-объект ноды
  */
 CartQuickCheckout.prototype._getProductForm = function ($button) {
   var self = this;
@@ -289,6 +339,10 @@ CartQuickCheckout.prototype._getProductForm = function ($button) {
 
 /**
  * Прибиваем слушателей шины
+ * @method
+ * @private
+ *
+ * @listens add_checkout:insales:cart
  */
 CartQuickCheckout.prototype._bindEvents = function () {
   var self = this;
@@ -299,7 +353,9 @@ CartQuickCheckout.prototype._bindEvents = function () {
 };
 
 /**
- *
+ * Показываем сообщения из чекаута
+ * @method
+ * @private
  */
 CartQuickCheckout.prototype.showMessage = function (message) {
   var self = this;
@@ -311,7 +367,9 @@ CartQuickCheckout.prototype.showMessage = function (message) {
 };
 
 /**
- *
+ * Прячем сообщения
+ * @method
+ * @private
  */
 CartQuickCheckout.prototype.hideMessage = function () {
   var self = this;

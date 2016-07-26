@@ -3,8 +3,15 @@
  *
  * Позволяет одной командой перехватывать все события, порождаемые компонентом
  */
+/** @private */
 var _ = require('lodash');
 
+/**
+ * Добавляем прослушку компонента
+ * @class
+ *
+ * @private
+ */
 var EventsLogger = function (_owner) {
   var self = this;
   self._owner = _owner;
@@ -13,7 +20,15 @@ var EventsLogger = function (_owner) {
 };
 
 /**
- * Добавляем прослушку компонента
+ * Добавление логера для компонента
+ * @method
+ *
+ * @memberof EventBus
+ * @alias logger.add
+ * @param {string} component - имя помпонента, который хотим прослушать
+ *
+ * @example
+ * EventBus.logger.add
  */
 EventsLogger.prototype.add = function (component) {
   var self = this;
@@ -26,6 +41,9 @@ EventsLogger.prototype.add = function (component) {
 
 /**
  * Проходим по уже существующим событиям и вешаемся на них
+ *
+ * @method
+ * @private
  */
 EventsLogger.prototype._init = function (component) {
   var self = this;
@@ -39,6 +57,9 @@ EventsLogger.prototype._init = function (component) {
 
 /**
  * Вешаем слушателя на событие
+ *
+ * @method
+ * @private
  */
 EventsLogger.prototype.addListner = function (eventName) {
   var self = this;
@@ -58,6 +79,9 @@ EventsLogger.prototype.addListner = function (eventName) {
 
 /**
  * Проверяем, слушаем ли мы такой компонент?
+ *
+ * @method
+ * @private
  */
 EventsLogger.prototype._inList = function (component) {
   var self = this;
@@ -67,6 +91,9 @@ EventsLogger.prototype._inList = function (component) {
 
 /**
  * Проверка
+ *
+ * @method
+ * @private
  */
 EventsLogger.prototype._isListen = function (eventName) {
   var self = this;
@@ -82,6 +109,9 @@ EventsLogger.prototype._isListen = function (eventName) {
 
 /**
  * Вытаскиваем название компонента из события
+ *
+ * @method
+ * @private
  */
 EventsLogger.prototype._component = function (eventName) {
   return _.last(eventName.split(':'));

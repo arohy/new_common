@@ -1,14 +1,17 @@
-/**
- * Сравнение товаров
- */
-
-// TODO: сделать синглтон
+/** @private */
 var _ = require('lodash');
 
-var ajax = require('../json/ajax.compare');
+/** @private */
+var ajax = require('../ajax/ajax.compare');
+/** @private */
 var EventBus = require('../events/events');
+/** @private */
 var _Singleton = require('../tools/singleton');
 
+/**
+ * Сравнение товаров
+ * @class
+ */
 var Compare = function (options) {
   options = options || {};
 
@@ -24,6 +27,19 @@ var Compare = function (options) {
 
 /**
  * Добавляем товар
+ * @method
+ *
+ * @param {Object} task - задача
+ * @param {number} task.item - id товара, добавляемого в сравнение
+ *
+ * @fires before:insales:compares
+ * @fires overload:insales:compares
+ * @fires in_list:insales:compares
+ * @fires add_item:insales:compares
+ * @fires always:insales:compares
+ *
+ * @example
+ * Compare.add({ item: 123456 });
  */
 Compare.prototype.add = function (task) {
   var self = this;
@@ -61,7 +77,19 @@ Compare.prototype.add = function (task) {
 };
 
 /**
- * Удаляем товар
+ * Удаляем товар из сравнения
+ * @method
+ *
+ * @param {Object} task - задача
+ * @param {number} task.item - id товара, добавляемого в сравнение
+ *
+ * @fires before:insales:compares
+ * @fires remove_item:insales:compares
+ * @fires update_items:insales:compares
+ * @fires always:insales:compares
+ *
+ * @example
+ * Compare.remove({item: 123456});
  */
 Compare.prototype.remove = function (task) {
   var self = this;
@@ -84,6 +112,14 @@ Compare.prototype.remove = function (task) {
 
 /**
  * Обновляем состояние сравнения
+ * @method
+ *
+ * @fires before:insales:compares
+ * @fires update_items:insales:compares
+ * @fires always:insales:compares
+ *
+ * @example
+ * Compare.update();
  */
 Compare.prototype.update = function () {
   var self = this;
@@ -94,7 +130,11 @@ Compare.prototype.update = function () {
 };
 
 /**
+ * Получение текущего состояния Сравнения
+ * @method
  *
+ * @example
+ * Compare.getCompare();
  */
 Compare.prototype.getCompare = function () {
   var self = this;
@@ -104,6 +144,11 @@ Compare.prototype.getCompare = function () {
 
 /**
  * Получение актуальной инфы с сервера
+ * @method
+ * @private
+ *
+ * @param {Object} tesk - задача
+ * @param {string} task.method - название метода. Объязательно. Иначе мы делаем инициализацию сущности.
  */
 Compare.prototype._update = function (task) {
   var self = this;
@@ -130,6 +175,11 @@ Compare.prototype._update = function (task) {
 
 /**
  * Вызов событий
+ * @method
+ * @private
+ *
+ * @param {Object} task - задача
+ * @param {string} task.method - назание действия, которое пытаемся сделать
  */
 Compare.prototype._events = function (task) {
   var self = this;
@@ -144,6 +194,8 @@ Compare.prototype._events = function (task) {
 
 /**
  * Событие ПЕРЕД действием
+ * @method
+ * @private
  */
 Compare.prototype._before = function (task) {
   EventBus.publish('before:insales:compares', task);
@@ -151,6 +203,8 @@ Compare.prototype._before = function (task) {
 
 /**
  * Мы закончили что-то делать в сравнении
+ * @method
+ * @private
  */
 Compare.prototype._always = function (task) {
   EventBus.publish('always:insales:compares', task);

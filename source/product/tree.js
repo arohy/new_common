@@ -1,26 +1,24 @@
+/** @private */
+var _ = require('lodash');
+
+/** @private */
+var URL = require('../tools/url');
+/** @private */
+var _Translit = require('../tools/translit');
+/** @private */
+var Translit = new _Translit();
+
 /**
- * Конструктор объета по работе с вариантами продукта
+ * Конструктор объекта по работе с вариантами продукта
  * @class
- * @name ProductVariants
+ * @memberof ProductInstance
+ * @alias variants
+ *
+ * @param  {object} _owner - родительский объект класса Product
  *
  * @example
  * self.variants = new ProductVariants(_owner);
- *
- * @param  {object} _owner родительский объект класса Product
- *
- * @property {array} variants массив модификаций продукта
- * @property {object} images картики продукта в виде {'title': {small_url: 'http//'}}
- * @property {number} urlVariant id варианта из урла
- * @property {object} options все опции продукта со всеми своими значениями
- * @property {object} tree дерево вариантов
- *
  */
-var _ = require('lodash');
-
-var URL = require('../tools/url');
-var _Translit = require('../tools/translit');
-var Translit = new _Translit();
-
 var ProductVariants = function (_owner) {
   var self = this;
 
@@ -34,6 +32,7 @@ var ProductVariants = function (_owner) {
 
 /**
  * Инициализация объекта по работе с вариантами
+ * @private
  */
 ProductVariants.prototype._init = function () {
   var self = this;
@@ -48,6 +47,7 @@ ProductVariants.prototype._init = function () {
 
 /**
  * Смена родителя
+ * @private
  */
 ProductVariants.prototype.setOwner = function (_owner) {
   var self = this;
@@ -63,6 +63,7 @@ ProductVariants.prototype.setOwner = function (_owner) {
 
 /**
  * Строим дерево вариантов
+ * @private
  */
 ProductVariants.prototype._initTree = function () {
   var self = this;
@@ -98,6 +99,7 @@ ProductVariants.prototype._initTree = function () {
 
 /**
  * Разбор Опций варианта
+ * @private
  */
 ProductVariants.prototype._parseVariantOptions = function (variant, leaf) {
   var self = this;
@@ -129,6 +131,7 @@ ProductVariants.prototype._parseVariantOptions = function (variant, leaf) {
 
 /**
  * Добавляем узел дерева
+ * @private
  */
 ProductVariants.prototype._addLeaf = function (option, leaf, _variantSet) {
   var self = this;
@@ -157,6 +160,8 @@ ProductVariants.prototype._addLeaf = function (option, leaf, _variantSet) {
  * Установка доступности вариантов
  *
  * Если все потомки узла недоступны - узел недоступен
+ *
+ * @private
  */
 ProductVariants.prototype._nodeAvailable = function (leaf) {
   var self = this;
@@ -178,6 +183,7 @@ ProductVariants.prototype._nodeAvailable = function (leaf) {
 
 /**
  * Обновляем состояние вариантов
+ * @private
  */
 ProductVariants.prototype._update = function () {
   var self = this;
@@ -198,6 +204,8 @@ ProductVariants.prototype._update = function () {
 
 /**
  * Получить значения с уровня
+ *
+ * @param {number} level - номер уровня, откуда забираем значения
  */
 ProductVariants.prototype.getLevel = function (level) {
   var self = this;
@@ -215,6 +223,7 @@ ProductVariants.prototype.getLevel = function (level) {
 
 /**
  * Получить первый элемент на уровне
+ * @param {Object|Array} leaf - список значений с одного уровня
  */
 ProductVariants.prototype.getFirst = function (leaf) {
   var self = this;
@@ -257,6 +266,9 @@ ProductVariants.prototype.getVariant = function () {
 
 /**
  * Получаем выбранный вариант
+ * @param {number} _id - id варианта
+ *
+ * @return {Object} variant - объект, описывющий нужный вариант
  */
 ProductVariants.prototype.getVariantById = function (_id) {
   var self = this;
@@ -266,6 +278,7 @@ ProductVariants.prototype.getVariantById = function (_id) {
 
 /**
  * Устанавливаем вариант
+ * @param {number} variant_id - id варианта
  */
 ProductVariants.prototype.setVariant = function (variant_id) {
   var self = this;
@@ -290,6 +303,8 @@ ProductVariants.prototype.setVariant = function (variant_id) {
 
 /**
  * Подготовка опций
+ *
+ * @private
  *
  * @return {object} options модифицированный объект опций, добавляется renderType из параметров продукта, добавляется handle как название опции транслитом.
  */
@@ -329,6 +344,7 @@ ProductVariants.prototype._initOptions = function () {
 
 /**
  * Собираем все значения опций варианта в опции по индексу (self.options[index].values)
+ * @private
  *
  * @param {object} value значение опции, прилетает из перебора всех вариантов. value добавляется в объект self.options[index].values.
  * @param {number} index порядковый номер опции.
@@ -346,6 +362,7 @@ ProductVariants.prototype._addValues = function (value, index) {
 
 /**
  * Устанавливаем selected
+ * @private
  *
  * @param  {object} options объект со всеми опциями (self.options)
  *
@@ -370,6 +387,8 @@ ProductVariants.prototype._selectedOptions = function (options) {
 /**
  * Устанавливаем опцию внешним обработчиком.
  * АХТУНГ!!! Влечет обновление актуального варианта!
+ *
+ * @private
  */
 ProductVariants.prototype.setOption = function (option) {
   var self = this;
@@ -412,6 +431,7 @@ ProductVariants.prototype.setOption = function (option) {
 
 /**
  * Получить опцию
+ * @param {number} index - номер уровня
  */
 ProductVariants.prototype.getOption = function (index) {
   var self = this;
@@ -423,6 +443,7 @@ ProductVariants.prototype.getOption = function (index) {
  * Фильтрация опций по доступности в выбанном варианте
  *
  * @param  {number} level уровень опции в дереве (self.tree)
+ *
  * @return {object} option опция готовая для рендера, в значениях опции проставлен value.disabled или удалены не относящиеся к варианту значения в зависимости от настроек продукта (self._owner.settings.filtered);
  */
 ProductVariants.prototype.getFilterOption = function (level) {
@@ -447,6 +468,7 @@ ProductVariants.prototype.getFilterOption = function (level) {
 
 /**
  * Установить опции по варианту
+ * @private
  */
 ProductVariants.prototype._setOptionByVariant = function (variant_id) {
   var self = this;
@@ -465,6 +487,7 @@ ProductVariants.prototype._setOptionByVariant = function (variant_id) {
 
 /**
  * генерим путь по выбранным опциям
+ * @private
  */
 ProductVariants.prototype._getSelectedVector = function (_length) {
   var self = this;

@@ -1,17 +1,19 @@
-/**
- * Live search
- *
- * @class
- * @name Search
- */
+/** @private */
 var $ = require('jquery');
+/** @private */
 var _ = require('lodash');
-
+/* @private */
 var EventBus = require('../events/events');
-
+/** @private */
 var _regTools = new (require('../tools/regTools')) ();
+/** @private */
 var _Singleton = require('../tools/singleton');
 
+/**
+ * Живой поиск по сайту
+ *
+ * @class
+ */
 var Search = function () {
   var self = this;
 
@@ -36,7 +38,7 @@ var Search = function () {
 
 /**
  * Настройка
- *
+ * @private
  * @param  {object} options конфигурация поиска
  */
 Search.prototype._init = function () {
@@ -49,10 +51,11 @@ Search.prototype._init = function () {
 
 /**
  * Что-то забираем
- * {
- *   query: string
- *   input: jquery(input)
- * }
+ * @private
+ *
+ * @param {Object}
+ * @param {string} query - запрос для поиска
+ * @param {Object} input - jquery(input)
  */
 Search.prototype._get = function (options) {
   var self = this;
@@ -73,6 +76,10 @@ Search.prototype._get = function (options) {
   }
 };
 
+/**
+ * Обновление состояния
+ * @private
+ */
 Search.prototype._update = function (options) {
   var self = this;
 
@@ -92,6 +99,7 @@ Search.prototype._update = function (options) {
 
 /**
  * Обновляем настройки
+ * @param {Object} settings - объект с настройками
  */
 Search.prototype.setConfig = function (settings) {
   var self = this;
@@ -109,6 +117,7 @@ Search.prototype.setConfig = function (settings) {
  * locale: Site.language.locale,
  * fields: [ 'price_min', 'price_min_available' ],
  * hide_items_out_of_stock: Site.account.hide_items
+ * @private
  */
 Search.prototype._setData = function (_data) {
   var self = this;
@@ -118,6 +127,7 @@ Search.prototype._setData = function (_data) {
 
 /**
  * приводим в общий порядок список поиска
+ * @private
  */
 Search.prototype._patch = function (options) {
   var self = this;
@@ -136,6 +146,10 @@ Search.prototype._patch = function (options) {
   }, []);
 };
 
+/**
+ * Является ли строка поиска достойной для поиска??
+ * @private
+ */
 Search.prototype._isValid = function (query) {
   var self = this;
 

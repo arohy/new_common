@@ -1,8 +1,16 @@
+/** @private */
 var $ = require('jquery');
+/** @private */
 var _ = require('lodash');
-
+/** @private */
 var EventBus = require('../events/events');
 
+/**
+ * Связка с DOM для поиска
+ * @memberof Search
+ * @alias ui
+ * @class
+ */
 var SearchDOM = function (_owner) {
   var self = this;
 
@@ -14,6 +22,10 @@ var SearchDOM = function (_owner) {
   self._init();
 }
 
+/**
+ * Инициализация
+ * @private
+ */
 SearchDOM.prototype._init = function () {
   var self = this;
 
@@ -25,6 +37,7 @@ SearchDOM.prototype._init = function () {
 
 /**
  * Грузим настройки по готовности DOM
+ * @private
  */
 SearchDOM.prototype._setConfig = function () {
   var self = this;
@@ -44,6 +57,11 @@ SearchDOM.prototype._setConfig = function () {
   });
 };
 
+/**
+ * Получаем форму, с которой работаем
+ * @private
+ * @param {Object} $object - jQuery-нода
+ */
 SearchDOM.prototype._getInstance = function ($object) {
   var self = this;
   var $search;
@@ -60,6 +78,7 @@ SearchDOM.prototype._getInstance = function ($object) {
 
 /**
  * Обработчик ввода символов
+ * @private
  */
 SearchDOM.prototype._keyUp = function () {
   var self = this;
@@ -94,6 +113,7 @@ SearchDOM.prototype._keyUp = function () {
 
 /**
  * Вешаем слушателя на обновление данных из поиска
+ * @private
  */
 SearchDOM.prototype._events = function () {
   var self = this;
@@ -125,6 +145,7 @@ SearchDOM.prototype._events = function () {
 
 /**
  * Перехватываем клик вне поиска
+ * @private
  */
 SearchDOM.prototype._outFocus = function () {
   var self = this;
