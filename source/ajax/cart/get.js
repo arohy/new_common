@@ -1,7 +1,7 @@
 /** @private */
 var URL = require('../../tools/url');
 /** @private */
-var $ = require('jquery');
+var $ = require('jquery/dist/jquery.min');
 
 /**
  * @memberof module:ajaxAPI/cart

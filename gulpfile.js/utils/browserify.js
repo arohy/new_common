@@ -7,6 +7,7 @@ var watchify = require('watchify');
 var gutil = require('gulp-util');
 var rename = require('gulp-rename');
 var source = require('vinyl-source-stream');
+var strip = require('gulp-strip-comments');
 
 var buffer = require('vinyl-buffer');
 var sourcemaps = require('gulp-sourcemaps');
@@ -60,6 +61,8 @@ function _bundle (b, options) {
   return b.bundle()
     .on('error', gutil.log.bind(gutil, 'Browserify Error'))
     .pipe(source(options.entry))
+    .pipe(buffer())
+    .pipe(strip())
     .pipe(gulp.dest(options.destDir))
     .pipe(gulpif(options.uglify, minimization(b, options)));
 };

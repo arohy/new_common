@@ -1,5 +1,5 @@
 /** @private */
-var $ = require('jquery');
+var $ = require('jquery/dist/jquery.min');
 /** @private */
 var EventBus = require('../events/events');
 
