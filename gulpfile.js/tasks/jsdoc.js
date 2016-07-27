@@ -4,7 +4,7 @@ var jsdoc = require('gulp-jsdoc3');
 
 var src = './source/**/*.js'
 
-var config = require('../config/jsdoc.json');
+var config = require('../config/jsdoc/conf.json');
 
 gulp.task('jsdoc', function () {
   return gulp.src(src, {read: false})
