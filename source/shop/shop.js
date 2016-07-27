@@ -30,6 +30,11 @@ Shop.prototype._init = function () {
  * Отправка сообщений
  *
  * @method
+ *
+ * @see module:ajaxAPI/shop.message
+ * @param {Object} message
+ *
+ * @return {$.ajax}
  */
 Shop.prototype.sendMessage = function (message) {
   var self = this;

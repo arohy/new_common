@@ -47,6 +47,9 @@ Money.prototype._set = function (params) {
  * @method
  *
  * @param {Object} params - Объект с настройками валюты, в ликвид '{{ money_with_currency_format }}'
+ *
+ * @example
+ * Shop.money.format(1234.00);
  */
 Money.prototype.set = function (params) {
   var self = this;
