@@ -10,9 +10,23 @@ var _Product = require('../product/product');
 var _Singleton = require('../tools/singleton');
 
 /**
- * Централизованная работа с товарами
  * @class
  *
+ * @description
+ * Централизованная работа с товарами. Производит связку с DOM через аттрибуты.
+ * Триггерит все события в EventBus.
+ *
+ * @fires before:insales:product
+ * @fires change_quantity:insales:product
+ * @fires unchange_quantity:insales:product
+ * @fires update_variant:insales:product
+ * @fires always:insales:product
+ *
+ * @fires before:insales:item
+ * @fires change_quantity:insales:item
+ * @fires unchange_quantity:insales:item
+ * @fires update_variant:insales:item
+ * @fires always:insales:item
  */
 var Products = function () {
   var self = this;
