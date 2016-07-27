@@ -3,6 +3,8 @@
  *
  * @description
  * Производим транслитерацию строки
+ *
+ * @private
  */
 /** @private */
 var _ = require('lodash');
