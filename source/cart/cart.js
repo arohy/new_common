@@ -53,9 +53,9 @@ Cart.prototype._get = function () {
  * @method
  *
  * @param {Object} task - задача
- * @param {Object} tesk.items - { variant_id: quantity, ... }
- * @param {Object} test.comments - { variant_id: comment, ...}
- * @param {string} test.coupon - название купона
+ * @param {Object} task.items - { variant_id: quantity, ... }
+ * @param {Object} task.comments - { variant_id: comment, ...}
+ * @param {string} task.coupon - название купона
  */
 Cart.prototype.add = function (task) {
   var self = this;
@@ -93,9 +93,9 @@ Cart.prototype._add_items = function (task, current_items) {
  * @method
  *
  * @param {Object} task - задача
- * @param {Object} tesk.items - { variant_id: quantity, ... }
- * @param {Object} test.comments - { variant_id: comment, ...}
- * @param {string} test.coupon - название купона
+ * @param {Object} task.items - { variant_id: quantity, ... }
+ * @param {Object} task.comments - { variant_id: comment, ...}
+ * @param {string} task.coupon - название купона
  */
 Cart.prototype.remove = function (task) {
   var self = this;
@@ -133,9 +133,9 @@ Cart.prototype._remove_items = function (task, current_items) {
  * @method
  *
  * @param {Object} task - задача
- * @param {Object} tesk.items - { variant_id: quantity, ... }
- * @param {Object} test.comments - { variant_id: comment, ...}
- * @param {string} test.coupon - название купона
+ * @param {Object} task.items - { variant_id: quantity, ... }
+ * @param {Object} task.comments - { variant_id: comment, ...}
+ * @param {string} task.coupon - название купона
  */
 Cart.prototype.set = function (task) {
   var self = this;
@@ -272,7 +272,7 @@ Cart.prototype._add_checkout = function (task, current_items) {
  * @method
  *
  * @param {Object} task - задача
- * @param {string} test.coupon - название купона
+ * @param {string} task.coupon - название купона
  */
 Cart.prototype.setCoupon = function (task) {
   var self = this;
@@ -298,6 +298,7 @@ Cart.prototype._set_coupon = function (task, current_items) {
  * Получить состав корзины
  * @method
  * @deprecated c 0.6.0. Использовать Cart.order.get();
+ * @private
  */
 Cart.prototype.getOrder = function () {
   var self = this;
@@ -333,6 +334,7 @@ Cart.prototype._update = function (items, task) {
 /**
  * Установка настроек для корзины
  * @method
+ * @private
  */
 Cart.prototype.setConfig = function (settings) {
   var self = this;
