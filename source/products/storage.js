@@ -15,6 +15,8 @@ var EventBus = require('../events/events');
  * @class
  * @memberof Products
  * @alias storage
+ *
+ * @private
  */
 var ProductsStorage = function (_owner) {
   var self = this;

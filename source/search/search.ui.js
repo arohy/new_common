@@ -10,6 +10,8 @@ var EventBus = require('../events/events');
  * @memberof Search
  * @alias ui
  * @class
+ *
+ * @private
  */
 var SearchDOM = function (_owner) {
   var self = this;
