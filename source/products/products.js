@@ -48,6 +48,13 @@ Products.prototype._init = function () {
  * @method
  *
  * @param {number} id - id товара
+ *
+ * @return {$.ajax}
+ *
+ * @example
+ * Products.get(123456)
+ *    .done(function (onDone) { console.log('onDone', onDone) })
+ *    .fail(function (onFail) { console.log('onFail', onFail) });
  */
 Products.prototype.get = function (id) {
   var self = this;
@@ -62,6 +69,13 @@ Products.prototype.get = function (id) {
  * @method
  *
  * @param {Array} idList - массив, состоящий из id товаров
+ *
+ * @return {$.ajax}
+ *
+ * @example
+ * Products.getList([123456, 123455, 1234454, 123458])
+ *    .done(function (onDone) { console.log('onDone', onDone) })
+ *    .fail(function (onFail) { console.log('onFail', onFail) });
  */
 Products.prototype.getList = function (idList) {
   var self = this;
@@ -75,7 +89,15 @@ Products.prototype.getList = function (idList) {
  * Обновление настроек продуктов созданных через
  * @method
  *
- * @param {Object} settings - объект с применяемыми настройками. Применяется для всехэкземпляров на странице
+ * @param {Object} settings - объект с применяемыми настройками.
+ * @param {Object} settings.options - объект с описанием какие шаблоны требуются для выводв различных опций
+ * @param {boolean} settings.showVariants - выводить селектор модификаций?
+ * @param {boolean} settings.initOption
+ * @param {Object} settings.fileUrl
+ * @param {boolean} settings.filtered
+ * @param {boolean} settings.useMax - учитывать максимально доступное кол-во товара
+ * @param {Object} settings.decimal - объект, указывает кол-во знаков после запятой для единиц измерения товара
+ * @param {boolean} settings.withCart
  */
 Products.prototype.setConfig = function (settings){
   var self = this;
