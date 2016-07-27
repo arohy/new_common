@@ -11,6 +11,7 @@ var EventBus = require('../events/events');
  * @class
  *
  * @alias Cart.ui
+ * @private
  */
 var CartDOM = function (_owner) {
   var self = this;
