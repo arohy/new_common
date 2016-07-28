@@ -33,14 +33,14 @@
 			<li class="dropdown">
 				<a href="modules.list.html" class="dropdown-toggle" data-toggle="dropdown">Modules<b class="caret"></b></a>
 				<ul class="dropdown-menu ">
-					<li><a href="module-ajaxAPI_cart.html">ajaxAPI/cart</a></li><li><a href="module-ajaxAPI_checkout.html">ajaxAPI/checkout</a></li><li><a href="module-ajaxAPI_collection.html">ajaxAPI/collection</a></li><li><a href="module-ajaxAPI_compare.html">ajaxAPI/compare</a></li><li><a href="module-ajaxAPI_product.html">ajaxAPI/product</a></li><li><a href="module-ajaxAPI_shop.html">ajaxAPI/shop</a></li><li><a href="module-tools_RegTools.html">tools/RegTools</a></li><li><a href="module-tools_translit.html">tools/translit</a></li><li><a href="module-tools_url.html">tools/url</a></li>
+					<li><a href="module-ajaxAPI_cart.html">ajaxAPI/cart</a></li><li><a href="module-ajaxAPI_checkout.html">ajaxAPI/checkout</a></li><li><a href="module-ajaxAPI_collection.html">ajaxAPI/collection</a></li><li><a href="module-ajaxAPI_compare.html">ajaxAPI/compare</a></li><li><a href="module-ajaxAPI_product.html">ajaxAPI/product</a></li><li><a href="module-ajaxAPI_shop.html">ajaxAPI/shop</a></li>
 				</ul>
 			</li>
 			
 			<li class="dropdown">
 				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
 				<ul class="dropdown-menu ">
-					<li><a href="Cart.html">Cart</a></li><li><a href="Cart.order.html">Cart.order</a></li><li><a href="Cart.quickCheckout.html">Cart.quickCheckout</a></li><li><a href="Cart.ui.html">Cart.ui</a></li><li><a href="Compare.html">Compare</a></li><li><a href="EventBus.html">EventBus</a></li><li><a href="Product.html">Product</a></li><li><a href="Product.settings.html">Product.settings</a></li><li><a href="ProductInstance.html">ProductInstance</a></li><li><a href="ProductInstance.OptionSelector.html">ProductInstance.OptionSelector</a></li><li><a href="ProductInstance.price_kinds.html">ProductInstance.price_kinds</a></li><li><a href="ProductInstance.quantity.html">ProductInstance.quantity</a></li><li><a href="ProductInstance.variants.html">ProductInstance.variants</a></li><li><a href="Products.html">Products</a></li><li><a href="Products.storage.html">Products.storage</a></li><li><a href="Search.html">Search</a></li><li><a href="Search.ui.html">Search.ui</a></li><li><a href="Shop.html">Shop</a></li><li><a href="Shop.client.html">Shop.client</a></li><li><a href="Shop.money.html">Shop.money</a></li><li><a href="Template.html">Template</a></li>
+					<li><a href="Cart.html">Cart</a></li><li><a href="Cart.order.html">Cart.order</a></li><li><a href="Compare.html">Compare</a></li><li><a href="EventBus.html">EventBus</a></li><li><a href="Products.html">Products</a></li><li><a href="Search.html">Search</a></li><li><a href="Shop.html">Shop</a></li><li><a href="Shop.client.html">Shop.client</a></li><li><a href="Shop.money.html">Shop.money</a></li><li><a href="Template.html">Template</a></li>
 				</ul>
 			</li>
 			
@@ -195,7 +195,7 @@
             
 <hr>
 <dt>
-    <h4 class="name" id="sendMessage"><span class="type-signature"></span>sendMessage()</h4>
+    <h4 class="name" id="sendMessage"><span class="type-signature"></span>sendMessage(message)</h4>
     
     
 </dt>
@@ -212,6 +212,56 @@
     
 
     
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>message</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
     
 
     
@@ -265,6 +315,40 @@
     
 
     
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">$.ajax</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+        <h5>Example</h5>
+        
+    <pre class="sunlight-highlight-javascript">Shop.sendMessage({
+  &#x27;from&#x27;: &#x27;json@test.ru&#x27;,
+  &#x27;name&#x27;: &#x27;test is my name&#x27;,
+  &#x27;subject&#x27;: &#x27;test is my subject&#x27;,
+  &#x27;content&#x27;: &#x27;YAAAAR!!!!&#x27;,
+  &#x27;phone&#x27;: &#x27;+00000000000000&#x27;
+})
+ .done(function (onDone) { console.log(&#x27;onDone: &#x27;, onDone) })
+ .fail(function (onFail) { console.log(&#x27;onFail: &#x27;, onFail) });</pre>
+
 
     
 </dd>
@@ -359,7 +443,7 @@ $( function () {
 	} );
 
 	Sunlight.highlightAll( {
-		lineNumbers : false,
+		lineNumbers : true,
 		showMenu : true,
 		enableDoclinks : true
 	} );

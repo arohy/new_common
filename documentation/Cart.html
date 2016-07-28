@@ -33,14 +33,14 @@
 			<li class="dropdown">
 				<a href="modules.list.html" class="dropdown-toggle" data-toggle="dropdown">Modules<b class="caret"></b></a>
 				<ul class="dropdown-menu ">
-					<li><a href="module-ajaxAPI_cart.html">ajaxAPI/cart</a></li><li><a href="module-ajaxAPI_checkout.html">ajaxAPI/checkout</a></li><li><a href="module-ajaxAPI_collection.html">ajaxAPI/collection</a></li><li><a href="module-ajaxAPI_compare.html">ajaxAPI/compare</a></li><li><a href="module-ajaxAPI_product.html">ajaxAPI/product</a></li><li><a href="module-ajaxAPI_shop.html">ajaxAPI/shop</a></li><li><a href="module-tools_RegTools.html">tools/RegTools</a></li><li><a href="module-tools_translit.html">tools/translit</a></li><li><a href="module-tools_url.html">tools/url</a></li>
+					<li><a href="module-ajaxAPI_cart.html">ajaxAPI/cart</a></li><li><a href="module-ajaxAPI_checkout.html">ajaxAPI/checkout</a></li><li><a href="module-ajaxAPI_collection.html">ajaxAPI/collection</a></li><li><a href="module-ajaxAPI_compare.html">ajaxAPI/compare</a></li><li><a href="module-ajaxAPI_product.html">ajaxAPI/product</a></li><li><a href="module-ajaxAPI_shop.html">ajaxAPI/shop</a></li>
 				</ul>
 			</li>
 			
 			<li class="dropdown">
 				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
 				<ul class="dropdown-menu ">
-					<li><a href="Cart.html">Cart</a></li><li><a href="Cart.order.html">Cart.order</a></li><li><a href="Cart.quickCheckout.html">Cart.quickCheckout</a></li><li><a href="Cart.ui.html">Cart.ui</a></li><li><a href="Compare.html">Compare</a></li><li><a href="EventBus.html">EventBus</a></li><li><a href="Product.html">Product</a></li><li><a href="Product.settings.html">Product.settings</a></li><li><a href="ProductInstance.html">ProductInstance</a></li><li><a href="ProductInstance.OptionSelector.html">ProductInstance.OptionSelector</a></li><li><a href="ProductInstance.price_kinds.html">ProductInstance.price_kinds</a></li><li><a href="ProductInstance.quantity.html">ProductInstance.quantity</a></li><li><a href="ProductInstance.variants.html">ProductInstance.variants</a></li><li><a href="Products.html">Products</a></li><li><a href="Products.storage.html">Products.storage</a></li><li><a href="Search.html">Search</a></li><li><a href="Search.ui.html">Search.ui</a></li><li><a href="Shop.html">Shop</a></li><li><a href="Shop.client.html">Shop.client</a></li><li><a href="Shop.money.html">Shop.money</a></li><li><a href="Template.html">Template</a></li>
+					<li><a href="Cart.html">Cart</a></li><li><a href="Cart.order.html">Cart.order</a></li><li><a href="Compare.html">Compare</a></li><li><a href="EventBus.html">EventBus</a></li><li><a href="Products.html">Products</a></li><li><a href="Search.html">Search</a></li><li><a href="Shop.html">Shop</a></li><li><a href="Shop.client.html">Shop.client</a></li><li><a href="Shop.money.html">Shop.money</a></li><li><a href="Template.html">Template</a></li>
 				</ul>
 			</li>
 			
@@ -172,12 +172,6 @@
         <dl>
             <dt><a href="Cart.order.html">order</a></dt>
             <dd></dd>
-        
-            <dt><a href="Cart.quickCheckout.html">quickCheckout</a></dt>
-            <dd></dd>
-        
-            <dt><a href="Cart.ui.html">ui</a></dt>
-            <dd></dd>
         </dl>
     
 
@@ -254,14 +248,33 @@
 
             
 
-            <td class="description last">задача</td>
-        </tr>
+            <td class="description last">задача
+                <h6 class="method-params-label method-subparams-label">Properties</h6>
+                
 
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
     
 
         <tr>
             
-                <td class="name"><code>tesk.items</code></td>
+                <td class="name"><code>items</code></td>
             
 
             <td class="type">
@@ -285,7 +298,7 @@
 
         <tr>
             
-                <td class="name"><code>test.comments</code></td>
+                <td class="name"><code>comments</code></td>
             
 
             <td class="type">
@@ -309,7 +322,7 @@
 
         <tr>
             
-                <td class="name"><code>test.coupon</code></td>
+                <td class="name"><code>coupon</code></td>
             
 
             <td class="type">
@@ -327,6 +340,13 @@
             
 
             <td class="description last">название купона</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+            </td>
         </tr>
 
     
@@ -377,6 +397,17 @@
 
     
 
+    
+    <h5>Fires:</h5>
+    <ul>
+        <li>before:insales:cart</li>
+    
+        <li>event:add_items:insales:cart</li>
+    
+        <li>event:update_items:insales:cart</li>
+    
+        <li>always:insales:cart</li>
+    </ul>
     
 
     
@@ -455,6 +486,17 @@
 
     
 
+    
+    <h5>Fires:</h5>
+    <ul>
+        <li>before:insales:cart</li>
+    
+        <li>event:clear_items:insales:cart</li>
+    
+        <li>event:update_items:insales:cart</li>
+    
+        <li>always:insales:cart</li>
+    </ul>
     
 
     
@@ -634,92 +676,16 @@
     
 
     
-
+    <h5>Fires:</h5>
+    <ul>
+        <li>before:insales:cart</li>
     
-
+        <li>event:delete_items:insales:cart</li>
     
-
+        <li>event:update_items:insales:cart</li>
     
-
-    
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt>
-    <h4 class="name" id="getOrder"><span class="type-signature"></span>getOrder()</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        Получить состав корзины
-    </div>
-    
-
-    
-
-    
-
-    
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-	<dt class="important tag-deprecated method-doc-label method-doc-details-label">Deprecated:</dt>
-	
-    <dd>
-        <ul class="dummy">
-            <li>c 0.6.0. Использовать Cart.order.get();</li>
-        </ul>
-    </dd>
-    
-    
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
+        <li>always:insales:cart</li>
+    </ul>
     
 
     
@@ -797,14 +763,33 @@
 
             
 
-            <td class="description last">задача</td>
-        </tr>
+            <td class="description last">задача
+                <h6 class="method-params-label method-subparams-label">Properties</h6>
+                
 
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
     
 
         <tr>
             
-                <td class="name"><code>tesk.items</code></td>
+                <td class="name"><code>items</code></td>
             
 
             <td class="type">
@@ -828,7 +813,7 @@
 
         <tr>
             
-                <td class="name"><code>test.comments</code></td>
+                <td class="name"><code>comments</code></td>
             
 
             <td class="type">
@@ -852,7 +837,7 @@
 
         <tr>
             
-                <td class="name"><code>test.coupon</code></td>
+                <td class="name"><code>coupon</code></td>
             
 
             <td class="type">
@@ -870,6 +855,13 @@
             
 
             <td class="description last">название купона</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+            </td>
         </tr>
 
     
@@ -920,6 +912,17 @@
 
     
 
+    
+    <h5>Fires:</h5>
+    <ul>
+        <li>before:insales:cart</li>
+    
+        <li>event:remove_items:insales:cart</li>
+    
+        <li>event:update_items:insales:cart</li>
+    
+        <li>always:insales:cart</li>
+    </ul>
     
 
     
@@ -997,14 +1000,33 @@
 
             
 
-            <td class="description last">задача</td>
-        </tr>
+            <td class="description last">задача
+                <h6 class="method-params-label method-subparams-label">Properties</h6>
+                
 
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
     
 
         <tr>
             
-                <td class="name"><code>tesk.items</code></td>
+                <td class="name"><code>items</code></td>
             
 
             <td class="type">
@@ -1028,7 +1050,7 @@
 
         <tr>
             
-                <td class="name"><code>test.comments</code></td>
+                <td class="name"><code>comments</code></td>
             
 
             <td class="type">
@@ -1052,7 +1074,7 @@
 
         <tr>
             
-                <td class="name"><code>test.coupon</code></td>
+                <td class="name"><code>coupon</code></td>
             
 
             <td class="type">
@@ -1070,6 +1092,13 @@
             
 
             <td class="description last">название купона</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+            </td>
         </tr>
 
     
@@ -1121,83 +1150,16 @@
     
 
     
-
+    <h5>Fires:</h5>
+    <ul>
+        <li>before:insales:cart</li>
     
-
+        <li>event:set_items:insales:cart</li>
     
-
+        <li>event:update_items:insales:cart</li>
     
-
-    
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt>
-    <h4 class="name" id="setConfig"><span class="type-signature"></span>setConfig()</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        Установка настроек для корзины
-    </div>
-    
-
-    
-
-    
-
-    
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
+        <li>always:insales:cart</li>
+    </ul>
     
 
     
@@ -1275,14 +1237,33 @@
 
             
 
-            <td class="description last">задача</td>
-        </tr>
+            <td class="description last">задача
+                <h6 class="method-params-label method-subparams-label">Properties</h6>
+                
 
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
     
 
         <tr>
             
-                <td class="name"><code>test.coupon</code></td>
+                <td class="name"><code>coupon</code></td>
             
 
             <td class="type">
@@ -1300,6 +1281,13 @@
             
 
             <td class="description last">название купона</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+            </td>
         </tr>
 
     
@@ -1350,6 +1338,17 @@
 
     
 
+    
+    <h5>Fires:</h5>
+    <ul>
+        <li>before:insales:cart</li>
+    
+        <li>event:set_coupon:insales:cart</li>
+    
+        <li>event:update_items:insales:cart</li>
+    
+        <li>always:insales:cart</li>
+    </ul>
     
 
     
@@ -1453,7 +1452,7 @@ $( function () {
 	} );
 
 	Sunlight.highlightAll( {
-		lineNumbers : false,
+		lineNumbers : true,
 		showMenu : true,
 		enableDoclinks : true
 	} );
