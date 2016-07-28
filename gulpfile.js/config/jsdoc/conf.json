@@ -1,9 +1,11 @@
 {
   "opts": {
-    "destination": "documentation"
+    "destination": "documentation",
+    "tutorials": "tutorials"
   },
   "templates": {
     "includeDate": false,
-    "theme": "readable"
+    "theme": "readable",
+    "linenums": true
   }
 }
