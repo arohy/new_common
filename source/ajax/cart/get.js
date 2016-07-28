@@ -9,7 +9,7 @@ var $ = require('jquery/dist/jquery.min');
  *
  * @description Получение состава корзины
  *
- * @return {$.Deferred} $.promise
+ * @return {$.ajax}
  *
  * @example
  * ajaxAPI.cart.get()

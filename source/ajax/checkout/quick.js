@@ -14,7 +14,7 @@ var _ = require('lodash');
  *
  * @param {Object} formData - объект сериализованной формы
  *
- * @return {$.Deferred} $.promise
+ * @return {$.ajax}
  *
  * @example
  * ajaxAPI.checkout.quick(form.serialize())

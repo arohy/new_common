@@ -16,7 +16,10 @@ var _ = require('lodash');
  *
  * @param {array} ids - список id товаров, за раз моно получить информацию не более чем о 100 товарах
  *
+ * @return {$.ajax}
+
  * @example
+ * {@lang javascript}
  * ajaxAPI.product.getList([123456,123457,123458,123459])
  *  .done(function (onDone) {console.log('onDone: ', onDone) })
  *  .fail(function (onFail) {console.log('onFail: ', onFail) });

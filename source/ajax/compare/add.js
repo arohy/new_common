@@ -14,7 +14,7 @@ var _ = require('lodash');
  *
  * @param {number} id - id товара, добавляемого в сравнение
  *
- * @return {$.ajax} $.post
+ * @return {$.ajax}
  *
  * @example
  * ajaxAPI.compare.add(123456)

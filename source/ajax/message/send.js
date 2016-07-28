@@ -19,7 +19,7 @@ var _ = require('lodash');
  * @param {string} options.name - имя, указывается в теле письма. По-умолчанию - пустое.
  * @param {string} options.subject - тема письма.
  *
- * @return {$.Deferred} $.promise
+ * @return {$.ajax}
  *
  * @example
  * ajaxAPI.shop.message({
