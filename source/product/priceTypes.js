@@ -9,7 +9,7 @@ var _ = require('lodash');
  * @alias price_kinds
  *
  * @param {object} _owner ссылка на родительский класс Products
- *
+ * @private
  */
 var ProductPriceType = function (_owner) {
   var self = this;

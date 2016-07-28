@@ -16,6 +16,8 @@ var Translit = new _Translit();
  *
  * @param  {object} _owner - родительский объект класса Product
  *
+ * @private
+ *
  * @example
  * self.variants = new ProductVariants(_owner);
  */

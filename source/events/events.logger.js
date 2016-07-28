@@ -25,7 +25,7 @@ var EventsLogger = function (_owner) {
  *
  * @memberof EventBus
  * @alias logger.add
- * @param {string} component - имя помпонента, который хотим прослушать
+ * @param {string} component - имя компонента, который хотим прослушать
  *
  * @example
  * EventBus.logger.add

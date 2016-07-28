@@ -6,6 +6,8 @@ var _Singleton = require('../tools/singleton');
 /**
  * Тул для разбора url.
  * @module tools/url
+ *
+ * @private
  */
 var URL = function () {
   var self = this;

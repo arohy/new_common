@@ -23,7 +23,7 @@ var _ = require('lodash');
  * @param {Object} options.comments - объект с комментариями вида {variant_id: comment, ...}
  * @param {string} options.coupon - название купона
  *
- * @return {$.Deferred} $.promise
+ * @return {$.ajax}
  *
  * @example
  * var items = {

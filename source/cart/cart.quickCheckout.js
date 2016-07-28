@@ -13,6 +13,8 @@ var EventBus = require('../events/events');
  * @memberof Cart
  * @class
  * @alias Cart.quickCheckout
+ *
+ * @private
  */
 var CartQuickCheckout = function (_owner) {
   var self = this;

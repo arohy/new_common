@@ -57,8 +57,14 @@ Client.prototype._get = function () {
 };
 
 /**
- * Обновление данных
+ * Получение информации о посетителе
  * @method
+ *
+ * @return {$.ajax}
+ *
+ * @example
+ * Shop.client.get()
+ *    .done(function (result) { console.log(result) });
  */
 Client.prototype.get = function () {
   var self = this;

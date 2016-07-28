@@ -14,7 +14,7 @@ var _ = require('lodash');
  *
  * @param {number} id - id товара
  *
- * @return {$.Deferred} $.promise
+ * @return {$.ajax}
  *
  * @example
  * ajaxAPI.product.get(123456)

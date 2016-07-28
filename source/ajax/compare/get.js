@@ -10,7 +10,7 @@ var $ = require('jquery/dist/jquery.min');
  * @description
  * Получение списка сравнения
  *
- * @return {$.Deferred} $.promise
+ * @return {$.ajax}
  *
  * @example
  * ajaxAPI.compare.get()

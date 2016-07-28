@@ -8,6 +8,8 @@ var _ = require('lodash');
  * @memberof Product
  * @alias Product.settings
  *
+ * @private
+ *
  * @param {Object} settings
  * @param {Object} _owner
  */

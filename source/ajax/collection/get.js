@@ -18,7 +18,7 @@ var _ = require('lodash');
  * @param {number} pager.page_size - размер разбивки на страницы
  * @param {number} pager.page - номер страницы, по которой получаем информацию
  *
- * @return {json}
+ * @return {$.ajax}
  * { status: "ok", count: 19, products: [//массив товаров]}
  *
  * @example

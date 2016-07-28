@@ -8,6 +8,7 @@ var EventBus = require('../events/events');
 /**
  * Класс отвечает за работу всех помпонентов товара
  * @class
+ * @private
  */
 var ProductInstance = function (_owner, $product) {
   var self = this;

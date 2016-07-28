@@ -20,7 +20,7 @@ var _ = require('lodash');
  * @param {number} order.delivery - id способа доставки
  * @param {number} order.payment - id способа оплаты
  *
- * @return {$.Deferred} $.promise
+ * @return {$.ajax}
  *
  * @example
  * ajaxAPI.checkout.order(client, order)

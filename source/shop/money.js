@@ -61,6 +61,9 @@ Money.prototype.set = function (params) {
  * @param {string|number} amount - строка или число, которое надо отформатировать в валюту
  *
  * @return {string} Строка, содержащая результат форматирования
+ *
+ * @example
+ * Shop.money.format(1234.00);
  */
 Money.prototype.format = function (amount) {
   var self = this;

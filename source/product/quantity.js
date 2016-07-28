@@ -11,6 +11,8 @@ var EventBus = require('../events/events');
  * @class
  * @memberof ProductInstance
  * @alias quantity
+ *
+ * @private
  */
 var ProductQuantity = function (_owner, _quantityNode) {
   var self = this;

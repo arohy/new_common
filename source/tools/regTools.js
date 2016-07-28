@@ -6,6 +6,8 @@ var _ = require('lodash');
  *
  * @description
  * вспомогательный модуль для работы с регулярками и строками, которые будут использоваться как шаблоны
+ *
+ * @private
  */
 var RegTools = function () {
   var self = this;

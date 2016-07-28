@@ -31,6 +31,8 @@ CartOrder.prototype.set = function (order) {
 /**
  * Забираем актуальный состав корзины
  * @method
+ *
+ * @return {Object} Объект с полным описанием текущего состояния корзины
  */
 CartOrder.prototype.get = function () {
   var self = this;
@@ -41,6 +43,8 @@ CartOrder.prototype.get = function () {
 /**
  * Забираем информацию только о позициях
  * @method
+ *
+ * @return {Object} Объект вида {variant_id: quantity, ...}
  */
 CartOrder.prototype.getItems = function () {
   var self = this;
@@ -56,6 +60,8 @@ CartOrder.prototype.getItems = function () {
 /**
  * Забираем комментарии
  * @method
+ *
+ * @return {Object} Объект вида {variant_id: comment}
  */
 CartOrder.prototype.getComments = function () {
   var self = this;
@@ -157,6 +163,8 @@ CartOrder.prototype._images = function () {
  * @method
  *
  * @param {number} id - id варианта
+ *
+ * @return {Object} Объект с подробной информацией о конкретной позиции в корзине
  */
 CartOrder.prototype.getItemByID = function (id) {
   var self = this;

@@ -30,6 +30,21 @@ Shop.prototype._init = function () {
  * Отправка сообщений
  *
  * @method
+ *
+ * @param {Object} message
+ *
+ * @return {$.ajax}
+ *
+ * @example
+ * Shop.sendMessage({
+ *   'from': 'json@test.ru',
+ *   'name': 'test is my name',
+ *   'subject': 'test is my subject',
+ *   'content': 'YAAAAR!!!!',
+ *   'phone': '+00000000000000'
+ * })
+ *  .done(function (onDone) { console.log('onDone: ', onDone) })
+ *  .fail(function (onFail) { console.log('onFail: ', onFail) });
  */
 Shop.prototype.sendMessage = function (message) {
   var self = this;

@@ -14,8 +14,8 @@ var EventBus = require('../events/events');
  * @class
  * @memberof ProductInstance
  *
- * @property {Object} _owner
- *
+ * @param {Object} _owner
+ * @private
  */
 var OptionSelector = function (_owner) {
   var self = this;

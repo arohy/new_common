@@ -19,6 +19,7 @@ var _Instance = require('./productInstance');
  * @param {object} settings конфиг для рендера optionSelector
  *
  * @todo Превратить в справочник всей подготовленной информации по товару
+ * @private
  */
 var Product = function (product, settings) {
   var self = this;

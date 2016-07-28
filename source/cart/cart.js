@@ -53,9 +53,14 @@ Cart.prototype._get = function () {
  * @method
  *
  * @param {Object} task - задача
- * @param {Object} tesk.items - { variant_id: quantity, ... }
- * @param {Object} test.comments - { variant_id: comment, ...}
- * @param {string} test.coupon - название купона
+ * @param {Object} task.items - { variant_id: quantity, ... }
+ * @param {Object} task.comments - { variant_id: comment, ...}
+ * @param {string} task.coupon - название купона
+ *
+ * @fires before:insales:cart
+ * @fires add_items:insales:cart
+ * @fires update_items:insales:cart
+ * @fires always:insales:cart
  */
 Cart.prototype.add = function (task) {
   var self = this;
@@ -93,9 +98,14 @@ Cart.prototype._add_items = function (task, current_items) {
  * @method
  *
  * @param {Object} task - задача
- * @param {Object} tesk.items - { variant_id: quantity, ... }
- * @param {Object} test.comments - { variant_id: comment, ...}
- * @param {string} test.coupon - название купона
+ * @param {Object} task.items - { variant_id: quantity, ... }
+ * @param {Object} task.comments - { variant_id: comment, ...}
+ * @param {string} task.coupon - название купона
+ *
+ * @fires before:insales:cart
+ * @fires remove_items:insales:cart
+ * @fires update_items:insales:cart
+ * @fires always:insales:cart
  */
 Cart.prototype.remove = function (task) {
   var self = this;
@@ -133,9 +143,14 @@ Cart.prototype._remove_items = function (task, current_items) {
  * @method
  *
  * @param {Object} task - задача
- * @param {Object} tesk.items - { variant_id: quantity, ... }
- * @param {Object} test.comments - { variant_id: comment, ...}
- * @param {string} test.coupon - название купона
+ * @param {Object} task.items - { variant_id: quantity, ... }
+ * @param {Object} task.comments - { variant_id: comment, ...}
+ * @param {string} task.coupon - название купона
+ *
+ * @fires before:insales:cart
+ * @fires set_items:insales:cart
+ * @fires update_items:insales:cart
+ * @fires always:insales:cart
  */
 Cart.prototype.set = function (task) {
   var self = this;
@@ -171,6 +186,11 @@ Cart.prototype._set_items = function (task, current_items) {
  *
  * @param {Object} task - задача
  * @param {Array} task.items - [variant_id, ...]
+ *
+ * @fires before:insales:cart
+ * @fires delete_items:insales:cart
+ * @fires update_items:insales:cart
+ * @fires always:insales:cart
  */
 Cart.prototype.delete = function (task) {
   var self = this;
@@ -206,6 +226,11 @@ Cart.prototype._delete_items = function (task, current_items) {
 /**
  * Полностью очистить корзину
  * @method
+ *
+ * @fires before:insales:cart
+ * @fires clear_items:insales:cart
+ * @fires update_items:insales:cart
+ * @fires always:insales:cart
  */
 Cart.prototype.clear = function (task) {
   var self = this;
@@ -241,6 +266,11 @@ Cart.prototype._clear_items = function (task, current_items) {
  * @private
  *
  * @param {}
+ *
+ * @fires before:insales:cart
+ * @fires add_checkout:insales:cart
+ * @fires update_items:insales:cart
+ * @fires always:insales:cart
  */
 Cart.prototype.add_checkout = function (task) {
   var self = this;
@@ -272,7 +302,12 @@ Cart.prototype._add_checkout = function (task, current_items) {
  * @method
  *
  * @param {Object} task - задача
- * @param {string} test.coupon - название купона
+ * @param {string} task.coupon - название купона
+ *
+ * @fires before:insales:cart
+ * @fires set_coupon:insales:cart
+ * @fires update_items:insales:cart
+ * @fires always:insales:cart
  */
 Cart.prototype.setCoupon = function (task) {
   var self = this;
@@ -298,6 +333,7 @@ Cart.prototype._set_coupon = function (task, current_items) {
  * Получить состав корзины
  * @method
  * @deprecated c 0.6.0. Использовать Cart.order.get();
+ * @private
  */
 Cart.prototype.getOrder = function () {
   var self = this;
@@ -333,6 +369,7 @@ Cart.prototype._update = function (items, task) {
 /**
  * Установка настроек для корзины
  * @method
+ * @private
  */
 Cart.prototype.setConfig = function (settings) {
   var self = this;

@@ -13,6 +13,10 @@ var _Singleton = require('../tools/singleton');
  * Живой поиск по сайту
  *
  * @class
+ *
+ * @fires before:insales:search
+ * @fires update:insales:search
+ * @fires always:insales:search
  */
 var Search = function () {
   var self = this;
@@ -100,6 +104,9 @@ Search.prototype._update = function (options) {
 /**
  * Обновляем настройки
  * @param {Object} settings - объект с настройками
+ * @param {Object} settings.letters - минимальное кол-во символов для поиска, 3 символа
+ * @param {Object} settings.template - шаблон вывода результатов, 'search-default'
+ * @param {Object} settings.delay - задержка начала поиска после нажатия, 300 мс
  */
 Search.prototype.setConfig = function (settings) {
   var self = this;

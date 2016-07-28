@@ -13,7 +13,7 @@ var _ = require('lodash');
  *
  * @param {Number} variant_id - id модификации
  *
- * @return {$.ajax} $.post
+ * @return {$.ajax}
  *
  * @example
  * ajaxAPI.cart.remove(123123)

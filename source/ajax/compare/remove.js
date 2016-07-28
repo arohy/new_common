@@ -14,7 +14,7 @@ var _ = require('lodash');
  *
  * @param {number} id - id товара, удаляемого из списка.
  *
- * @return {$.ajax} $.post
+ * @return {$.ajax}
  *
  * @example
  * ajaxAPI.compare.remove(123456)
