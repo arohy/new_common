@@ -133,6 +133,8 @@ Compare.prototype.update = function () {
  * Получение текущего состояния Сравнения
  * @method
  *
+ * @return {Object} Объект, описывающий состояние и настройки сравнения
+ *
  * @example
  * Compare.getCompare();
  */

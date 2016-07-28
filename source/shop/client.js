@@ -57,7 +57,7 @@ Client.prototype._get = function () {
 };
 
 /**
- * Обновление данных
+ * Получение информации о посетителе
  * @method
  *
  * @return {$.ajax}

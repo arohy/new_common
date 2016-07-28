@@ -28,7 +28,10 @@ var Template = function () {
  * @param {Object} data - информация для шаблонизатора
  * @param {string} template_id - названи
  *
- * @returm {string|boolean} html|false
+ * @return {string|boolean} html|false
+ *
+ * @example
+ * $(targetNode).html(Template.render({ title: 'Click me!' }, 'test-button' ));
  */
 Template.prototype.render = function (data, template_id) {
   var self = this;
@@ -51,6 +54,9 @@ Template.prototype.render = function (data, template_id) {
  *
  * @param {string} template_body - верстка шаблона
  * @param {string} template_id - название шаблона
+ *
+ * @example
+ * Template.load('<button class="button button--click_me"><%= title %></button>', 'test-button')
  */
 Template.prototype.load = function (template_body, template_id) {
   var self = this;
@@ -103,8 +109,11 @@ Template.prototype._init = function () {
 };
 
 /**
+ * Проверяем, подключен ли указанный шаблон
  * @method
  * @private
+ *
+ * @param {string} template_id - название шаблона
  */
 Template.prototype.has = function (template_id) {
   var self = this;

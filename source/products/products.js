@@ -100,7 +100,7 @@ Products.prototype.getList = function (idList) {
 };
 
 /**
- * Обновление настроек продуктов созданных через
+ * Обновление настроек продуктов
  * @method
  *
  * @param {Object} settings - объект с применяемыми настройками.
